@@ -172,8 +172,7 @@ class RobotControlManagerClass:
         processDuration = 0
         listFrameRate   = []
         if isFixedFrameRate:
-            print('Use fixed frame rate > ' + str(frameRate) + '[fps]')
-
+            print('Use fixed frame rate > ' + str(frameRate) + '[fps]') #画像速度1秒あたりのフレーム数
 
         # ----- Instantiating custom classes ----- #
         caBehaviour                         = CyberneticAvatarMotionBehaviour(defaultParticipantNum=participantNum)
@@ -298,7 +297,7 @@ class RobotControlManagerClass:
                     # ----- Bending sensor ----- #
                     dictBendingValue = participantMotionManager.GripperControlValue(loopCount=self.loopCount)
 
-                    # ----- Bending sensor for integration or one side ----- #                  #control側は一人がする役割分担で良い
+                    # ----- Bending sensor for integration or one side ----- #                  #control側は一人がする役割分担で良い//伏せ字？
                     if self.bendinSensorNumber == '1':
                         gripperValue_1 = dictBendingValue['gripperValue1']
                     elif self.bendinSensorNumber == '2':
