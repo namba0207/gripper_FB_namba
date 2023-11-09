@@ -7,17 +7,17 @@
 import threading
 import time
 
-# ----- Custom class ----- #
-from Audio.AudioManager import AudioManager
-from RobotArmController.xArmIO import xArmIO
 from MotionFilter.MotionFilter import MotionFilter
+
+# ----- Custom class ----- #
+from RobotArmController.xArmIO import xArmIO
 from UDP.UDPManager import UDPManager
 
 
 class LoadCellManager:
     def __init__(self, arm, wifiAddr) -> None:
         self.xArmIO = xArmIO()
-        self.audioManager = AudioManager(7)
+        # self.audioManager = AudioManager(7)
         self.udpManager = UDPManager(9000, wifiAddr)
 
         # ----- Initialize MotionFilter ----- #
@@ -27,19 +27,21 @@ class LoadCellManager:
         self.motionFilter.InitHighPassFilter(fs, 600, 300)
 
         # ----- Set variables ----- #
-        self.rawLoadValList = [] 
+        self.rawLoadValList = []
         self.isGripping = False
         self.InitialLoadCellValue = self.xArmIO.GetxArmAnalogInput(arm)[1][1]
 
         # ----- Start thread of tactile feedback ----- #
-        eRubberFeedbackThread = threading.Thread(target=self.GrippingLoadFeedback, args=(arm,))
+        eRubberFeedbackThread = threading.Thread(
+            target=self.GrippingLoadFeedback, args=(arm,)
+        )
         eRubberFeedbackThread.setDaemon(True)
         eRubberFeedbackThread.start()
 
-        #squeezeFeedbackThread = threading.Thread(target=self.GrippingLoadFeedbackWithSqueeze, args=(arm,))
-        #squeezeFeedbackThread.setDaemon(True)
-        #squeezeFeedbackThread.start()
-    
+        # squeezeFeedbackThread = threading.Thread(target=self.GrippingLoadFeedbackWithSqueeze, args=(arm,))
+        # squeezeFeedbackThread.setDaemon(True)
+        # squeezeFeedbackThread.start()
+
     def GetLoadCellAnalogValue(self, arm):
         """
         Get load cell analog value
@@ -49,10 +51,16 @@ class LoadCellManager:
         arm: XArmAPI
             XArmAPI object
         """
-        
+
         return self.xArmIO.GetxArmAnalogInput(arm)
-    
-    def GrippingLoadFeedback(self, arm, isAMSignel: bool = True, threshold: float = 0.2, isConst: bool = False):
+
+    def GrippingLoadFeedback(
+        self,
+        arm,
+        isAMSignel: bool = True,
+        threshold: float = 0.2,
+        isConst: bool = False,
+    ):
         """
         Get feedback of gripping load.
         Default is to get a few frames of raw data from the load cell and present it with HPF applied.
@@ -70,17 +78,19 @@ class LoadCellManager:
             Appear constant vibration when detect gripping
         """
 
-        beforeLoadValue = self.InitialLoadCellValue       
+        beforeLoadValue = self.InitialLoadCellValue
 
         while True:
-            val = self.GetLoadCellAnalogValue(arm)  # まずここで100fpsくらい落ちる (arm.get_tgpio_analog()が遅いもよう)
+            val = self.GetLoadCellAnalogValue(
+                arm
+            )  # まずここで100fpsくらい落ちる (arm.get_tgpio_analog()が遅いもよう)
             self.rawLoadValList.append(val[1][1])
 
             loadVal = abs(val[1][1] - beforeLoadValue)
 
             if loadVal < 0:
                 loadVal = 0
-            
+
             beforeLoadValue = val[1][1]
 
             if isAMSignel:
@@ -89,9 +99,8 @@ class LoadCellManager:
                 if len(self.rawLoadValList) > 24:
                     hpfDat = self.motionFilter.HighPassFilter(self.rawLoadValList)
                     self.rawLoadValList.pop(0)
-                    
-                    self.audioManager.PlayRawAnalog(hpfDat)
 
+                    self.audioManager.PlayRawAnalog(hpfDat)
 
             # ----- Detect gripping ----- #
             loadDiffFromInit = val[1][1] - self.InitialLoadCellValue
@@ -103,7 +112,7 @@ class LoadCellManager:
             if self.isGripping and isConst:
                 self.audioManager.PlaySinWave()
                 pass
-    
+
     def GrippingLoadFeedbackWithSqueeze(self, arm, threshold: float = 2000):
         """
         Get feedback of gripping load.
@@ -123,9 +132,9 @@ class LoadCellManager:
             val = self.GetLoadCellAnalogValue(arm)
             loadVal = abs(val[1][1] - beforeLoadValue)
 
-            angle = loadVal*1000/1.9 + 1000
+            angle = loadVal * 1000 / 1.9 + 1000
             if angle >= threshold:
                 angle = threshold
 
-            self.udpManager.SendData(angle, '192.168.11.9', 7000)
-            self.udpManager.SendData(angle, '192.168.11.8', 7000)
+            self.udpManager.SendData(angle, "192.168.11.9", 7000)
+            self.udpManager.SendData(angle, "192.168.11.8", 7000)
