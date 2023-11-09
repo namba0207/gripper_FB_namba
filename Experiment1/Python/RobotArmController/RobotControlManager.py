@@ -266,8 +266,6 @@ class RobotControlManagerClass:
                     transform_1.x, transform_1.y, transform_1.z           = position_1[2], position_1[0], position_1[1]
                     transform_1.roll, transform_1.pitch, transform_1.yaw  = rotation_1[2], rotation_1[0], rotation_1[1]
 
-                    # transform_2.x, transform_2.y, transform_2.z           = position_2[2], position_2[0], position_2[1]
-                    # transform_2.roll, transform_2.pitch, transform_2.yaw  = rotation_2[2], rotation_2[0], rotation_2[1]
 
 
                     # ----- Safety check (Position) ---- #
@@ -275,13 +273,6 @@ class RobotControlManagerClass:
                     diffY_1 = transform_1.y - beforeY_1
                     diffZ_1 = transform_1.z - beforeZ_1
                     beforeX_1, beforeY_1, beforeZ_1 = transform_1.x, transform_1.y, transform_1.z
-
-                    # diffX_2 = transform_2.x - beforeX_2
-                    # diffY_2 = transform_2.y - beforeY_2
-                    # diffZ_2 = transform_2.z - beforeZ_2
-                    # beforeX_2, beforeY_2, beforeZ_2 = transform_2.x, transform_2.y, transform_2.z
-
-                    # print(transform_1.roll, transform_2.roll)
 
 
                     if diffX_1 == 0 and  diffY_1 == 0 and diffZ_1 == 0 and  isFixedFrameRate:
