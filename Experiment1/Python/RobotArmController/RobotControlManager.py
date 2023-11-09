@@ -205,7 +205,7 @@ class RobotControlManagerClass:
         # ----- Internal flags ----- #
         isPrintFrameRate    = False     # For debug
         isPrintData         = False     # For debug
-
+        # ----- Mainloop ----- #
         try:
             while True:
                 # if time.perf_counter() - taskStartTime > executionTime:
@@ -298,7 +298,7 @@ class RobotControlManagerClass:
                     # ----- Bending sensor ----- #
                     dictBendingValue = participantMotionManager.GripperControlValue(loopCount=self.loopCount)
 
-                    # ----- Bending sensor for integration or one side ----- #
+                    # ----- Bending sensor for integration or one side ----- #                  #control側は一人がする役割分担で良い
                     if self.bendinSensorNumber == '1':
                         gripperValue_1 = dictBendingValue['gripperValue1']
                     elif self.bendinSensorNumber == '2':
