@@ -203,14 +203,14 @@ class RobotControlManager:
                     )
 
                     # ----- For opposite condition ----- #
-                    if directionOfParticipants == "opposite":
-                        for oppositeParticipant in oppositeParticipants:
-                            # yz: Mirror mode, xz: Natural mode
-                            localRotation[
-                                oppositeParticipant
-                            ] = caBehaviour.InversedRotation(
-                                localRotation[oppositeParticipant], axes=inversedAxes
-                            )
+                    # if directionOfParticipants == "opposite":
+                    #     for oppositeParticipant in oppositeParticipants:
+                    #         # yz: Mirror mode, xz: Natural mode
+                    #         localRotation[
+                    #             oppositeParticipant
+                    #         ] = caBehaviour.InversedRotation(
+                    #             localRotation[oppositeParticipant], axes=inversedAxes
+                    #         )
 
                     # ----- Calculate shared transform ----- #
                     # position, rotation = caBehaviour.GetSharedTransform(localPosition, localRotation, sharedMethod, 0.5)
@@ -237,9 +237,9 @@ class RobotControlManager:
                         position[1],
                     )
                     transform.roll, transform.pitch, transform.yaw = (
-                        rotation[2],
                         rotation[0],
                         rotation[1],
+                        rotation[2],
                     )
 
                     # ----- Safety check (Position) ---- #
