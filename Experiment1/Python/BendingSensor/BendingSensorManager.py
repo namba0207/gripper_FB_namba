@@ -4,40 +4,41 @@
 # Summary:  曲げセンサからのデータ取得用マネージャー
 # -----------------------------------------------------------------------
 
-import serial
-
 from UDP.UDPManager import UDPManager
-
+import numpy as np
+import socket
+import serial
 
 class BendingSensorManager:
 
     bendingValue = 0
-
-    def __init__(self, BendingSensor_connectionmethod, ip, port) -> None:
+    
+    def __init__(self, ip, port) -> None:
         self.ip             = ip
         self.port           = port
         self.bufsize        = 4096
         self.bendingValue   = 425
 
-        if BendingSensor_connectionmethod == 'wireless':
-            try:
-                self.udpManager = UDPManager(port=self.port, localAddr=self.ip)
-            except:
-                print("could not open port: %s"%port)
+        # wireless
+        # self.udpManager = UDPManager(port=self.port, localAddr=self.ip)
 
-        elif BendingSensor_connectionmethod == 'wired':
-            try:
-                self.serialObject = serial.Serial(ip, port, timeout=0.01)
-                # not_used = self.serialObject.readline()
-            except:
-                print("could not open port: %s"%port)
+        # serial
+        self.serialObject = serial.Serial(ip, port)
+        nonUsed = self.serialObject.readline()
 
+        """
+        self.ser1 = serial.Serial("COM3",9600)
+        self.not_used1 = self.ser1.readline()
+        self.ser2 = serial.Serial("COM2",9600)
+        self.not_used2 = self.ser2.readline()
+        """
 
-
+    
     def StartReceiving(self, fromUdp: bool = False):
         """
         Receiving data from bending sensor and update self.bendingValue
         """
+        
         if fromUdp:
             sock = self.udpManager.sock
 
@@ -46,25 +47,25 @@ class BendingSensorManager:
                     data, addr = self.udpManager.ReceiveData()
                     self.bendingValue = float(data[0])
 
+                    # ----- (TEST) For Unity -----
+                    #triggerValue = float(data[data.index('trigger')+1])
+                    #self.bendingValue = (triggerValue - 0) / (1 - 0) * (800 - 0) + 0
+                    pass
+
             except OSError:
                 print('[OSError] UDPManager >> I/O related errors. Please check the UDP socket.')
 
             except KeyboardInterrupt:
                 print('KeyboardInterrupt >> Stop: BendingSensorManager.py')
-
+        
         else:
-            while True:
-                try:
+            try:
+                while True:
                     data = self.serialObject.readline()
                     self.bendingValue = float(data.strip().decode('utf-8'))
-                    if self.bendingValue > 0.6:
-                        self.bendingValue = 1.0
 
-                except KeyboardInterrupt:
-                    print('KeyboardInterrupt >> Stop: BendingSensorManager.py')
-
-                except:
-                    pass
-
+            except KeyboardInterrupt:
+                print('KeyboardInterrupt >> Stop: BendingSensorManager.py')
+    
     def EndReceiving(self):
         self.udpManager.CloseSocket()

@@ -8,23 +8,29 @@ from threading import local
 from . import NatNetClient
 import numpy as np
 
-serverAddress = ''
-localAddress = ''
 
 class OptiTrackStreamingManager:
+	# ---------- Settings: Optitrack streaming address ---------- #
+	serverAddress	= '192.168.1.1'
+	localAddress	= '192.168.1.2'
+
 	# ---------- Variables ---------- #
 	position = {}	# dict { 'ParticipantN': [x, y, z] }. 	N is the number of participants' rigid body. Unit = [m]
 	rotation = {}	# dict { 'ParticipantN': [x, y, z, w]}. N is the number of participants' rigid body
 
-	def __init__(self, defaultParticipantNum: int = 2, mocapServer: str = '', mocapLocal: str = ''):
-		global serverAddress
-		global localAddress
-		serverAddress = mocapServer
-		localAddress = mocapLocal
-
+	def __init__(self, defaultParticipantNum: int = 2):
 		for i in range(defaultParticipantNum):
 			self.position['participant'+str(i+1)] = np.zeros(3)
 			self.rotation['participant'+str(i+1)] = np.zeros(4)
+		
+		from FileIO.FileIO import FileIO
+		fileIO = FileIO()
+		settings = fileIO.Read('settings.csv', ',')
+		serverIP = [addr for addr in settings if 'motiveServer' in addr[0]][0][1]
+		localIP = [addr for addr in settings if 'motiveLocal' in addr[0]][0][1]
+
+		self.serverAddress 	= serverIP
+		self.localAddress 	= localIP
 
 
 	# This is a callback function that gets connected to the NatNet client and called once per mocap frame.
@@ -67,7 +73,7 @@ class OptiTrackStreamingManager:
 
 
 	def stream_run(self):
-		streamingClient = NatNetClient.NatNetClient(serverIP=serverAddress, localIP=localAddress)
+		streamingClient = NatNetClient.NatNetClient(serverIP=self.serverAddress, localIP=self.localAddress)
 		
 		# Configure the streaming client to call our rigid body handler on the emulator to send data out.
 		streamingClient.new_frame_listener = self.receive_new_frame

@@ -27,8 +27,7 @@ class UDPManager:
         bufSize: (Optional) int
             Received buffer size
         """
-        if port == 9000:
-            print("hello")
+        
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', port))
@@ -65,7 +64,6 @@ class UDPManager:
         
         data, cli_addr = self.sock.recvfrom(self.bufferSize)
         self.data = data.decode(encoding='utf-8').split(',')
-        print(self.data)
 
         return self.data, cli_addr
     

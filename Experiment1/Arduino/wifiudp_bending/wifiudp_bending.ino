@@ -2,11 +2,11 @@
 #include <WiFiUDP.h>
 
 // ---------- Settings: WiFi router's IP address and passward ---------- //
-const char ssid[] = "Buffalo-G-23D0"; // SSID
-const char pass[] = "srry3xrayrv8i";  // password
+const char ssid[] = "cyberneticbeinglab"; // SSID
+const char pass[] = "c1bernet1cs";  // password
 
 // ---------- Settings: Target IP address and port ---------- //
-static const char *kRemoteIpadr = "192.168.11.6";
+static const char *kRemoteIpadr = "192.168.80.202";
 static const int kRmoteUdpPort = 9000; //送信先のポート
 
 // ----- Settings: Numeric range remapping ----- //

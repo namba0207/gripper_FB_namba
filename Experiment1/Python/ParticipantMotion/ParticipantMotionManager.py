@@ -4,22 +4,23 @@
 # Summary:  操作者の動きマネージャー
 # -----------------------------------------------------------------------
 
-import csv
 import threading
 import time
-
 import numpy as np
-from BendingSensor.BendingSensorManager import BendingSensorManager
-from OptiTrack.OptiTrackStreamingManager import OptiTrackStreamingManager
+import csv
+
 # ----- Custom class ----- #
 from UDP.UDPManager import UDPManager
+from OptiTrack.OptiTrackStreamingManager import OptiTrackStreamingManager
+from BendingSensor.BendingSensorManager import BendingSensorManager
 
 # ----- Numeric range remapping ----- #
-# targetMin   = 200
-targetMin   = 300
+targetMin   = 100
 targetMax   = 850
 originalMin = 0
 originalMax = 1
+bendingSensorMin = 0
+bendingSensorMax = 850
 
 # ----- Settings: Recorded motion data ----- #
 recordedMotionPath              = 'RecordedMotion/'
@@ -27,7 +28,7 @@ recordedMotionFileName          = 'Transform_Participant_'
 recordedGripperValueFileName    = 'GripperValue_'
 
 class ParticipantMotionManager:
-    def __init__(self, defaultParticipantNum: int, recordedParticipantNum: int = 0, motionInputSystem: str = 'optitrack', mocapServer: str = '', mocapLocal: str = '', gripperInputSystem: str = 'bendingsensor', bendingSensorNum: int = 1, BendingSensor_ConnectionMethod: str = 'wireless', recordedGripperValueNum: int = 0, bendingSensorUdpIpAddress: str = '192.168.80.142', bendingSensorUdpPort: list = [9000, 9001], bendingSensorSerialCOMs: list = []) -> None:
+    def __init__(self, defaultParticipantNum: int, recordedParticipantNum: int = 0, motionInputSystem: str = 'optitrack', gripperInputSystem: str = 'bendingsensor', bendingSensorNum: int = 1, recordedGripperValueNum: int = 0, bendingSensorUdpIpAddress: str = '192.168.80.142', bendingSensorUdpPort: list = [9000, 9001]) -> None:
         """
         Initialize
 
@@ -75,7 +76,7 @@ class ParticipantMotionManager:
 
         # ----- Initialize participants' motion input system ----- #
         if motionInputSystem == 'optitrack':
-            self.optiTrackStreamingManager = OptiTrackStreamingManager(defaultParticipantNum=defaultParticipantNum,mocapServer=mocapServer,mocapLocal=mocapLocal)
+            self.optiTrackStreamingManager = OptiTrackStreamingManager(defaultParticipantNum=defaultParticipantNum)
 
             # ----- Start streaming from OptiTrack ----- #
             streamingThread = threading.Thread(target=self.optiTrackStreamingManager.stream_run)
@@ -90,10 +91,10 @@ class ParticipantMotionManager:
             streamingThread = threading.Thread(target=self.udpManager.UpdateData)
             streamingThread.setDaemon(True)
             streamingThread.start()
-
+        
             # Wait for UDP streaming
             time.sleep(0.1)
-
+        
         # Recorded motions will be counted after the number of real participants.
         # e.g. defaultParticipantNum = 2 => recordedParticipant = ['participant3'], ['participant4']...
         for i in range(recordedParticipantNum):
@@ -104,21 +105,17 @@ class ParticipantMotionManager:
                 self.recordedMotion['participant' + str(defaultParticipantNum + i+1)] = data
                 self.recordedMotionLength.append(len(data))
 
+
         # ----- Initialize gripper control system ----- #
         if gripperInputSystem == 'bendingsensor':
             self.bendingSensors             = []
-
-            if BendingSensor_ConnectionMethod == 'wireless':
-                print('wireless')
-                self.ip = [bendingSensorUdpIpAddress,bendingSensorUdpIpAddress]
-                self.port = bendingSensorUdpPort
-            elif BendingSensor_ConnectionMethod == 'wired':
-                print('wired')
-                self.ip = bendingSensorSerialCOMs
-                self.port = [115200, 115200]
+            bendingSensorSerialComs     = ['COM11', 'COM12']
+            bendingSensorSerialPorts    = [9600, 9600]
 
             for i in range(bendingSensorNum):
-                bendingSensorManager = BendingSensorManager(BendingSensor_connectionmethod=BendingSensor_ConnectionMethod, ip=self.ip[i], port=self.port[i])
+                # bendingSensorManager = BendingSensorManager(ip=bendingSensorUdpIpAddress, port=bendingSensorUdpPort[i])
+
+                bendingSensorManager = BendingSensorManager(ip=bendingSensorSerialComs[i], port=bendingSensorSerialPorts[i])
                 self.bendingSensors.append(bendingSensorManager)
 
                 # ----- Start receiving bending sensor value from UDP socket ----- #
@@ -128,7 +125,7 @@ class ParticipantMotionManager:
 
             # ----- Set init value ----- #
             self.SetInitialBendingValue()
-
+        
         elif gripperInputSystem == 'unity':
             if not self.udpManager:
                 self.defaultParticipantNum = 1
@@ -137,9 +134,11 @@ class ParticipantMotionManager:
                 streamingThread = threading.Thread(target=self.udpManager.UpdateData)
                 streamingThread.setDaemon(True)
                 streamingThread.start()
-
+            
                 # Wait for UDP streaming
                 time.sleep(0.1)
+        
+
         # Recorded motions will be counted after the number of bending sensors.
         # e.g. bendingSensorNum = 1 => recordedGripperValue = ['gripperValue2'], ['gripperValue3']...
         for i in range(recordedGripperValueNum):
@@ -153,7 +152,7 @@ class ParticipantMotionManager:
         """
         Set init bending value
         """
-
+        
         if self.gripperInputSystem == 'bendingsensor':
             self.InitBendingSensorValues    = []
 
@@ -180,11 +179,11 @@ class ParticipantMotionManager:
         dictPos = {}
         if self.motionInputSystem == 'optitrack':
             dictPos = self.optiTrackStreamingManager.position
-        elif self.motionInputSystem == 'unity':
+        elif self.motionInputSystem == 'unity': 
             data = self.udpManager.data
             position = np.array([float(data[data.index('pos')+1]), float(data[data.index('pos')+2]), float(data[data.index('pos')+3])])
             dictPos['participant1'] = position
-
+        
         # If the data is ended, the last value is returned.
         for i in range(self.recordedParticipantNum):
             recordedParticipantNum = self.defaultParticipantNum + i+1
@@ -223,7 +222,7 @@ class ParticipantMotionManager:
             elif 'rotQuaternion' in data:
                 rotation = np.array([float(data[data.index('rotQuaternion')+1]), float(data[data.index('rotQuaternion')+2]), float(data[data.index('rotQuaternion')+3]), float(data[data.index('rotQuaternion')+4])])
             dictRot['participant1'] = rotation
-
+        
         # If the data is ended, the last value is returned.
         for i in range(self.recordedParticipantNum):
             recordedParticipantNum = self.defaultParticipantNum + i+1
@@ -232,9 +231,9 @@ class ParticipantMotionManager:
                 continue
 
             dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][3:8])
-
+        
         return dictRot
-
+    
     def GripperControlValue(self, loopCount: int = 0):
         """
         Value for control of the xArm gripper
@@ -250,17 +249,15 @@ class ParticipantMotionManager:
         Value for control of the xArm gripper: dict
         {'gripperValue1': float value}
         """
-
+        
         if self.gripperInputSystem == 'bendingsensor':
             dictGripperValue = {}
             for i in range(self.bendingSensorNum):
                 bendingVal = self.bendingSensors[i].bendingValue
-                bendingValueNorm = bendingVal* (targetMax - targetMin) + targetMin
+                bendingValueNorm = (bendingVal - bendingSensorMin) / (self.InitBendingSensorValues[i] - bendingSensorMin) * (targetMax - targetMin) + targetMin
 
                 if bendingValueNorm > targetMax:
                     bendingValueNorm = targetMax
-                elif bendingValueNorm < targetMin:
-                    bendingValueNorm = targetMin
                 dictGripperValue['gripperValue'+str(i+1)] = bendingValueNorm
 
         elif self.gripperInputSystem == 'unity':
@@ -270,11 +267,11 @@ class ParticipantMotionManager:
                 triggerValue = float(data[data.index('trigger')+1])
                 triggerValueNorm = (triggerValue - originalMin) / (originalMax - originalMin) * (targetMax - targetMin) + targetMin
                 dictGripperValue['gripperValue1'] = targetMax - triggerValueNorm
-
+        
         elif self.gripperInputSystem == 'debug':
             dictGripperValue = {}
             dictGripperValue['gripperValue1'] = targetMax / 2
-
+        
         # If the data is ended, the last value is returned.
         for i in range(self.recordedGripperValueNum):
             recordedGripperNum = self.bendingSensorNum + i+1
@@ -283,5 +280,5 @@ class ParticipantMotionManager:
                 continue
 
             dictGripperValue['gripperValue'+str(recordedGripperNum)] = np.array(self.recordedGripperValue['gripperValue'+str(recordedGripperNum)][loopCount][0])
-
+        
         return dictGripperValue
