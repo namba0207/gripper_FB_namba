@@ -66,7 +66,7 @@ class BendingSensorManager:
         #     except KeyboardInterrupt:
         #         print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
-        # else:
+        # else:いえい
         try:
             while True:
                 # data = self.serialObject.readline()
