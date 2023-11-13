@@ -27,7 +27,10 @@ class BendingSensorManager:
         # serial
         # self.serialObject = serial.Serial(ip, port)
         # nonUsed = self.serialObject.readline()
-        # print(1111)
+        arduino_port = 'COM3'
+        baud_rate = 115200
+        ser = serial.Serial(arduino_port, baud_rate)
+        not_used = ser.readline()
 
         """
         self.ser1 = serial.Serial("COM3",9600)
@@ -67,7 +70,9 @@ class BendingSensorManager:
                 while True:
                     # data = self.serialObject.readline()
                     # self.bendingValue = float(data.strip().decode('utf-8'))
+                    
                     self.bendingValue = 1
+                    print(11111)
                     time.sleep(0.05)
 
             except KeyboardInterrupt:
