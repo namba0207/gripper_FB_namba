@@ -13,7 +13,7 @@ from . import NatNetClient
 
 class OptiTrackStreamingManager:
     # ---------- Settings: Optitrack streaming address ---------- #
-    serverAddress = "192.168.1.1"
+    serverAddress = "192.168.1.1"               #いる?下で変わらん？
     localAddress = "192.168.1.2"
 
     # ---------- Variables ---------- #
@@ -29,7 +29,7 @@ class OptiTrackStreamingManager:
             self.position["participant" + str(i + 1)] = np.zeros(3)
             self.rotation["participant" + str(i + 1)] = np.zeros(4)
 
-        from FileIO.FileIO import FileIO
+        # from FileIO.FileIO import FileIO
 
         # fileIO = FileIO()
         # settings = fileIO.Read('settings.csv', ',')

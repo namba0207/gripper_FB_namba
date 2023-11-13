@@ -179,19 +179,19 @@ class ParticipantMotionManager:
         dictPos = {}
         if self.motionInputSystem == 'optitrack':
             dictPos = self.optiTrackStreamingManager.position
-        elif self.motionInputSystem == 'unity': 
-            data = self.udpManager.data
-            position = np.array([float(data[data.index('pos')+1]), float(data[data.index('pos')+2]), float(data[data.index('pos')+3])])
-            dictPos['participant1'] = position
+        # elif self.motionInputSystem == 'unity': 
+        #     data = self.udpManager.data
+        #     position = np.array([float(data[data.index('pos')+1]), float(data[data.index('pos')+2]), float(data[data.index('pos')+3])])
+        #     dictPos['participant1'] = position
         
         # If the data is ended, the last value is returned.
-        for i in range(self.recordedParticipantNum):
-            recordedParticipantNum = self.defaultParticipantNum + i+1
-            if loopCount >= self.recordedMotionLength[i]:
-                dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][0:3])
-                continue
+        # for i in range(self.recordedParticipantNum):
+        #     recordedParticipantNum = self.defaultParticipantNum + i+1
+        #     if loopCount >= self.recordedMotionLength[i]:
+        #         dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][0:3])
+        #         continue
 
-            dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][0:3])
+        #     dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][0:3])
 
         return dictPos
 
@@ -214,23 +214,23 @@ class ParticipantMotionManager:
         dictRot = {}
         if self.motionInputSystem == 'optitrack':
             dictRot = self.optiTrackStreamingManager.rotation
-        elif self.motionInputSystem == 'unity':
-            data = self.udpManager.data
-            # ----- Rotation (x, y, z, w) or (x, y, z) ----- #
-            if 'rotEuler' in data:
-                rotation = float(data[data.index('rotEuler')+1]), float(data[data.index('rotEuler')+2]), float(data[data.index('rotEuler')+3])
-            elif 'rotQuaternion' in data:
-                rotation = np.array([float(data[data.index('rotQuaternion')+1]), float(data[data.index('rotQuaternion')+2]), float(data[data.index('rotQuaternion')+3]), float(data[data.index('rotQuaternion')+4])])
-            dictRot['participant1'] = rotation
+        # elif self.motionInputSystem == 'unity':
+        #     data = self.udpManager.data
+        #     # ----- Rotation (x, y, z, w) or (x, y, z) ----- #
+        #     if 'rotEuler' in data:
+        #         rotation = float(data[data.index('rotEuler')+1]), float(data[data.index('rotEuler')+2]), float(data[data.index('rotEuler')+3])
+        #     elif 'rotQuaternion' in data:
+        #         rotation = np.array([float(data[data.index('rotQuaternion')+1]), float(data[data.index('rotQuaternion')+2]), float(data[data.index('rotQuaternion')+3]), float(data[data.index('rotQuaternion')+4])])
+        #     dictRot['participant1'] = rotation
         
-        # If the data is ended, the last value is returned.
-        for i in range(self.recordedParticipantNum):
-            recordedParticipantNum = self.defaultParticipantNum + i+1
-            if loopCount >= self.recordedMotionLength[i]:
-                dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][3:8])
-                continue
+        # # If the data is ended, the last value is returned.
+        # for i in range(self.recordedParticipantNum):
+        #     recordedParticipantNum = self.defaultParticipantNum + i+1
+        #     if loopCount >= self.recordedMotionLength[i]:
+        #         dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][3:8])
+        #         continue
 
-            dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][3:8])
+        #     dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][3:8])
         
         return dictRot
     
