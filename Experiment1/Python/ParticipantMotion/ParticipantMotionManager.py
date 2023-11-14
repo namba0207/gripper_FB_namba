@@ -84,7 +84,7 @@ class ParticipantMotionManager:
         self.recordedMotion = {}
         self.recordedGripperValue = {}
         self.recordedMotionLength = []
-        self.InitBendingSensorValues = []
+        self.InitBendingSensorValue = 0
 
         # ----- Initialize participants' motion input system ----- #
         if motionInputSystem == "optitrack":
@@ -128,8 +128,8 @@ class ParticipantMotionManager:
         # ----- Initialize gripper control system ----- #
         if gripperInputSystem == "bendingsensor":
             self.bendingSensors = []
-            bendingSensorSerialCom = ["COM3"]
-            bendingSensorSerialPort = [115200]
+            bendingSensorSerialCom = "COM8"
+            bendingSensorSerialPort = 115200
 
             # for i in range(bendingSensorNum):
             # bendingSensorManager = BendingSensorManager(ip=bendingSensorUdpIpAddress, port=bendingSensorUdpPort[i])
@@ -146,8 +146,8 @@ class ParticipantMotionManager:
             bendingSensorThread.setDaemon(True)
             bendingSensorThread.start()
 
-            # ----- Set init value ----- #
-            self.SetInitialBendingValue()
+            # # ----- Set init value ----- #
+            # self.SetInitialBendingValue()
 
         elif gripperInputSystem == "unity":
             if not self.udpManager:
@@ -174,16 +174,16 @@ class ParticipantMotionManager:
                     "gripperValue" + str(bendingSensorNum + i + 1)
                 ] = data
 
-    def SetInitialBendingValue(self):
-        """
-        Set init bending value
-        """
+    # def SetInitialBendingValue(self):
+    #     """
+    #     Set init bending value
+    #     """
 
-        if self.gripperInputSystem == "bendingsensor":
-            self.InitBendingSensorValues = []
+    #     if self.gripperInputSystem == "bendingsensor":
+    #         self.InitBendingSensorValues = 0
 
-            for i in range(self.bendingSensorNum):
-                self.InitBendingSensorValues.append(self.bendingSensors[i].bendingValue)
+    #         for i in range(self.bendingSensorNum):
+    #             self.InitBendingSensorValues.append(self.bendingSensor.bendingValue)
 
     def LocalPosition(self, loopCount: int = 0):
         """
@@ -275,9 +275,10 @@ class ParticipantMotionManager:
         Value for control of the xArm gripper: dict
         {'gripperValue1': float value}
         """
-
+        # dictGripperValue = 850
         if self.gripperInputSystem == "bendingsensor":
             dictGripperValue = self.bendingSensorManager.bendingValue
+            print(dictGripperValue)
         #     for i in range(self.bendingSensorNum):
         #         bendingVal = self.bendingSensors[i].bendingValue
         #         bendingValueNorm = (bendingVal - bendingSensorMin) / (self.InitBendingSensorValues[i] - bendingSensorMin) * (targetMax - targetMin) + targetMin

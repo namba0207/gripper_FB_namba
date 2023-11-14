@@ -273,7 +273,9 @@ class RobotControlManager:
                         loopCount=self.loopCount
                     )
                     # gripperValue = sum(dictBendingValue.values()) / len(dictBendingValue)
+                    # print(dictBendingValue)
                     gripperValue = dictBendingValue
+
                     # for i in len(dictBendingValue):
                     #     gripperValue += (
                     #         dictBendingValue["gripperValue" + str(i + 1)]
@@ -298,10 +300,10 @@ class RobotControlManager:
                     #             localPosition, localRotation
                     #         )
 
-                    # ----- Data recording ----- #
-                    dataRecordManager.Record(
-                        localPosition, localRotation, dictBendingValue
-                    )
+                    # # ----- Data recording ----- #
+                    # dataRecordManager.Record(
+                    #     localPosition, localRotation, dictBendingValue
+                    # )
 
                     # ----- If xArm error has occured ----- #
                     if isEnablexArm and arm.has_err_warn:
@@ -387,7 +389,7 @@ class RobotControlManager:
                             position[1],
                         )
 
-                        participantMotionManager.SetInitialBendingValue()
+                        # participantMotionManager.SetInitialBendingValue()
 
                         isMoving = True
                         taskStartTime = time.perf_counter()
@@ -530,47 +532,47 @@ class RobotControlManager:
         print("------------------------")
 
     # ----- For debug ----- #
-    def BendingSensorTest(self):
-        """
-        For testing.
-        Only get the value of the bending sensor.
-        """
+    # def BendingSensorTest(self):
+    #     """
+    #     For testing.
+    #     Only get the value of the bending sensor.
+    #     """
 
-        bendingSensorManagerMaster = BendingSensorManager(
-            ip="192.168.80.142", port=9000
-        )
-        bendingSensorManagerBeginner = BendingSensorManager(
-            ip="192.168.80.142", port=9001
-        )
+    #     bendingSensorManagerMaster = BendingSensorManager(
+    #         ip="192.168.80.142", port=9000
+    #     )
+    #     bendingSensorManagerBeginner = BendingSensorManager(
+    #         ip="192.168.80.142", port=9001
+    #     )
 
-        # ----- Start receiving bending sensor value from UDP socket ----- #
-        bendingSensorThreadMaster = threading.Thread(
-            target=bendingSensorManagerMaster.StartReceiving
-        )
-        bendingSensorThreadMaster.setDaemon(True)
-        bendingSensorThreadMaster.start()
+    #     # ----- Start receiving bending sensor value from UDP socket ----- #
+    #     bendingSensorThreadMaster = threading.Thread(
+    #         target=bendingSensorManagerMaster.StartReceiving
+    #     )
+    #     bendingSensorThreadMaster.setDaemon(True)
+    #     bendingSensorThreadMaster.start()
 
-        bendingSensorThreadBeginner = threading.Thread(
-            target=bendingSensorManagerBeginner.StartReceiving
-        )
-        bendingSensorThreadBeginner.setDaemon(True)
-        bendingSensorThreadBeginner.start()
+    #     bendingSensorThreadBeginner = threading.Thread(
+    #         target=bendingSensorManagerBeginner.StartReceiving
+    #     )
+    #     bendingSensorThreadBeginner.setDaemon(True)
+    #     bendingSensorThreadBeginner.start()
 
-        try:
-            while True:
-                bendingSensorValue1 = bendingSensorManagerMaster.bendingValue
-                bendingSensorValue2 = bendingSensorManagerBeginner.bendingValue
-                print(
-                    "Sensor1 > "
-                    + str(bendingSensorValue1)
-                    + "   Sensor2 > "
-                    + str(bendingSensorValue2)
-                )
+    #     try:
+    #         while True:
+    #             bendingSensorValue1 = bendingSensorManagerMaster.bendingValue
+    #             bendingSensorValue2 = bendingSensorManagerBeginner.bendingValue
+    #             print(
+    #                 "Sensor1 > "
+    #                 + str(bendingSensorValue1)
+    #                 + "   Sensor2 > "
+    #                 + str(bendingSensorValue2)
+    #             )
 
-        except KeyboardInterrupt:
-            print("KeyboardInterrupt >> Stop: RobotControlManager.BendingSensorTest()")
-            bendingSensorManagerMaster.EndReceiving()
-            bendingSensorManagerBeginner.EndReceiving()
+    #     except KeyboardInterrupt:
+    #         print("KeyboardInterrupt >> Stop: RobotControlManager.BendingSensorTest()")
+    #         bendingSensorManagerMaster.EndReceiving()
+    #         bendingSensorManagerBeginner.EndReceiving()
 
     def LoadCellTest(self):
         """
