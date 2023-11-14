@@ -9,6 +9,7 @@ import time
 
 import numpy as np
 import serial
+
 # from UDP.UDPManager import UDPManager
 
 
@@ -28,7 +29,7 @@ class BendingSensorManager:
         # serial
         # self.serialObject = serial.Serial(ip, port)
         # nonUsed = self.serialObject.readline()
-        self.arduino_port = 'COM3'
+        self.arduino_port = "COM3"
         self.baud_rate = 115200
         self.ser = serial.Serial(self.arduino_port, self.baud_rate)
         self.not_used = self.ser.readline()
@@ -71,12 +72,12 @@ class BendingSensorManager:
             while True:
                 # data = self.serialObject.readline()
                 # self.bendingValue = float(data.strip().decode('utf-8'))
-                #code3//ESP32からencoder受信(loadcell受信)
-                line = self.ser.readline().decode('utf-8').rstrip()
+                # code3//ESP32からencoder受信(loadcell受信)
+                line = self.ser.readline().decode("utf-8").rstrip()
                 # データの抽出と変数への代入
-                data_parts = line.split(',')
-                pos1 = int(850+float(data_parts[0])/1600*850)#-425-0
-                
+                data_parts = line.split(",")
+                pos1 = int(850 + float(data_parts[0]) / 1600 * 850)  # -425-0
+
                 self.bendingValue = 1
                 print(11111)
                 time.sleep(0.05)
@@ -86,4 +87,6 @@ class BendingSensorManager:
 
     def EndReceiving(self):
         self.udpManager.CloseSocket()
-#hello
+
+
+# helloworld
