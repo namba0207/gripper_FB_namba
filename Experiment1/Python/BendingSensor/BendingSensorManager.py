@@ -16,9 +16,9 @@ import serial
 class BendingSensorManager:
     bendingValue = 0
 
-    def __init__(self, port) -> None:
-        # self.ip = ip
-        # self.port = port
+    def __init__(self, ip, port) -> None:
+        self.ip = ip
+        self.port = port
         # self.bufsize = 4096
         # self.bendingValue = 425
         self.bendingValue = 1
@@ -29,9 +29,7 @@ class BendingSensorManager:
         # serial
         # self.serialObject = serial.Serial(ip, port)
         # nonUsed = self.serialObject.readline()
-        self.arduino_port = "COM3"
-        self.baud_rate = 115200
-        self.ser = serial.Serial(self.arduino_port, self.baud_rate)
+        self.ser = serial.Serial(self.ip, port)
         self.not_used = self.ser.readline()
 
         """
@@ -67,7 +65,7 @@ class BendingSensorManager:
         #     except KeyboardInterrupt:
         #         print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
-        # else:いえい
+        # else:
         try:
             while True:
                 # data = self.serialObject.readline()
@@ -76,10 +74,9 @@ class BendingSensorManager:
                 line = self.ser.readline().decode("utf-8").rstrip()
                 # データの抽出と変数への代入
                 data_parts = line.split(",")
-                pos1 = int(850 + float(data_parts[0]) / 1600 * 850)  # -425-0
-
-                self.bendingValue = 1
-                print(11111)
+                self.bendingValue = int(
+                    850 + float(data_parts[0]) / 1600 * 850
+                )  # -425-0
                 time.sleep(0.05)
 
         except KeyboardInterrupt:

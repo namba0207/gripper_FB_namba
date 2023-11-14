@@ -273,7 +273,7 @@ class RobotControlManager:
                         loopCount=self.loopCount
                     )
                     # gripperValue = sum(dictBendingValue.values()) / len(dictBendingValue)
-                    gripperValue = 850
+                    gripperValue = dictBendingValue
                     # for i in len(dictBendingValue):
                     #     gripperValue += (
                     #         dictBendingValue["gripperValue" + str(i + 1)]
