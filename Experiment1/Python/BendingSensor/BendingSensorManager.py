@@ -4,13 +4,17 @@
 # Summary:  曲げセンサからのデータ取得用マネージャー
 # -----------------------------------------------------------------------
 
+import threading
+
 # import socket
 import time
 
 import numpy as np
+import RobotArmController.Robotconfig as RC
 import serial
 
 # from UDP.UDPManager import UDPManager
+# from LoadCell.LoadCellManager import LoadCellManager
 
 
 class BendingSensorManager:
@@ -36,54 +40,46 @@ class BendingSensorManager:
         self.not_used2 = self.ser2.readline()
         """
 
-    def StartReceiving(self, fromUdp: bool = False):
+    def thread(self):
+        while True:
+            # num_str = str(RC.num_int)
+            # chunks = [num_str[i : i + 4] for i in range(0, len(num_str), 4)]
+            # for chunk in chunks:
+            #     self.ser.write(chunk.encode())
+            # self.ser.write("b".encode())
+
+            self.ser.write(bytes([RC.num_int]))
+            # print(RC.num_int)
+            time.sleep(0.03)
+
+    def StartReceiving(self):
         """
         Receiving data from bending sensor and update self.bendingValue
         """
-
-        # if fromUdp:
-        #     sock = self.udpManager.sock
-
-        #     try:
-        #         while True:
-        #             data, addr = self.udpManager.ReceiveData()
-        #             self.bendingValue = float(data[0])
-
-        #             # ----- (TEST) For Unity -----
-        #             # triggerValue = float(data[data.index('trigger')+1])
-        #             # self.bendingValue = (triggerValue - 0) / (1 - 0) * (800 - 0) + 0
-        #             pass
-
-        #     except OSError:
-        #         print(
-        #             "[OSError] UDPManager >> I/O related errors. Please check the UDP socket."
-        #         )
-
-        #     except KeyboardInterrupt:
-        #         print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
-
-        # else:
         try:
+            thr = threading.Thread(target=self.thread)
+            thr.setDaemon(True)
+            thr.start()
             while True:
                 # code3//ESP32からencoder受信(loadcell受信)
                 line = self.ser.readline().decode("utf-8").rstrip()
                 # データの抽出と変数への代入
                 data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    850 - int(data_parts[0]) / 1800 * 850
+                    850 - int(data_parts[0].rstrip()) / 1800 * 850
                 )  # -425-0
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                # print(bendingValue)
+                print(RC.num_int, data_parts)
                 # time.sleep(0.0001)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
-    def EndReceiving(self):
-        self.udpManager.CloseSocket()
+    # def EndReceiving(self):
+    #     self.udpManager.CloseSocket()
 
 
 # helloworld

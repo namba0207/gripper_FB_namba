@@ -278,7 +278,7 @@ class ParticipantMotionManager:
         # dictGripperValue = 850
         if self.gripperInputSystem == "bendingsensor":
             dictGripperValue = self.bendingSensorManager.bendingValue
-            print(dictGripperValue)
+            # print(dictGripperValue)
         #     for i in range(self.bendingSensorNum):
         #         bendingVal = self.bendingSensors[i].bendingValue
         #         bendingValueNorm = (bendingVal - bendingSensorMin) / (self.InitBendingSensorValues[i] - bendingSensorMin) * (targetMax - targetMin) + targetMin

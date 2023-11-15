@@ -9,21 +9,25 @@ import time
 from ctypes import windll
 
 import numpy as np
+import RobotArmController.Robotconfig as RC
 from BendingSensor.BendingSensorManager import BendingSensorManager
 from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
     CyberneticAvatarMotionBehaviour,
 )
 from FileIO.FileIO import FileIO
-from LoadCell.LoadCellManager import LoadCellManager
+
+# from LoadCell.LoadCellManager import LoadCellManager
 from ParticipantMotion.ParticipantMotionManager import ParticipantMotionManager
 from Recorder.DataRecordManager import DataRecordManager
-from RobotArmController.WeightSliderManager import WeightSliderManager
 
 # ----- Custom class ----- #
 from RobotArmController.xArmTransform import xArmTransform
 
 # from VibrotactileFeedback.VibrotactileFeedbackManager import VibrotactileFeedbackManager
 from xarm.wrapper import XArmAPI
+
+# from RobotArmController.WeightSliderManager import WeightSliderManage
+
 
 # ---------- Settings: xArm connection and UDP connection ---------- #
 localPort = 8000
@@ -70,6 +74,7 @@ class RobotControlManager:
         # localIP = [addr for addr in dat if "localIP" in addr[0]][0][1]
         self.xArmIpAddress = "192.168.1.199"
         self.wirelessIpAddress = None
+        self.num_int = 127
         # self.localIpAddress = localIP
 
     def SendDataToRobot(
@@ -154,8 +159,9 @@ class RobotControlManager:
 
         # ----- Initialize robot arm ----- #
         if isEnablexArm:
-            arm = XArmAPI(self.xArmIpAddress)
-            self.InitializeAll(arm, transform)
+            self.arm = XArmAPI(self.xArmIpAddress)
+            self.InitializeAll(self.arm, transform)
+            # print(1000)
             # self.InitRobotArm(arm, transform)
             # self.InitGripper(arm)
             # LoadCellManager(arm, bendingSensorIpAddress)
@@ -167,6 +173,11 @@ class RobotControlManager:
         isPrintFrameRate = False  # For debug
         isPrintData = False  # For debug
 
+        # loadCellManager = LoadCellManager(True, self.xArmIpAddress)
+        self.arm.set_tgpio_modbus_baudrate(2000000)
+        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
+        # self.loadcell_thr = threading.Thread(target=self.get_loadcell_val, daemon=True)
+        # self.loadcell_thr.start()
         try:
             while True:
                 if time.perf_counter() - taskStartTime > executionTime:
@@ -182,7 +193,7 @@ class RobotControlManager:
 
                     # ----- Disconnect ----- #
                     if isEnablexArm:
-                        arm.disconnect()
+                        self.arm.disconnect()
 
                     windll.winmm.timeEndPeriod(1)
 
@@ -190,7 +201,6 @@ class RobotControlManager:
                     break
 
                 if isMoving:
-                    # print("hello")
                     # ---------- Start control process timer ---------- #
                     loopStartTime = time.perf_counter()
 
@@ -264,7 +274,7 @@ class RobotControlManager:
                     else:
                         if isEnablexArm:
                             # ----- Send to xArm ----- #
-                            arm.set_servo_cartesian(
+                            self.arm.set_servo_cartesian(
                                 transform.Transform(isOnlyPosition=False)
                             )
 
@@ -284,9 +294,20 @@ class RobotControlManager:
 
                     # ----- Gripper control ----- #
                     if isEnablexArm:
-                        code, ret = arm.getset_tgpio_modbus_data(
+                        code, ret = self.arm.getset_tgpio_modbus_data(
                             self.ConvertToModbusData(gripperValue)
                         )
+
+                    self.num = (
+                        float(self.arm.get_cgpio_analog(1)[1])
+                        - float(self.init_loadcell_val)
+                    ) * 1000
+                    if self.num > 150:
+                        self.num = 150
+                    elif self.num < 0:
+                        self.num = 0
+                    RC.num_int = int(self.num / 150 * (220 - 127) + 127)
+                    # print(self.num_int)
 
                     # ----- Vibrotactile Feedback ----- #
                     # vibrotactileFeedbackManager.GenerateVibrotactileFeedback(localPosition, localRotation, weightSlider)
@@ -306,7 +327,7 @@ class RobotControlManager:
                     # )
 
                     # ----- If xArm error has occured ----- #
-                    if isEnablexArm and arm.has_err_warn:
+                    if isEnablexArm and self.arm.has_err_warn:
                         isMoving = False
                         self.errorCount += 1
                         self.taskTime.append(time.perf_counter() - taskStartTime)
@@ -355,7 +376,7 @@ class RobotControlManager:
                     # ----- Quit program ----- #
                     if keycode == "q":
                         if isEnablexArm:
-                            arm.disconnect()
+                            self.arm.disconnect()
                         self.PrintProcessInfo()
 
                         windll.winmm.timeEndPeriod(1)
@@ -364,7 +385,7 @@ class RobotControlManager:
                     # ----- Reset xArm and gripper ----- #
                     elif keycode == "r":
                         if isEnablexArm:
-                            self.InitializeAll(arm, transform)
+                            self.InitializeAll(self.arm, transform)
                             # self.InitRobotArm(arm, transform)
                             # self.InitGripper(arm)
 
@@ -405,7 +426,7 @@ class RobotControlManager:
 
             # ----- Disconnect ----- #
             if isEnablexArm:
-                arm.disconnect()
+                self.arm.disconnect()
 
             windll.winmm.timeEndPeriod(1)
 
@@ -574,183 +595,185 @@ class RobotControlManager:
     #         bendingSensorManagerMaster.EndReceiving()
     #         bendingSensorManagerBeginner.EndReceiving()
 
-    def LoadCellTest(self):
-        """
-        For testing.
-        Only get the value of the load cell.
-        """
+    # def LoadCellTest(self):
+    #     """
+    #     For testing.
+    #     Only get the value of the load cell.
+    #     """
 
-        transform = xArmTransform()
-        loadCellManager = LoadCellManager()
+    #     transform = xArmTransform()
+    #     loadCellManager = LoadCellManager()
 
-        arm = XArmAPI(self.xArmIpAddress)
-        self.InitRobotArm(arm, transform)
+    #     arm = XArmAPI(self.xArmIpAddress)
+    #     self.InitRobotArm(arm, transform)
+    #     print(1100)
+    #     while True:
+    #         val = loadCellManager.GetLoadCellAnalogValue(arm)
+    #         print(val)
 
-        while True:
-            val = loadCellManager.GetLoadCellAnalogValue(arm)
-            print(val)
+    # def AudioTest(self):
+    #     """
+    #     For testing.
+    #     Only play the audio.
+    #     """
 
-    def AudioTest(self):
-        """
-        For testing.
-        Only play the audio.
-        """
+    #     audioManager = AudioManager()
 
-        audioManager = AudioManager()
+    #     while True:
+    #         keycode = input()
+    #         if keycode == "p":
+    #             audioManager.PlayPositive()
 
-        while True:
-            keycode = input()
-            if keycode == "p":
-                audioManager.PlayPositive()
+    # def eRubberTactileFeedbackTest(self):
+    #     arm = XArmAPI(self.xArmIpAddress)
+    #     transform = xArmTransform()
+    #     self.InitRobotArm(arm, transform)
+    #     self.InitGripper(arm)
+    #     print(1200)
 
-    def eRubberTactileFeedbackTest(self):
-        arm = XArmAPI(self.xArmIpAddress)
-        transform = xArmTransform()
-        self.InitRobotArm(arm, transform)
-        self.InitGripper(arm)
+    #     loadCellManager = LoadCellManager(arm)
+    #     audioManager = AudioManager(6)
 
-        loadCellManager = LoadCellManager(arm)
-        audioManager = AudioManager(6)
+    #     bendingSensorManager = BendingSensorManager(
+    #         ip=self.wirelessIpAddress, port=bendingSensorPortParticipant1
+    #     )
 
-        bendingSensorManager = BendingSensorManager(
-            ip=self.wirelessIpAddress, port=bendingSensorPortParticipant1
-        )
+    #     # ----- Start receiving bending sensor value from UDP socket ----- #
+    #     bendingSensorThread = threading.Thread(
+    #         target=bendingSensorManager.StartReceiving
+    #     )
+    #     bendingSensorThread.setDaemon(True)
+    #     bendingSensorThread.start()
 
-        # ----- Start receiving bending sensor value from UDP socket ----- #
-        bendingSensorThread = threading.Thread(
-            target=bendingSensorManager.StartReceiving
-        )
-        bendingSensorThread.setDaemon(True)
-        bendingSensorThread.start()
+    #     beforeLoadValue = loadCellManager.InitialLoadCellValue
 
-        beforeLoadValue = loadCellManager.InitialLoadCellValue
+    #     isGripping = False
+    #     threshold = 0.2
 
-        isGripping = False
-        threshold = 0.2
+    #     from MotionFilter.MotionFilter import MotionFilter
 
-        from MotionFilter.MotionFilter import MotionFilter
+    #     n = 2
+    #     fs = 180
+    #     motionFilter = MotionFilter(n, 1, fs)
+    #     loadValList = []
 
-        n = 2
-        fs = 180
-        motionFilter = MotionFilter(n, 1, fs)
-        loadValList = []
+    #     try:
+    #         while True:
+    #             code, ret = arm.getset_tgpio_modbus_data(
+    #                 self.ConvertToModbusData(bendingSensorManager.bendingValue)
+    #             )
 
-        try:
-            while True:
-                code, ret = arm.getset_tgpio_modbus_data(
-                    self.ConvertToModbusData(bendingSensorManager.bendingValue)
-                )
+    #             val = loadCellManager.GetLoadCellAnalogValue(arm)
+    #             loadVal = abs(val[1][1] - beforeLoadValue)
+    #             # print(val[1][1])
 
-                val = loadCellManager.GetLoadCellAnalogValue(arm)
-                loadVal = abs(val[1][1] - beforeLoadValue)
-                # print(val[1][1])
+    #             # audioManager.AddRawAnalogValue(loadVal)
 
-                # audioManager.AddRawAnalogValue(loadVal)
+    #             if loadVal < 0:
+    #                 loadVal = 0
 
-                if loadVal < 0:
-                    loadVal = 0
+    #             beforeLoadValue = val[1][1]
 
-                beforeLoadValue = val[1][1]
+    #             # ----- Detect gripping ----- #
+    #             loadDiffFromInit = val[1][1] - loadCellManager.InitialLoadCellValue
+    #             if not isGripping and loadDiffFromInit > threshold:
+    #                 isGripping = True
+    #             elif isGripping and loadDiffFromInit < threshold:
+    #                 isGripping = False
 
-                # ----- Detect gripping ----- #
-                loadDiffFromInit = val[1][1] - loadCellManager.InitialLoadCellValue
-                if not isGripping and loadDiffFromInit > threshold:
-                    isGripping = True
-                elif isGripping and loadDiffFromInit < threshold:
-                    isGripping = False
+    #             if isGripping:
+    #                 print("Gripping")
+    #                 # audioManager.PlaySinWave()
 
-                if isGripping:
-                    print("Gripping")
-                    # audioManager.PlaySinWave()
+    #             loadValList.append(val[1][1])
+    #             if len(loadValList) > 9:
+    #                 hpfDat = motionFilter.HighPassFilter(loadValList)
+    #                 loadValList.pop(0)
 
-                loadValList.append(val[1][1])
-                if len(loadValList) > 9:
-                    hpfDat = motionFilter.HighPassFilter(loadValList)
-                    loadValList.pop(0)
+    #                 audioManager.PlayRawAnalog(hpfDat)
+    #                 print(hpfDat)
 
-                    audioManager.PlayRawAnalog(hpfDat)
-                    print(hpfDat)
+    #     except KeyboardInterrupt:
+    #         print("End")
 
-        except KeyboardInterrupt:
-            print("End")
+    # def CheckGraph(self):
+    #     # ----- Settings: Plot ----- #
+    #     import math
 
-    def CheckGraph(self):
-        # ----- Settings: Plot ----- #
-        import math
+    #     import matplotlib.pyplot as plt
 
-        import matplotlib.pyplot as plt
+    #     times = [0 for i in range(200)]
+    #     loads = [0 for i in range(200)]
+    #     grippers = [0 for i in range(200)]
 
-        times = [0 for i in range(200)]
-        loads = [0 for i in range(200)]
-        grippers = [0 for i in range(200)]
+    #     time = 0
+    #     load = 0
+    #     gripper = 0
 
-        time = 0
-        load = 0
-        gripper = 0
+    #     # initialize matplotlib
+    #     plt.ion()
+    #     plt.figure()
+    #     (li_load,) = plt.plot(times, loads, color="red", label="Load value")
+    #     (li_gripper,) = plt.plot(times, grippers, color="blue", label="Gripper")
 
-        # initialize matplotlib
-        plt.ion()
-        plt.figure()
-        (li_load,) = plt.plot(times, loads, color="red", label="Load value")
-        (li_gripper,) = plt.plot(times, grippers, color="blue", label="Gripper")
+    #     plt.ylim(-0.1, 900)
+    #     plt.xlabel("time")
+    #     plt.ylabel("diff load value")
+    #     # plt.title("real time plot")
+    #     # ----- End settings: Plot ----- #
 
-        plt.ylim(-0.1, 900)
-        plt.xlabel("time")
-        plt.ylabel("diff load value")
-        # plt.title("real time plot")
-        # ----- End settings: Plot ----- #
+    #     arm = XArmAPI(self.xArmIpAddress)
+    #     transform = xArmTransform()
+    #     self.InitRobotArm(arm, transform)
+    #     self.InitGripper(arm)
+    #     print(1300)
 
-        arm = XArmAPI(self.xArmIpAddress)
-        transform = xArmTransform()
-        self.InitRobotArm(arm, transform)
-        self.InitGripper(arm)
+    #     loadCellManager = LoadCellManager(arm)
+    #     beforeLoadValue = loadCellManager.InitialLoadCellValue
 
-        loadCellManager = LoadCellManager(arm)
-        beforeLoadValue = loadCellManager.InitialLoadCellValue
+    #     bendingSensorManager = BendingSensorManager(
+    #         ip=self.wirelessIpAddress, port=bendingSensorPortParticipant1
+    #     )
 
-        bendingSensorManager = BendingSensorManager(
-            ip=self.wirelessIpAddress, port=bendingSensorPortParticipant1
-        )
+    #     # ----- Start receiving bending sensor value from UDP socket ----- #
+    #     bendingSensorThread = threading.Thread(
+    #         target=bendingSensorManager.StartReceiving
+    #     )
+    #     bendingSensorThread.setDaemon(True)
+    #     bendingSensorThread.start()
 
-        # ----- Start receiving bending sensor value from UDP socket ----- #
-        bendingSensorThread = threading.Thread(
-            target=bendingSensorManager.StartReceiving
-        )
-        bendingSensorThread.setDaemon(True)
-        bendingSensorThread.start()
+    #     try:
+    #         while True:
+    #             # code, ret = arm.getset_tgpio_modbus_data(self.ConvertToModbusData(bendingSensorManager.bendingValue))
 
-        try:
-            while True:
-                # code, ret = arm.getset_tgpio_modbus_data(self.ConvertToModbusData(bendingSensorManager.bendingValue))
+    #             val = loadCellManager.GetLoadCellAnalogValue(arm)
+    #             loadVal = abs(val[1][1] - beforeLoadValue)
+    #             beforeLoadValue = val[1][1]
 
-                val = loadCellManager.GetLoadCellAnalogValue(arm)
-                loadVal = abs(val[1][1] - beforeLoadValue)
-                beforeLoadValue = val[1][1]
+    #             time += 0.1
+    #             load = loadVal * 10000
+    #             gripper = arm.get_gripper_position()[1]
 
-                time += 0.1
-                load = loadVal * 10000
-                gripper = arm.get_gripper_position()[1]
+    #             times.append(time)
+    #             times.pop(0)
+    #             loads.append(load)
+    #             loads.pop(0)
+    #             grippers.append(gripper)
+    #             grippers.pop(0)
 
-                times.append(time)
-                times.pop(0)
-                loads.append(load)
-                loads.pop(0)
-                grippers.append(gripper)
-                grippers.pop(0)
+    #             li_load.set_xdata(times)
+    #             li_load.set_ydata(loads)
+    #             li_gripper.set_xdata(times)
+    #             li_gripper.set_ydata(grippers)
 
-                li_load.set_xdata(times)
-                li_load.set_ydata(loads)
-                li_gripper.set_xdata(times)
-                li_gripper.set_ydata(grippers)
+    #             plt.xlim(min(times), max(times))
+    #             plt.draw()
+    #             plt.legend()
 
-                plt.xlim(min(times), max(times))
-                plt.draw()
-                plt.legend()
+    #             plt.pause(0.01)
 
-                plt.pause(0.01)
-
-        except KeyboardInterrupt:
-            print("END")
+    #     except KeyboardInterrupt:
+    #         print("END")
 
     def InitializeAll(self, robotArm, transform, isSetInitPosition=True):
         """
@@ -806,3 +829,17 @@ class RobotControlManager:
 
         robotArm.set_mode(1)
         robotArm.set_state(state=0)
+
+    # def get_loadcell_val(self):
+    #     while True:
+    #         self.num = (
+    #             float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
+    #         ) * 1000
+    #         if self.num > 150:
+    #             self.num = 150
+    #         elif self.num < 0:
+    #             self.num = 0
+    #         RC.num_int = int(self.num / 150 * (220 - 127) + 127)
+    #         print(self.num_int)
+
+    #         time.sleep(0.01)
