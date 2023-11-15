@@ -251,7 +251,7 @@ class RobotControlManager:
                         rotation[1],
                         rotation[2],
                     )
-
+                    # print(position[0], position[1], position[2])
                     # ----- Safety check (Position) ---- #
                     diffX = transform.x - beforeX
                     diffY = transform.y - beforeY
@@ -829,17 +829,3 @@ class RobotControlManager:
 
         robotArm.set_mode(1)
         robotArm.set_state(state=0)
-
-    # def get_loadcell_val(self):
-    #     while True:
-    #         self.num = (
-    #             float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
-    #         ) * 1000
-    #         if self.num > 150:
-    #             self.num = 150
-    #         elif self.num < 0:
-    #             self.num = 0
-    #         RC.num_int = int(self.num / 150 * (220 - 127) + 127)
-    #         print(self.num_int)
-
-    #         time.sleep(0.01)
