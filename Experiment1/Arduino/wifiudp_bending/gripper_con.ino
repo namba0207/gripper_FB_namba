@@ -24,7 +24,7 @@ int newpos2_int = 0;
 float pretime = 0;
 float preP1 = 0;
 float preP2 = 0;
-float Kd1 = 0.008; // 発振用ダンパ係数
+float Kd1 = 0.005; // 発振用ダンパ係数
 float Kp2 = 0.05;  // PIDをゆるく
 float Kd2 = 0.008;
 float dt;
