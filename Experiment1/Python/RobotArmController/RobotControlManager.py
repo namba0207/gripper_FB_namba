@@ -243,15 +243,14 @@ class RobotControlManager:
                     # ----- Set xArm transform ----- #
                     transform.x, transform.y, transform.z = (
                         position[2],
-                        position[0],
                         position[1],
+                        -position[0],
                     )
                     transform.roll, transform.pitch, transform.yaw = (
                         rotation[0],
-                        rotation[1],
                         rotation[2],
+                        -rotation[1],
                     )
-                    # print(position[0], position[1], position[2])
                     # ----- Safety check (Position) ---- #
                     diffX = transform.x - beforeX
                     diffY = transform.y - beforeY

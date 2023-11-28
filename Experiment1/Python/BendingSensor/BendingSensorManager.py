@@ -48,6 +48,6 @@ class BendingSensorManager:
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                print(RC.num_int, data_parts)
+                # print(RC.num_int, data_parts)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
