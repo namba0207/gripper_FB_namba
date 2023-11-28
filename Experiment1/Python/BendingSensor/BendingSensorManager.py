@@ -41,13 +41,13 @@ class BendingSensorManager:
                 # データの抽出と変数への代入
                 data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    850 - int(data_parts[0].rstrip()) / 1800 * 850
+                    850 - int(data_parts[0].rstrip()) / 1500 * 850
                 )  # -425-0
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                # print(RC.num_int, data_parts)
+                print(RC.num_int, data_parts)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
