@@ -20,14 +20,14 @@ class xArmTransform:
 
     # ----- Minimum limitation ----- #
     __initX, __initY, __initZ = 300, 0, 340
-    __initRoll, __initPitch, __initYaw = 179.9, 1.6, 0.3
+    __initRoll, __initPitch, __initYaw = 89.9, 0, 0
 
     # ----- Minimum limitation ----- #
-    __minX, __minY, __minZ = 200, -300, 225
+    __minX, __minY, __minZ = 200, -200, 0
     __minRoll, __minPitch, __minYaw = -90, -65, -90
 
     # ----- Maximum limitation ----- #
-    __maxX, __maxY, __maxZ = 650, 300, 650
+    __maxX, __maxY, __maxZ = 650, 300, 400
     __maxRoll, __maxPitch, __maxYaw = 90, 70, 90
 
     def __init__(self):
