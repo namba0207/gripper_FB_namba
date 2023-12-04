@@ -70,7 +70,7 @@ void loop()
   D2 = (P2 - preP2) / dt;
   preP2 = P2;
 
-  vol1_int = int(loadcell_rec);              // コントロール側は今まで通り反力くる
+  vol1_int = int(loadcell_rec + Kd1 * D1);   // コントロール側は今まで通り反力くる
   vol2_int = int(Kp2 * P2 + Kd2 * D2 + 127); // サポート側はスクイーズで反力くる
 
   if (vol1_int > 255)
@@ -92,9 +92,9 @@ void loop()
 
   dacWrite(DAC_PIN_1, vol1_int);
   dacWrite(DAC_PIN_2, vol2_int);
-  Serial.print(newpos1_int);
+  Serial.print(-newpos1_int);
   Serial.print(',');
-  Serial.print(newpos2_int);
+  Serial.print(-newpos2_int);
   Serial.print(',');
   Serial.print(vol1_int);
   Serial.print(',');
