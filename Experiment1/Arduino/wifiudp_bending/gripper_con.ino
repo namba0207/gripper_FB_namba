@@ -1,4 +1,4 @@
-// 把持力フィードバック//
+// 把持力フィードバック//1205
 #include <RotaryEncoder.h>
 #include <math.h>
 
