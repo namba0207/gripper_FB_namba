@@ -32,8 +32,8 @@ float P1;
 float P2;
 float D1;
 float D2;
-RotaryEncoder encoder1(ENCODER_PIN_1, ENCODER_PIN_2);
-RotaryEncoder encoder2(ENCODER_PIN_3, ENCODER_PIN_4);
+RotaryEncoder encoder1(ENCODER_PIN_1, ENCODER_PIN_2,RotaryEncoder::LatchMode::TWO03);//3つ目あるそう調べるOK
+RotaryEncoder encoder2(ENCODER_PIN_3, ENCODER_PIN_4,RotaryEncoder::LatchMode::TWO03);
 
 void IRAM_ATTR ISR()
 {
@@ -43,17 +43,22 @@ void IRAM_ATTR ISR()
 
 void setup()
 {
-  pinMode(DAC_PIN_1, OUTPUT);
+  pinMode(ENCODER_PIN_1, INPUT);
+  pinMode(ENCODER_PIN_2, INPUT);
+  pinMode(ENCODER_PIN_3, INPUT);
+  pinMode(ENCODER_PIN_4, INPUT);
+  pinMode(DAC_PIN_1, OUTPUT);//割り込み処理用の番号PULLUP、ピンの番号でないそう
   pinMode(DAC_PIN_2, OUTPUT);
   Serial.begin(115200);
   Serial.println("SimplePollRotator example for the RotaryEncoder library.");
-  attachInterrupt(ENCODER_PIN_1, ISR, CHANGE);
+  attachInterrupt(ENCODER_PIN_1, ISR, CHANGE);//割り込み処理はできるだけ簡単にINPUTしてないのにできてるのは気持ち悪い、
   attachInterrupt(ENCODER_PIN_2, ISR, CHANGE);
   attachInterrupt(ENCODER_PIN_3, ISR, CHANGE);
-  attachInterrupt(ENCODER_PIN_4, ISR, CHANGE); // 割り込み処理いる？loop()内にISR()の内容書いても動きそう
+  attachInterrupt(ENCODER_PIN_4, ISR, CHANGE);
+  xTaskCreatePinnedToCore(subProcess, "subProcess", 4096, NULL, 1, NULL, 0);
 }
 
-void loop()
+void loop()//画面表示だけ、PIDを割り込み、文字表示と計算処理は別が良い
 {
   newpos1_int = (int)encoder1.getPosition(); // 元々のgetPositionはintで拾う？ → 確認したらlong型でした．実機で動かしてから修正したい．
   newpos2_int = (int)encoder2.getPosition(); // 腹を括って並列処理を削除．動かなかったら戻す．
