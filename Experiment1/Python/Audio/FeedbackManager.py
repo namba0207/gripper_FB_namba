@@ -19,14 +19,16 @@ class Vibrotactile:
             rate=self.rate,
             output=True,
             frames_per_buffer=self.chunk,
-            output_device_index=0,#ファイルで探すやつ
+            output_device_index=31,  # ファイルで探すやつ
             stream_callback=self.callback,
         )
         self.stream.start_stream()
 
     def callback(self, in_data, frame_count, time_info, status):
         # self.data_out = 0
-        out_data = (int(self.amp * self.data_out) * self.sin).astype(np.int16)#振幅をインスタンス変数で速度にしたり
+        out_data = (int(self.amp * self.data_out) * self.sin).astype(
+            np.int16
+        )  # 振幅をインスタンス変数で速度にしたり
         # print(int(self.amp * self.data_out))
         return (out_data, pyaudio.paContinue)
 
@@ -49,4 +51,4 @@ if __name__ == "__main__":
         vibro.stream.close()
         vibro.close()
         print("finish loop")
-#source env/bin/activate
+# source env/bin/activate
