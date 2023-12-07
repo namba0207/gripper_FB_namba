@@ -42,12 +42,16 @@ class BendingSensorManager:
                 data_parts = line.split(",")
                 self.bendingValue_int = int(
                     850 - int(data_parts[0].rstrip()) / 1500 * 850
-                )  # -425-0
+                )
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                # print(RC.num_int, data_parts)
+                self.bendingValue_sub = int(
+                    850 - int(data_parts[1].rstrip()) / 1500 * 850
+                )
+                print(self.bendingValue)
+                time.sleep(0.001)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
