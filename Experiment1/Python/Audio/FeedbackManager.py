@@ -10,26 +10,47 @@ class Vibrotactile:
         self.freq = 200
         self.chunk = int(self.rate / self.freq)
         self.sin = np.sin(2.0 * np.pi * np.arange(self.chunk) * self.freq / self.rate)
-        self.amp = 11000
+        self.ampL = 11000
+        self.ampR = 1100
         self.data_out = 0
         self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(
+
+        self.streamL = self.p.open(
             format=pyaudio.paInt16,
             channels=1,
             rate=self.rate,
             output=True,
             frames_per_buffer=self.chunk,
-            output_device_index=31,  # ファイルで探すやつ
-            stream_callback=self.callback,
+            output_device_index=37,  # ファイルで探すやつ
+            stream_callback=self.callback1,
         )
-        self.stream.start_stream()
+        self.streamL.start_stream()
 
-    def callback(self, in_data, frame_count, time_info, status):
+        self.streamR = self.p.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=self.rate,
+            output=True,
+            frames_per_buffer=self.chunk,
+            output_device_index=39,  # ファイルで探すやつ
+            stream_callback=self.callback2,
+        )
+        self.streamR.start_stream()
+
+    def callback1(self, in_data, frame_count, time_info, status):
         # self.data_out = 0
-        out_data = (int(self.amp * self.data_out) * self.sin).astype(
+        out_data = (int(self.ampL * self.data_out) * self.sin).astype(
             np.int16
         )  # 振幅をインスタンス変数で速度にしたり
         # print(int(self.amp * self.data_out))
+        return (out_data, pyaudio.paContinue)
+
+    def callback2(self, in_data, frame_count, time_info, status):
+        # self.data_out = 0
+        out_data = (int(self.ampR * self.data_out) * self.sin).astype(
+            np.int16
+        )  # 振幅をインスタンス変数で速度にしたり
+        # print(int(self.amp2 * self.data_out))
         return (out_data, pyaudio.paContinue)
 
     def close(self):
