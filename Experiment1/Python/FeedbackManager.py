@@ -15,11 +15,14 @@ class Vibrotactile:
         self.chunk = int(self.rate / self.freq)
         self.sin = np.sin(2.0 * np.pi * np.arange(self.chunk) * self.freq / self.rate)
         self.ampL = 11000
-        self.ampR = 55000
+        self.ampR = 11000
         self.data_outL = 1
         self.data_outR = 1
         self.p = pyaudio.PyAudio()
         self.bendingValue = 850
+        self.pretime = 0
+        self.bendingVelocity = 0
+        self.flag = 0
         # self.test = Test()
         # self.test_start = self.test.start()
 
@@ -50,20 +53,23 @@ class Vibrotactile:
         self.streamR.start_stream()
 
     def callback1(self, in_data, frame_count, time_info, status):
-        if self.bendingValue > 400:
-            self.data_outR = 1
+        if self.bendingVelocity > 2000:
+            self.data_outL = 1
+            self.flag = 1
+            print("index")
         else:
-            self.data_outR = 0
+            self.data_outL = 0
         out_data = (int(self.ampL * self.data_outL) * self.sin).astype(
             np.int16
         )  # 振幅をインスタンス変数で速度にしたり
         # print(int(self.amp * self.data_out))
-        print(self.bendingValue)
+        # print(self.flag)
         return (out_data, pyaudio.paContinue)
 
     def callback2(self, in_data, frame_count, time_info, status):
-        if self.bendingValue < 400:
+        if self.bendingVelocity < -2000:
             self.data_outR = 1
+            print("back")
         else:
             self.data_outR = 0
         out_data = (int(self.ampR * self.data_outR) * self.sin).astype(
@@ -88,8 +94,12 @@ class Vibrotactile:
                     self.bendingValue_sub = 850
                 elif self.bendingValue_sub < 0:
                     self.bendingValue_sub = 0
+                self.bendingVelocity = (self.bendingValue - self.bendingValue_sub) / (
+                    time.perf_counter() - self.pretime
+                )
                 self.bendingValue = self.bendingValue_sub
-                # print(self.bendingValue)
+                self.pretime = time.perf_counter()
+                # print(self.bendingVelocity)
                 # time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
@@ -109,8 +119,10 @@ if __name__ == "__main__":
             time.sleep(0.005)
 
     except KeyboardInterrupt:
-        vibro.stream.stop_stream()
-        vibro.stream.close()
+        vibro.streamR.stop_stream()
+        vibro.streamR.close()
+        vibro.streamL.stop_stream()
+        vibro.streamL.close()
         vibro.close()
         print("finish loop")
 # source env/bin/activate
