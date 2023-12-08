@@ -22,6 +22,8 @@ class Vibrotactile:
         self.bendingValue = 850
         self.pretime = 0
         self.bendingVelocity = 0
+        self.closetime = 0
+        self.opentime = 0
         self.flag = 0
         # self.test = Test()
         # self.test_start = self.test.start()
@@ -53,30 +55,59 @@ class Vibrotactile:
         self.streamR.start_stream()
 
     def callback1(self, in_data, frame_count, time_info, status):
-        if self.bendingVelocity > 2000:
-            self.data_outL = 1
+        # 閉じるとフラグが1になる。
+        if self.bendingVelocity > 2000 and self.flag == 0:
             self.flag = 1
+            self.closetime = time.perf_counter()
+
+        # フラグが1のとき任意の時間振動する！
+        if self.flag == 1 and time.perf_counter() - self.closetime < 0.1:
+            self.data_outL = 1
             print("index")
         else:
             self.data_outL = 0
-        out_data = (int(self.ampL * self.data_outL) * self.sin).astype(
-            np.int16
-        )  # 振幅をインスタンス変数で速度にしたり
-        # print(int(self.amp * self.data_out))
-        # print(self.flag)
+
+        # # フラグが2のとき任意の時間振動する！
+        # if (
+        #     self.flag == 2
+        #     and time.perf_counter() - self.opentime > 0.1
+        #     and time.perf_counter() - self.opentime < 0.2
+        # ):
+        #     self.data_outL = 1
+        #     print("index")
+        # elif self.flag == 2 and time.perf_counter() - self.opentime > 0.2:
+        #     self.flag = 0
+        # elif self.flag == 0:
+        #     self.data_outL = 0
+        out_data = (int(self.ampL * self.data_outL) * self.sin).astype(np.int16)
         return (out_data, pyaudio.paContinue)
 
     def callback2(self, in_data, frame_count, time_info, status):
-        if self.bendingVelocity < -2000:
+        # # 開くとフラグが2になる。
+        # if self.bendingVelocity < -2000 and self.flag == 0:
+        #     self.flag = 2
+        #     self.opentime = time.perf_counter()
+
+        # フラグが1のとき任意の時間振動する！
+        if (
+            self.flag == 1
+            and time.perf_counter() - self.closetime > 0.2
+            and time.perf_counter() - self.closetime < 0.3
+        ):
             self.data_outR = 1
             print("back")
-        else:
+        elif self.flag == 1 and time.perf_counter() - self.closetime > 0.3:
+            self.flag = 0
+        elif self.flag == 0:
             self.data_outR = 0
-        out_data = (int(self.ampR * self.data_outR) * self.sin).astype(
-            np.int16
-        )  # 振幅をインスタンス変数で速度にしたり
-        # print(int(self.amp2 * self.data_out))
-        # print(self.bendingValue)
+
+        # # フラグが2のとき任意の時間振動する！
+        # if self.flag == 2 and time.perf_counter() - self.opentime < 0.1:
+        #     self.data_outR = 1
+        #     print("back")
+        # elif self.flag == 2 and time.perf_counter() - self.opentime > 0.1:
+        #     self.data_outR = 0
+        out_data = (int(self.ampR * self.data_outR) * self.sin).astype(np.int16)
         return (out_data, pyaudio.paContinue)
 
     def thread(self):
@@ -100,6 +131,7 @@ class Vibrotactile:
                 self.bendingValue = self.bendingValue_sub
                 self.pretime = time.perf_counter()
                 # print(self.bendingVelocity)
+                print(self.flag)
                 # time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
@@ -115,7 +147,7 @@ if __name__ == "__main__":
 
     try:
         while True:
-            print(time.perf_counter() - start_time)
+            # print(time.perf_counter() - start_time)
             time.sleep(0.005)
 
     except KeyboardInterrupt:
