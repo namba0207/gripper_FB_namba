@@ -22,8 +22,7 @@ from Recorder.DataRecordManager import DataRecordManager
 
 # ----- Custom class ----- #
 from RobotArmController.xArmTransform import xArmTransform
-
-# from VibrotactileFeedback.VibrotactileFeedbackManager import VibrotactileFeedbackManager
+from VibrotactileFeedback.VibrationFeedback import Vibrotactile
 from xarm.wrapper import XArmAPI
 
 # from RobotArmController.WeightSliderManager import WeightSliderManage
@@ -153,6 +152,9 @@ class RobotControlManager:
             bendingSensorUdpIpAddress=self.wirelessIpAddress,
             bendingSensorUdpPort=bendingSensorPorts,
         )
+
+        vibrotactile = Vibrotactile()
+        vibrotactile.__init__
 
         # weightSliderManager = WeightSliderManager(ip=self.wirelessIpAddress)
         # vibrotactileFeedbackManager = VibrotactileFeedbackManager()
