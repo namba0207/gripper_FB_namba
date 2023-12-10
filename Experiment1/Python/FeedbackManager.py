@@ -5,8 +5,6 @@ import numpy as np
 import pyaudio
 import serial
 
-# from BendingSensor.test import Test
-
 
 class Vibrotactile:
     def __init__(self) -> None:
@@ -61,19 +59,13 @@ class Vibrotactile:
                 # code3//ESP32からencoder受信(loadcell受信)
                 self.line = self.ser.readline().decode("utf-8").rstrip()
                 self.data_parts = self.line.split(",")
-                self.bendingValue_sub = int(
-                    850 - int(self.data_parts[1].rstrip()) / 2800 * 850
-                )
-                if self.bendingValue_sub > 850:
-                    self.bendingValue_sub = 850
-                elif self.bendingValue_sub < 0:
-                    self.bendingValue_sub = 0
+                self.bendingValue_sub = int(self.data_parts[1].rstrip())
                 self.bendingVelocity = (self.bendingValue - self.bendingValue_sub) / (
                     time.perf_counter() - self.pretime
                 )
                 self.bendingValue = self.bendingValue_sub
                 self.pretime = time.perf_counter()
-                # print(self.bendingVelocity)
+                # print(self.data_parts)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
@@ -81,11 +73,11 @@ class Vibrotactile:
         try:
             while True:
                 # 閉じるとフラグが1になる。今の時間計測
-                if self.bendingVelocity > 2000 and self.flag == 0:
+                if self.bendingVelocity > 5000 and self.flag == 0:
                     self.flag = 1
                     self.closetime = time.perf_counter()
                 # 開くとフラグが2になる。
-                if self.bendingVelocity < -2000 and self.flag == 0:
+                if self.bendingVelocity < -5000 and self.flag == 0:
                     self.flag = 2
                     self.opentime = time.perf_counter()
                 time.sleep(0.005)
@@ -93,42 +85,49 @@ class Vibrotactile:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
     def callback1(self, in_data, frame_count, time_info, status):
-        self.data_outL = 0
         # フラグが1のとき任意の時間振動する！
         if self.flag == 1 and time.perf_counter() - self.closetime < 0.05:
             self.data_outL = 1
 
         # フラグが2のとき任意の時間振動する！振動後フラグ、opentimeを0に戻す
-        if (
+        elif (
             self.flag == 2
             and time.perf_counter() - self.opentime > 0.2
             and time.perf_counter() - self.opentime < 0.25
         ):
-            # self.data_outL = 1
-            print(222)
+            self.data_outL = 1
+            # print(222)
         elif self.flag == 2 and time.perf_counter() - self.opentime > 0.25:
             self.flag = 0
             self.opentime = 0
+
+        # その他は0
+        else:
+            self.data_outL = 0
 
         out_data = (int(self.ampL * self.data_outL) * self.sin).astype(np.int16)
         return (out_data, pyaudio.paContinue)
 
     def callback2(self, in_data, frame_count, time_info, status):
-        self.data_outR = 0
         # フラグが2のとき任意の時間振動する！
         if self.flag == 2 and time.perf_counter() - self.opentime < 0.05:
             self.data_outR = 1
+
         # フラグが1のとき任意の時間振動する！振動後フラグ、opentimeを0に戻す
-        if (
+        elif (
             self.flag == 1
             and time.perf_counter() - self.closetime > 0.2
             and time.perf_counter() - self.closetime < 0.25
         ):
-            # self.data_outR = 1
-            print(111)
+            self.data_outR = 1
+            # print(111)
         elif self.flag == 1 and time.perf_counter() - self.closetime > 0.25:
             self.flag = 0
             self.closetime = 0
+
+        # その他は0
+        else:
+            self.data_outR = 0
 
         out_data = (int(self.ampR * self.data_outR) * self.sin).astype(np.int16)
         return (out_data, pyaudio.paContinue)
@@ -142,7 +141,7 @@ if __name__ == "__main__":
 
     try:
         while True:
-            print(vibro.closetime, vibro.opentime)
+            print(vibro.flag)
             time.sleep(0.005)
 
     except KeyboardInterrupt:
