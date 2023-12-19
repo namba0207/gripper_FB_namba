@@ -81,7 +81,7 @@ class Text_class:
 
 if __name__ == "__main__":
     text_class = Text_class()
-    time.sleep(1)
+    time.sleep(0.5)
     while True:
         try:
             with open("data.txt", mode="a") as txt_file:
