@@ -298,12 +298,11 @@ class RobotControlManager:
                         float(self.arm.get_cgpio_analog(1)[1])
                         - float(self.init_loadcell_val)
                     ) * 1000
-                    if self.num > 150:
-                        self.num = 150
+                    if self.num > 250:
+                        self.num = 250
                     elif self.num < 0:
                         self.num = 0
-                    RC.num_int = int(self.num / 150 * (220 - 127) + 127)
-                    # print(self.num_int)
+                    RC.num_int = int(self.num / 250 * (220 - 127) + 127)
 
                     # ----- Vibrotactile Feedback ----- #
                     # vibrotactileFeedbackManager.GenerateVibrotactileFeedback(localPosition, localRotation, weightSlider)
