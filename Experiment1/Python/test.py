@@ -45,9 +45,9 @@ class Text_class:
             line = self.ser.readline().decode("utf-8").rstrip()
             self.pos1 = 500 - 80 * (time.perf_counter() - startTime)
             if (time.perf_counter() - startTime) > 5:
-                self.pos1 = 0
+                self.pos1 = 100
             if (time.perf_counter() - startTime) > 10:
-                self.pos1 = 0 + 80 * (time.perf_counter() - startTime - 10)
+                self.pos1 = 100 + 80 * (time.perf_counter() - startTime - 10)
             # data_record.append([pos1, num_str, time.perf_counter()])  # 記録用
             self.pos_gripper = self.pos1
             if self.pos_gripper > 850:
