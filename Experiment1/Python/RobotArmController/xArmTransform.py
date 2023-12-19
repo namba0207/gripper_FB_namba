@@ -19,7 +19,7 @@ class xArmTransform:
     roll, pitch, yaw = 0, 0, 0
 
     # ----- Minimum limitation ----- #
-    __initX, __initY, __initZ = 300, 0, 340
+    __initX, __initY, __initZ = 300, -100, 340
     __initRoll, __initPitch, __initYaw = 89.9, 0, 0
 
     # ----- Minimum limitation ----- #

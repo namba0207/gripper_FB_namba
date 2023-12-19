@@ -10,7 +10,6 @@ from ctypes import windll
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
-from BendingSensor.BendingSensorManager import BendingSensorManager
 from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
     CyberneticAvatarMotionBehaviour,
 )
