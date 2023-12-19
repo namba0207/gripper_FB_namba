@@ -154,10 +154,6 @@ class RobotControlManager:
         )
 
         vibrotactile = Vibrotactile()
-        vibrotactile.__init__
-
-        # weightSliderManager = WeightSliderManager(ip=self.wirelessIpAddress)
-        # vibrotactileFeedbackManager = VibrotactileFeedbackManager()
 
         # ----- Initialize robot arm ----- #
         if isEnablexArm:

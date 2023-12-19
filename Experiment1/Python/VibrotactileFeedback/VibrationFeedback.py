@@ -3,8 +3,7 @@ import time
 
 import numpy as np
 import pyaudio
-import serial
-from BendingSensor.BendingSensorManager import BendingSensorManager
+import RobotArmController.Robotconfig_vib as RV
 
 
 class Vibrotactile:
@@ -34,7 +33,7 @@ class Vibrotactile:
             rate=self.rate,
             output=True,
             frames_per_buffer=self.chunk,
-            output_device_index=39,  # ファイルで探すやつ
+            output_device_index=37,  # ファイルで探すやつ
             stream_callback=self.callback1,
         )
         self.streamL.start_stream()
@@ -45,24 +44,23 @@ class Vibrotactile:
             rate=self.rate,
             output=True,
             frames_per_buffer=self.chunk,
-            output_device_index=37,  # ファイルで探すやつ
+            output_device_index=39,  # ファイルで探すやつ
             stream_callback=self.callback2,
         )
         self.streamR.start_stream()
 
     def thread_flag(self):
         try:
-            self.bendingSensorManager = BendingSensorManager()
-            self.bendingVelocity = self.bendingSensorManager.bendingVelocity
             while True:
                 # 閉じるとフラグが1になる。今の時間計測
-                if self.bendingVelocity > 5000 and self.flag == 0:
+                if RV.num_v > 5000 and self.flag == 0:
                     self.flag = 1
                     self.closetime = time.perf_counter()
                 # 開くとフラグが2になる。
-                if self.bendingVelocity < -5000 and self.flag == 0:
+                if RV.num_v < -5000 and self.flag == 0:
                     self.flag = 2
                     self.opentime = time.perf_counter()
+                # print(self.flag)
                 time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
@@ -75,12 +73,12 @@ class Vibrotactile:
         # フラグが2のとき任意の時間振動する！振動後フラグ、opentimeを0に戻す
         elif (
             self.flag == 2
-            and time.perf_counter() - self.opentime > 0.2
-            and time.perf_counter() - self.opentime < 0.25
+            and time.perf_counter() - self.opentime > 0.3
+            and time.perf_counter() - self.opentime < 0.35
         ):
             self.data_outL = 1
-            # print(222)
-        elif self.flag == 2 and time.perf_counter() - self.opentime > 0.25:
+            # print(111)
+        elif self.flag == 2 and time.perf_counter() - self.opentime > 0.35:
             self.flag = 0
             self.opentime = 0
 
@@ -99,12 +97,12 @@ class Vibrotactile:
         # フラグが1のとき任意の時間振動する！振動後フラグ、opentimeを0に戻す
         elif (
             self.flag == 1
-            and time.perf_counter() - self.closetime > 0.2
-            and time.perf_counter() - self.closetime < 0.25
+            and time.perf_counter() - self.closetime > 0.3
+            and time.perf_counter() - self.closetime < 0.35
         ):
             self.data_outR = 1
             # print(111)
-        elif self.flag == 1 and time.perf_counter() - self.closetime > 0.25:
+        elif self.flag == 1 and time.perf_counter() - self.closetime > 0.35:
             self.flag = 0
             self.closetime = 0
 
@@ -117,21 +115,3 @@ class Vibrotactile:
 
     def close(self):
         self.p.terminate()
-
-
-if __name__ == "__main__":
-    vibro = Vibrotactile()
-
-    try:
-        while True:
-            print(vibro.flag)
-            time.sleep(0.005)
-
-    except KeyboardInterrupt:
-        vibro.streamR.stop_stream()
-        vibro.streamR.close()
-        vibro.streamL.stop_stream()
-        vibro.streamL.close()
-        vibro.close()
-        print("finish loop")
-# source env/bin/activate

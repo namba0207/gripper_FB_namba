@@ -11,6 +11,7 @@ import time
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
+import RobotArmController.Robotconfig_vib as RV
 import serial
 
 
@@ -19,6 +20,7 @@ class BendingSensorManager:
         self.ip = ip
         self.port = port
         self.bendingValue = 850
+        self.bendingValue_sub = 0
         self.ser = serial.Serial(ip, port)
         self.not_used = self.ser.readline()
 
@@ -40,21 +42,20 @@ class BendingSensorManager:
                 # code3//ESP32からencoder受信(loadcell受信)
                 line = self.ser.readline().decode("utf-8").rstrip()
                 # データの抽出と変数への代入
-                data_parts = line.split(",")
+                self.data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    850 - int(data_parts[0].rstrip()) / 2800 * 850
+                    850 - int(self.data_parts[0].rstrip()) / 2800 * 850
                 )
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                self.bendingValue_sub = int(data_parts[1].rstrip())
-                self.bendingVelocity = self.bendingValue_sub / (
-                    time.perf_counter() - self.pretime
-                )
+                self.bendingVelocity = (
+                    int(self.data_parts[1].rstrip()) - self.bendingValue_sub
+                ) / (time.perf_counter() - self.pretime)
+                RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
-                print(self.bendingVelocity)
-                time.sleep(0.001)
+                self.bendingValue_sub = int(self.data_parts[1].rstrip())
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
