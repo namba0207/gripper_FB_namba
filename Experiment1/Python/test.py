@@ -38,7 +38,9 @@ from ArmWrapper1000 import ArmWrapper
 
 datal = ArmWrapper(True, ip)
 global num_str
+global pos
 num_str = str(127)
+pos = str(500)
 
 
 def thread():
@@ -65,6 +67,7 @@ def thread():
             pos_gripper = 850
         elif pos_gripper < 0:
             pos_gripper = 0
+        pos = str(pos1)
         print(pos_gripper, pos1, int(num_str))
         # code4//encoderの値をgripperへ送信
         code, ret = arm.getset_tgpio_modbus_data(datal.ConvertToModbusData(pos_gripper))
@@ -87,7 +90,9 @@ try:
         # code6//loadcell送信
         ser.write(bytes([num_int]))
         with open("data.txt", mode="a") as txt_file:
-            txt_file.write(str(time.perf_counter()) + "  " + num_str + "\n")
+            txt_file.write(
+                pos + "  " + num_str + "  " + str(time.perf_counter()) + "\n"
+            )
         # print(time.perf_counter(), num_str)
         time.sleep(0.02)  # ターミナルで大きさ変更0.03が遅延なくできる
 except KeyboardInterrupt:
