@@ -39,12 +39,13 @@ class BendingSensorManager:
             thr.start()
             self.pretime = time.perf_counter()
             while True:
-                # code3//ESP32からencoder受信(loadcell受信)
                 line = self.ser.readline().decode("utf-8").rstrip()
-                # データの抽出と変数への代入
                 self.data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    850 - int(self.data_parts[0].rstrip()) / 2800 * 850
+                    850
+                    - int(self.data_parts[0].rstrip())
+                    / 2800
+                    * 850  # 発振するときデバイスの可動域の大きさ注意！
                 )
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
@@ -57,5 +58,6 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
+                print(self.data_parts)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")

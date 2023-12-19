@@ -23,10 +23,10 @@ volatile int newpos2_int = 0;
 float pretime = 0;
 float preP1 = 0;
 float preP2 = 0;
-float Kd1 = 0.01; // 発振用ダンパ係数
-float Kp2 = 0.05; // PIDをゆるく
-float Kd2 = 0.01;
-float dt = 0.001;
+float Kd1 = 0.001; // 発振用ダンパ係数
+float Kp2 = 0.05;  // PIDをゆるく
+float Kd2 = 0.001;
+float dt = 0.005;
 float P1;
 float P2;
 float D1;
@@ -78,6 +78,7 @@ void subProcess(void *pvParameters)
     }
     dacWrite(DAC_PIN_1, vol1_int);
     dacWrite(DAC_PIN_2, vol2_int);
+    delay(5);
   }
 }
 
@@ -107,5 +108,5 @@ void loop()
   Serial.print(vol1_int);
   Serial.print(',');
   Serial.println(vol2_int);
-  delay(10); // 100Hz
+  delay(5); // 200Hz
 }
