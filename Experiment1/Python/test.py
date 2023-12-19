@@ -8,100 +8,103 @@ import time
 
 import numpy as np
 import serial
-
-# ip = '192.168.1.240'
-ip = "192.168.1.199"
-
-# data_record = []  # 記録用
-
-arduino_port = "COM8"
-baud_rate = 115200
-ser = serial.Serial(arduino_port, baud_rate)
-not_used = ser.readline()
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "../../.."))
-
+from ArmWrapper1000 import ArmWrapper
 from xarm.wrapper import XArmAPI
 
-arm = XArmAPI(ip)
-time.sleep(0.5)
-if arm.warn_code != 0:
-    arm.clean_warn()
-if arm.error_code != 0:
-    arm.clean_error()
 
-arm.motion_enable(True)
-arm.set_mode(0)
-arm.set_state(0)
-# ーーーーーーーーーーーーーーーーーーーーーーーーーーーーmainーーーーーーーーーーーーーーーーーーーーーーーーーー
-from ArmWrapper1000 import ArmWrapper
+class Text_class:
+    def __init__(self):
+        self.pos1 = 500
+        self.num_int = 127
+        ip = "192.168.1.199"
+        arduino_port = "COM8"
+        baud_rate = 115200
+        self.ser = serial.Serial(arduino_port, baud_rate)
+        not_used = self.ser.readline()
+        self.arm = XArmAPI(ip)
+        time.sleep(0.5)
+        if self.arm.warn_code != 0:
+            self.arm.clean_warn()
+        if self.arm.error_code != 0:
+            self.arm.clean_error()
+        self.arm.motion_enable(True)
+        self.arm.set_mode(0)
+        self.arm.set_state(0)
+        self.datal = ArmWrapper(True, ip)
+        thr1 = threading.Thread(target=self.loop)
+        thr1.setDaemon(True)
+        thr1.start()
+        thr2 = threading.Thread(target=self.thread)
+        thr2.setDaemon(True)
+        thr2.start()
 
-datal = ArmWrapper(True, ip)
-global num_str
-global pos
-num_str = str(127)
-pos = str(500)
-
-
-def thread():
-    startTime = time.perf_counter()
-    while True:
-        # code3//ESP32からencoder受信(loadcell受信)
-        line = ser.readline().decode("utf-8").rstrip()
-        # データの抽出と変数への代入
-        # data_parts = line.split(",")
-        # pos1 = int(850 - float(data_parts[0]) / 1600 * 850)  # -425-0
-        # pos2 = int(425+float(data_parts[1])/1400*850/2)#-425-0
-        # pos2 = 0
-        # pos3 = int(float(data_parts[2]))  # -425-0
-        # pos4 = int(float(data_parts[3]))  # -425-0
-        # pos1 = int(212.5 * (np.sin(2 * np.pi * 0.3 * (time.perf_counter()-startTime)) + 1))
-        pos1 = 500 - 100 * (time.perf_counter() - startTime)
-        if (time.perf_counter() - startTime) > 5:
-            pos1 = 0
-        if (time.perf_counter() - startTime) > 10:
-            pos1 = 0 + 100 * (time.perf_counter() - startTime - 10)
-        # data_record.append([pos1, num_str, time.perf_counter()])  # 記録用
-        pos_gripper = pos1
-        if pos_gripper > 850:
-            pos_gripper = 850
-        elif pos_gripper < 0:
-            pos_gripper = 0
-        pos = str(pos1)
-        print(pos_gripper, pos1, int(num_str))
-        # code4//encoderの値をgripperへ送信
-        code, ret = arm.getset_tgpio_modbus_data(datal.ConvertToModbusData(pos_gripper))
-
-
-try:
-    # startTime = time.perf_counter()
-    thr = threading.Thread(target=thread)
-    thr.setDaemon(True)  # threadをDaemonにすることでmain文終了で自動で終了する
-    thr.start()
-    # code5//loadcell読み取り
-    while True:
-        num = int(datal.loadcell_val * 1000)
-        if num > 250:
-            num = 250
-        elif num < 0:
-            num = 0
-        num_int = int(num / 250 * (220 - 127) + 127)
-        num_str = str(num_int)
-        # code6//loadcell送信
-        ser.write(bytes([num_int]))
-        with open("data.txt", mode="a") as txt_file:
-            txt_file.write(
-                pos + "  " + num_str + "  " + str(time.perf_counter()) + "\n"
+    def thread(self):
+        startTime = time.perf_counter()
+        while True:
+            # code3//ESP32からencoder受信(loadcell受信)
+            line = self.ser.readline().decode("utf-8").rstrip()
+            self.pos1 = 500 - 80 * (time.perf_counter() - startTime)
+            if (time.perf_counter() - startTime) > 5:
+                self.pos1 = 0
+            if (time.perf_counter() - startTime) > 10:
+                self.pos1 = 0 + 80 * (time.perf_counter() - startTime - 10)
+            # data_record.append([pos1, num_str, time.perf_counter()])  # 記録用
+            self.pos_gripper = self.pos1
+            if self.pos_gripper > 850:
+                self.pos_gripper = 850
+            elif self.pos_gripper < 0:
+                self.pos_gripper = 0
+            # code4//encoderの値をgripperへ送信
+            code, ret = self.arm.getset_tgpio_modbus_data(
+                self.datal.ConvertToModbusData(self.pos_gripper)
             )
-        # print(time.perf_counter(), num_str)
-        time.sleep(0.02)  # ターミナルで大きさ変更0.03が遅延なくできる
-except KeyboardInterrupt:
-    print("except KeyboardInterrupt")
-    # with open("data_record/" + "data1", "w", newline="") as f:
-    # writer = csv.writer(f)
-    # writer.writerow(['pos1', 'pos2', 'loadcell'])
-    # writer.writerows(data_record)
-    ser.close()
-    sys.exit()
-# # python gripper_con1108.py
-# # env\Scripts\Activate.ps1
+            # print(self.pos1, self.num_int, time.perf_counter())
+
+    def loop(self):
+        try:
+            # code5//loadcell読み取り
+            while True:
+                self.num = int(self.datal.loadcell_val * 1000)
+                if self.num > 250:
+                    self.num = 250
+                elif self.num < 0:
+                    self.num = 0
+                self.num_int = int(self.num / 250 * (220 - 127) + 127)
+                # code6//loadcell送信
+                self.ser.write(bytes([self.num_int]))
+                time.sleep(0.02)  # ターミナルで大きさ変更0.03が遅延なくできる
+        except KeyboardInterrupt:
+            print("except KeyboardInterrupt")
+            self.ser.close()
+            sys.exit()
+
+
+if __name__ == "__main__":
+    text_class = Text_class()
+    time.sleep(1)
+    while True:
+        try:
+            with open("data.txt", mode="a") as txt_file:
+                txt_file.write(
+                    str(text_class.pos1)
+                    + " "
+                    + str(text_class.num_int)
+                    + " "
+                    + str(time.perf_counter())
+                    + "\n"
+                )
+            print(text_class.pos1, text_class.num_int, time.perf_counter())
+            time.sleep(0.005)
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt Stop:text")
+            break
+
+with open("data.txt", mode="a") as txt_file:
+    txt_file.write(
+        text_class.pos1
+        + "  "
+        + text_class.num_int
+        + "  "
+        + str(time.perf_counter())
+        + "\n"
+    )
