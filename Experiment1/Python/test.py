@@ -65,11 +65,12 @@ class Text_class:
             # code5//loadcell読み取り
             while True:
                 self.num = int(self.datal.loadcell_val * 1000)
-                if self.num > 300:
-                    self.num = 300
-                elif self.num < 0:
-                    self.num = 0
-                self.num_int = int(self.num / 300 * (220 - 127) + 127)
+                if self.num > 350:
+                    self.num = 350
+                elif self.num < 100:
+                    self.num = 100
+                self.num_int = int((self.num - 100) / 250 * (220 - 127) + 127)
+                # self.num_int = int(self.num)
                 # code6//loadcell送信
                 # self.ser.write(bytes([self.num_int]))
                 time.sleep(0.02)  # ターミナルで大きさ変更0.03が遅延なくできる

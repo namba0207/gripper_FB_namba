@@ -303,7 +303,7 @@ class RobotControlManager:
                     elif self.num < 0:
                         self.num = 0
                     RC.num_int = int(self.num / 250 * (220 - 127) + 127)
-                    print(self.arm.get_cgpio_analog(1)[1])
+                    # print(self.arm.get_cgpio_analog(1)[1])
 
                     # ----- Vibrotactile Feedback ----- #
                     # vibrotactileFeedbackManager.GenerateVibrotactileFeedback(localPosition, localRotation, weightSlider)
@@ -820,7 +820,7 @@ class RobotControlManager:
         robotArm.set_gripper_mode(0)
         robotArm.set_gripper_enable(True)
         robotArm.set_gripper_position(
-            850, speed=3000
+            850, speed=2000
         )  # デバイスの可動域チェックした？可動域変化したら最大値変換を変更！
         robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(425))
         print("Initialized > xArm gripper")
