@@ -81,11 +81,11 @@ try:
     # code5//loadcell読み取り
     while True:
         num = int(datal.loadcell_val * 1000)
-        if num > 150:
-            num = 150
+        if num > 250:
+            num = 250
         elif num < 0:
             num = 0
-        num_int = int(num / 150 * (220 - 127) + 127)
+        num_int = int(num / 250 * (220 - 127) + 127)
         num_str = str(num_int)
         # code6//loadcell送信
         ser.write(bytes([num_int]))
