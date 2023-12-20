@@ -10,6 +10,7 @@ from ctypes import windll
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
+import RobotArmController.Robotconfig_pos as RP
 from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
     CyberneticAvatarMotionBehaviour,
 )
@@ -293,17 +294,25 @@ class RobotControlManager:
                         code, ret = self.arm.getset_tgpio_modbus_data(
                             self.ConvertToModbusData(gripperValue)
                         )
-
+                    RP.num_gripper_pos = self.arm.get_gripper_position()
+                    # print(self.arm.get_gripper_position())
                     self.num = (
                         float(self.arm.get_cgpio_analog(1)[1])
                         - float(self.init_loadcell_val)
                     ) * 1000
-                    if self.num > 250:
-                        self.num = 250
+                    if self.num > 270:
+                        self.num = 270
                     elif self.num < 0:
                         self.num = 0
-                    RC.num_int = int(self.num / 250 * (220 - 127) + 127)
-                    # print(self.arm.get_cgpio_analog(1)[1])
+                    RC.num_int = int(self.num / (270 - 0) * (255 - 127) + 127)
+
+                    # print(
+                    #     (
+                    #         float(self.arm.get_cgpio_analog(1)[1])
+                    #         - float(self.init_loadcell_val)
+                    #     )
+                    #     * 1000
+                    # )
 
                     # ----- Vibrotactile Feedback ----- #
                     # vibrotactileFeedbackManager.GenerateVibrotactileFeedback(localPosition, localRotation, weightSlider)

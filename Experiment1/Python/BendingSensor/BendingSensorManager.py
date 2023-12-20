@@ -11,6 +11,7 @@ import time
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
+import RobotArmController.Robotconfig_pos as RP
 import RobotArmController.Robotconfig_vib as RV
 import serial
 
@@ -23,11 +24,17 @@ class BendingSensorManager:
         self.bendingValue_sub = 0
         self.ser = serial.Serial(ip, port)
         self.not_used = self.ser.readline()
+        # self.num = 127
 
     def thread(self):
         while True:
+            # if RC.num_int > 255:
+            #     self.num = 255
+            # elif RC.num_int < 0:
+            #     self.num = 0
             self.ser.write(bytes([RC.num_int]))
-            time.sleep(0.03)
+            # print(RC.num_int)
+            time.sleep(0.0005)
 
     def StartReceiving(self):
         """
@@ -44,7 +51,7 @@ class BendingSensorManager:
                 self.bendingValue_int = int(
                     850
                     - int(self.data_parts[0].rstrip())
-                    / 2800
+                    / 2100
                     * 850  # 発振するときデバイスの可動域の大きさ注意！
                 )
                 if self.bendingValue_int > 850:
@@ -58,6 +65,6 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                # print(self.data_parts)
+                print(self.data_parts, RP.num_gripper_pos)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")

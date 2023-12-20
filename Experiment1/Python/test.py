@@ -15,6 +15,7 @@ from xarm.wrapper import XArmAPI
 class Text_class:
     def __init__(self):
         self.pos1 = 500
+        self.pos = 425
         self.num_int = 127
         ip = "192.168.1.199"
         arduino_port = "COM8"
@@ -58,7 +59,8 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.pos_gripper)
             )
-            # print(self.pos1, self.num_int, time.perf_counter())
+            self.pos = self.arm.get_gripper_position()[1]
+            print(self.pos)
 
     def loop(self):
         try:
@@ -70,7 +72,7 @@ class Text_class:
                 elif self.num < 150:
                     self.num = 150
                 self.num_int = int((self.num - 150) / (300 - 150) * (220 - 127) + 127)
-                print(self.num)
+                # print(self.num)
                 # self.num_int = int(self.num)
                 # code6//loadcell送信
                 # self.ser.write(bytes([self.num_int]))
@@ -88,14 +90,14 @@ if __name__ == "__main__":
         try:
             with open("data.txt", mode="a") as txt_file:
                 txt_file.write(
-                    str(text_class.pos1)
+                    str(text_class.pos)
                     + " "
                     + str(text_class.num_int)
                     + " "
                     + str(time.perf_counter())
                     + "\n"
                 )
-            print(text_class.pos1, text_class.num_int, time.perf_counter())
+            # print(text_class.pos, text_class.num_int, time.perf_counter())
             time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
