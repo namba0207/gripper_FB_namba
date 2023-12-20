@@ -67,11 +67,11 @@ class Text_class:
             # code5//loadcell読み取り
             while True:
                 self.num = int(self.datal.loadcell_val * 1000)
-                if self.num > 300:
-                    self.num = 300
-                elif self.num < 150:
-                    self.num = 150
-                self.num_int = int((self.num - 150) / (300 - 150) * (220 - 127) + 127)
+                if self.num > 270:
+                    self.num = 270
+                elif self.num < 0:
+                    self.num = 0
+                self.num_int = int(self.num / (270 - 0) * (220 - 127) + 127)
                 # print(self.num)
                 # self.num_int = int(self.num)
                 # code6//loadcell送信
