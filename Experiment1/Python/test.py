@@ -17,6 +17,7 @@ class Text_class:
         self.pos1 = 500
         self.pos = 425
         self.num_int = 127
+        self.vol1 = 127
         ip = "192.168.1.199"
         arduino_port = "COM8"
         baud_rate = 115200
@@ -73,10 +74,10 @@ class Text_class:
                 elif self.num < 0:
                     self.num = 0
                 self.num_int = int(self.num / (270 - 0) * (255 - 127) + 127)
-                # print(self.num)
-                # self.num_int = int(self.num)
                 # code6//loadcell送信
                 self.ser.write(bytes([self.num_int]))
+                self.Pf = self.num_int - self.vol1
+                self.vol1 = int(0.1 * self.Pf + self.num_int)
                 time.sleep(0.005)  # ターミナルで大きさ変更0.03が遅延なくできる
         except KeyboardInterrupt:
             print("except KeyboardInterrupt")
@@ -95,6 +96,8 @@ if __name__ == "__main__":
                     + " "
                     + str(text_class.num_int)
                     + " "
+                    + str(text_class.vol1)
+                    + " "
                     + str(text_class.data_parts[2])
                     + " "
                     + str(time.perf_counter())
@@ -109,6 +112,8 @@ if __name__ == "__main__":
 with open("data.txt", mode="a") as txt_file:
     txt_file.write(
         text_class.pos1
+        + "  "
+        + text_class.vol1
         + "  "
         + text_class.data_parts[2]
         + "  "
