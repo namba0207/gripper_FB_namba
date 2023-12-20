@@ -71,7 +71,7 @@ class Text_class:
                     self.num = 270
                 elif self.num < 0:
                     self.num = 0
-                self.num_int = int(self.num / (270 - 0) * (220 - 127) + 127)
+                self.num_int = int(self.num / (270 - 0) * (255 - 127) + 127)
                 # print(self.num)
                 # self.num_int = int(self.num)
                 # code6//loadcell送信
