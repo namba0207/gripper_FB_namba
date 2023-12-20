@@ -52,7 +52,7 @@ class BendingSensorManager:
                     850
                     - int(self.data_parts[0].rstrip())
                     / 2000
-                    * 850  # 発振するときデバイスの可動域の大きさ注意！
+                    * 850  # 発振するときデバイスの可動域の大きさ注意！!
                 )
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
