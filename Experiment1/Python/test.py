@@ -44,6 +44,7 @@ class Text_class:
         while True:
             # code3//ESP32からencoder受信(loadcell受信)
             line = self.ser.readline().decode("utf-8").rstrip()
+            self.data_parts = line.split(",")
             self.pos1 = 500 - 80 * (time.perf_counter() - startTime)
             if (time.perf_counter() - startTime) > 5:
                 self.pos1 = 100
@@ -60,7 +61,7 @@ class Text_class:
                 self.datal.ConvertToModbusData(self.pos_gripper)
             )
             self.pos = self.arm.get_gripper_position()[1]
-            print(self.pos)
+            # print(self.pos)
 
     def loop(self):
         try:
@@ -75,8 +76,8 @@ class Text_class:
                 # print(self.num)
                 # self.num_int = int(self.num)
                 # code6//loadcell送信
-                # self.ser.write(bytes([self.num_int]))
-                time.sleep(0.02)  # ターミナルで大きさ変更0.03が遅延なくできる
+                self.ser.write(bytes([self.num_int]))
+                time.sleep(0.005)  # ターミナルで大きさ変更0.03が遅延なくできる
         except KeyboardInterrupt:
             print("except KeyboardInterrupt")
             self.ser.close()
@@ -94,10 +95,12 @@ if __name__ == "__main__":
                     + " "
                     + str(text_class.num_int)
                     + " "
+                    + str(text_class.data_parts[2])
+                    + " "
                     + str(time.perf_counter())
                     + "\n"
                 )
-            # print(text_class.pos, text_class.num_int, time.perf_counter())
+            print(text_class.pos, text_class.data_parts[2], time.perf_counter())
             time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
@@ -107,7 +110,7 @@ with open("data.txt", mode="a") as txt_file:
     txt_file.write(
         text_class.pos1
         + "  "
-        + text_class.num_int
+        + text_class.data_parts[2]
         + "  "
         + str(time.perf_counter())
         + "\n"
