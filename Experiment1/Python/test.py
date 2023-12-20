@@ -69,15 +69,13 @@ class Text_class:
             # code5//loadcell読み取り
             while True:
                 self.num = int(self.datal.loadcell_val * 1000)
-                if self.num > 270:
-                    self.num = 270
+                if self.num > 250:
+                    self.num = 250
                 elif self.num < 0:
                     self.num = 0
-                self.num_int = int(self.num / (270 - 0) * (255 - 127) + 127)
+                self.num_int = int(self.num / (250 - 0) * (255 - 127) + 127)
                 # code6//loadcell送信
                 self.ser.write(bytes([self.num_int]))
-                self.Pf = self.num_int - self.vol1
-                self.vol1 = int(0.025 * self.Pf + self.num_int)
                 time.sleep(0.005)  # ターミナルで大きさ変更0.03が遅延なくできる
         except KeyboardInterrupt:
             print("except KeyboardInterrupt")
@@ -96,8 +94,6 @@ if __name__ == "__main__":
                     + " "
                     + str(text_class.num_int)
                     + " "
-                    + str(text_class.vol1)
-                    + " "
                     + str(text_class.data_parts[2])
                     + " "
                     + str(time.perf_counter())
@@ -106,7 +102,6 @@ if __name__ == "__main__":
             print(
                 text_class.pos,
                 text_class.num_int,
-                text_class.vol1,
                 text_class.data_parts[2],
                 time.perf_counter(),
             )
