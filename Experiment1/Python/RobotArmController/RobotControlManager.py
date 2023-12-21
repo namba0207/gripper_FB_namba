@@ -830,7 +830,7 @@ class RobotControlManager:
         robotArm.set_gripper_mode(0)
         robotArm.set_gripper_enable(True)
         robotArm.set_gripper_position(
-            850, speed=2000
+            850, speed=1500
         )  # デバイスの可動域チェックした？可動域変化したら最大値変換を変更！
         robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(425))
         print("Initialized > xArm gripper")
