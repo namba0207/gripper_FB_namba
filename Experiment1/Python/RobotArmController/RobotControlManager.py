@@ -304,7 +304,8 @@ class RobotControlManager:
                         self.num = 250
                     elif self.num < 0:
                         self.num = 0
-                    RC.num_int = int(self.num / (250 - 0) * (255 - 127) + 127)
+                    # RC.num_int = int(self.num / (250 - 0) * (255 - 127) + 127)
+                    RC.num_int = 127
 
                     # print(
                     #     (
