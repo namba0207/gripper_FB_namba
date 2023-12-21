@@ -65,6 +65,6 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                print(self.data_parts, RP.num_gripper_pos)
+                print(self.data_parts, RC.num_int)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
