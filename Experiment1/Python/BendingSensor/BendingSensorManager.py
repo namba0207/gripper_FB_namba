@@ -5,8 +5,6 @@
 # -----------------------------------------------------------------------
 
 import threading
-
-# import socket
 import time
 
 import numpy as np
@@ -14,6 +12,7 @@ import RobotArmController.Robotconfig as RC
 import RobotArmController.Robotconfig_pos as RP
 import RobotArmController.Robotconfig_vib as RV
 import serial
+from xarm.wrapper import XArmAPI
 
 
 class BendingSensorManager:
@@ -24,7 +23,7 @@ class BendingSensorManager:
         self.bendingValue_sub = 0
         self.ser = serial.Serial(ip, port)
         self.not_used = self.ser.readline()
-        # self.num = 127
+        self.arm = XArmAPI("192.168.1.199")
 
     def thread(self):
         while True:
@@ -47,12 +46,12 @@ class BendingSensorManager:
                     850
                     - int(self.data_parts[0].rstrip())
                     / 2000
-                    * 850  # 発振するときデバイスの可動域の大きさ注意！!
+                    * 600  # 発振するときデバイスの可動域の大きさ注意！!
                 )
                 if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
-                elif self.bendingValue_int < 0:
-                    self.bendingValue_int = 0
+                elif self.bendingValue_int < 250:
+                    self.bendingValue_int = 250
                 self.bendingValue = self.bendingValue_int
                 self.bendingVelocity = (
                     int(self.data_parts[1].rstrip()) - self.bendingValue_sub
@@ -60,6 +59,17 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                print(self.data_parts, RC.num_int)
+                # with open("data.txt", mode="a") as txt_file:
+                #     txt_file.write(
+                #         str(self.arm.get_gripper_position()[1])
+                #         + " "
+                #         + str(RC.num_int)
+                #         + " "
+                #         + str(self.data_parts[2])
+                #         + " "
+                #         + str(time.perf_counter())
+                #         + "\n"
+                #     )
+                print(self.data_parts, RC.num_int, self.arm.get_gripper_position()[1])
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
