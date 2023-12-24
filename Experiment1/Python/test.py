@@ -76,7 +76,7 @@ class Text_class:
                 self.num_int = int(self.num / (250 - 0) * (255 - 127) + 127)
                 # code6//loadcell送信
                 self.ser.write(bytes([self.num_int]))
-                time.sleep(0.005)  # ターミナルで大きさ変更0.03が遅延なくできる
+                time.sleep(0.005)
         except KeyboardInterrupt:
             print("except KeyboardInterrupt")
             self.ser.close()
@@ -109,17 +109,3 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break
-
-# with open("data.txt", mode="a") as txt_file:
-#     txt_file.write(
-#         text_class.pos1
-#         + "  "
-#         + text_class.num_int
-#         + "  "
-#         + text_class.vol1
-#         + "  "
-#         + text_class.data_parts[2]
-#         + "  "
-#         + str(time.perf_counter())
-#         + "\n"
-#     )

@@ -28,12 +28,7 @@ class BendingSensorManager:
 
     def thread(self):
         while True:
-            # if RC.num_int > 255:
-            #     self.num = 255
-            # elif RC.num_int < 0:
-            #     self.num = 0
             self.ser.write(bytes([RC.num_int]))
-            # print(RC.num_int)
             time.sleep(0.0005)
 
     def StartReceiving(self):
@@ -54,7 +49,7 @@ class BendingSensorManager:
                     / 2000
                     * 850  # 発振するときデバイスの可動域の大きさ注意！!
                 )
-                if self.bendingValue_int > 850:
+                if self.bendingValue_int > 850:s
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
