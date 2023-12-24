@@ -46,11 +46,11 @@ class Text_class:
             # code3//ESP32からencoder受信(loadcell受信)
             line = self.ser.readline().decode("utf-8").rstrip()
             self.data_parts = line.split(",")
-            self.pos1 = 500 - 80 * (time.perf_counter() - startTime)
+            self.pos1 = 500 - 100 * (time.perf_counter() - startTime)
+            if (time.perf_counter() - startTime) > 2.5:
+                self.pos1 = 250
             if (time.perf_counter() - startTime) > 5:
-                self.pos1 = 100
-            if (time.perf_counter() - startTime) > 10:
-                self.pos1 = 100 + 80 * (time.perf_counter() - startTime - 10)
+                self.pos1 = 250 + 100 * (time.perf_counter() - startTime - 5)
             # data_record.append([pos1, num_str, time.perf_counter()])  # 記録用
             self.pos_gripper = self.pos1
             if self.pos_gripper > 850:
