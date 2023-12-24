@@ -49,7 +49,7 @@ class BendingSensorManager:
                     / 2000
                     * 850  # 発振するときデバイスの可動域の大きさ注意！!
                 )
-                if self.bendingValue_int > 850:s
+                if self.bendingValue_int > 850:
                     self.bendingValue_int = 850
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0

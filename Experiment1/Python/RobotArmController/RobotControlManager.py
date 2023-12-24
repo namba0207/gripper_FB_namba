@@ -210,26 +210,6 @@ class RobotControlManager:
                         loopCount=self.loopCount
                     )
 
-                    # ----- For opposite condition ----- #
-                    # if directionOfParticipants == "opposite":
-                    #     for oppositeParticipant in oppositeParticipants:
-                    #         # yz: Mirror mode, xz: Natural mode
-                    #         localRotation[
-                    #             oppositeParticipant
-                    #         ] = caBehaviour.InversedRotation(
-                    #             localRotation[oppositeParticipant], axes=inversedAxes
-                    #         )
-
-                    # ----- Calculate shared transform ----- #
-                    # position, rotation = caBehaviour.GetSharedTransform(localPosition, localRotation, sharedMethod, 0.5)
-                    # rotation = caBehaviour.Quaternion2Euler(rotation)
-
-                    # ----- For weight slider (Made by Ogura-san) ----- #
-                    # weightSliderList = weightSliderManager.GetSliderValue()
-                    # weightSlider = [
-                    #     [1 - weightSliderList[0], weightSliderList[0]],
-                    #     [1 - weightSliderList[1], weightSliderList[1]],
-                    # ]
                     weightSlider = [0.5, 0.5]
 
                     position, rotation = caBehaviour.GetSharedTransformWithCustomWeight(
@@ -279,15 +259,7 @@ class RobotControlManager:
                     dictBendingValue = participantMotionManager.GripperControlValue(
                         loopCount=self.loopCount
                     )
-                    # gripperValue = sum(dictBendingValue.values()) / len(dictBendingValue)
-                    # print(dictBendingValue)
                     gripperValue = dictBendingValue
-
-                    # for i in len(dictBendingValue):
-                    #     gripperValue += (
-                    #         dictBendingValue["gripperValue" + str(i + 1)]
-                    #         * weightSlider[1][i]
-                    #     )
 
                     # ----- Gripper control ----- #
                     if isEnablexArm:
@@ -314,18 +286,6 @@ class RobotControlManager:
                     #     )
                     #     * 1000
                     # )
-
-                    # ----- Vibrotactile Feedback ----- #
-                    # vibrotactileFeedbackManager.GenerateVibrotactileFeedback(localPosition, localRotation, weightSlider)
-                    # if participantNum == 2:
-                    #     if sharedMethod == "integration":
-                    #         vibrotactileFeedbackManager.forIntegration(
-                    #             localPosition, localRotation, weightSlider[0][0]
-                    #         )
-                    #     elif sharedMethod == "divisionofroles":
-                    #         vibrotactileFeedbackManager.forDivisionOfRoles(
-                    #             localPosition, localRotation
-                    #         )
 
                     # # ----- Data recording ----- #
                     # dataRecordManager.Record(
