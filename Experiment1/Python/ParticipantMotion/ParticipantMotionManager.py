@@ -131,13 +131,9 @@ class ParticipantMotionManager:
             bendingSensorSerialCom = "COM8"
             bendingSensorSerialPort = 115200
 
-            # for i in range(bendingSensorNum):
-            # bendingSensorManager = BendingSensorManager(ip=bendingSensorUdpIpAddress, port=bendingSensorUdpPort[i])
-
             self.bendingSensorManager = BendingSensorManager(
                 ip=bendingSensorSerialCom, port=bendingSensorSerialPort
             )
-            # self.bendingSensors.append(bendingSensorManager)
 
             # ----- Start receiving bending sensor value from UDP socket ----- #
             bendingSensorThread = threading.Thread(

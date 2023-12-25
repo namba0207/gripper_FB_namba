@@ -1,18 +1,16 @@
 // 把持力フィードバック//1205
 #include <RotaryEncoder.h>
 // ロードセル
-int loadcell_rec = 127;
+volatile int loadcell_rec = 127;
 
 // アナログピン34,13 モーター->マイコン エンコーダー用
 const int ENCODER_PIN_1 = 32;
 const int ENCODER_PIN_2 = 33;
 const int ENCODER_PIN_3 = 34;
 const int ENCODER_PIN_4 = 35;
-
 // アナログピン25,26 マイコン->モータ モータ制御用
 const int DAC_PIN_1 = 26;
 const int DAC_PIN_2 = 25;
-
 // ESP32並列処理
 volatile int vol1_int = 127;
 volatile int vol2_int = 127;
@@ -24,7 +22,7 @@ volatile int newpos2_int = 0;
 float pretime = 0;
 float preP1 = 0;
 float preP2 = 0;
-float Kd1 = 0.004; // 発振用ダンパ係数
+float Kd1 = 0.005; // 発振用ダンパ係数
 float Kp2 = 0.05;  // PIDをゆるく
 float Kd2 = 0.005;
 float dt = 0.005;
@@ -32,7 +30,10 @@ float P1;
 float P2;
 float D1;
 float D2;
-float a = 0.99; // Lowpass-fft用
+float a = 0.9; // Lowpass-filter用
+// float a = 1;//反力127固定
+// float a = 0;//filter無し
+
 RotaryEncoder encoder1(ENCODER_PIN_1, ENCODER_PIN_2, RotaryEncoder::LatchMode::TWO03);
 RotaryEncoder encoder2(ENCODER_PIN_3, ENCODER_PIN_4, RotaryEncoder::LatchMode::TWO03);
 
@@ -59,8 +60,7 @@ void subProcess(void *pvParameters)
     D2 = (P2 - preP2) / dt;
     preP2 = P2;
     volt = a * volt + (1 - a) * loadcell_rec;
-    //    vol1_int = int(volt + Kd1* D1);
-    vol1_int = int(loadcell_rec + Kd1 * D1);   // コントロール側は今まで通り反力くる0.004体験
+    vol1_int = int(volt + Kd1 * D1);
     vol2_int = int(Kp2 * P2 + Kd2 * D2 + 127); // サポート側はスクイーズで反力くる
 
     if (vol1_int > 255)

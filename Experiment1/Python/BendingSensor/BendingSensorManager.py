@@ -43,15 +43,15 @@ class BendingSensorManager:
                 line = self.ser.readline().decode("utf-8").rstrip()
                 self.data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    850
+                    500
                     - int(self.data_parts[0].rstrip())
                     / 2000
-                    * 600  # 発振するときデバイスの可動域の大きさ注意！!
+                    * 500  # 発振するときデバイスの可動域の大きさ注意！!
                 )
-                if self.bendingValue_int > 850:
-                    self.bendingValue_int = 850
-                elif self.bendingValue_int < 250:
-                    self.bendingValue_int = 250
+                if self.bendingValue_int > 500:
+                    self.bendingValue_int = 500
+                elif self.bendingValue_int < 0:
+                    self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
                 self.bendingVelocity = (
                     int(self.data_parts[1].rstrip()) - self.bendingValue_sub

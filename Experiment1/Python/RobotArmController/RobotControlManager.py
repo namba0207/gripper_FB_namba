@@ -272,11 +272,11 @@ class RobotControlManager:
                         float(self.arm.get_cgpio_analog(1)[1])
                         - float(self.init_loadcell_val)
                     ) * 1000
-                    if self.num > 250:
-                        self.num = 250
+                    if self.num > 200:
+                        self.num = 200
                     elif self.num < 0:
                         self.num = 0
-                    RC.num_int = int(self.num / (250 - 0) * (255 - 127) + 127)
+                    RC.num_int = int(self.num / (200 - 0) * (255 - 127) + 127)
                     # RC.num_int = 127
 
                     # print(
