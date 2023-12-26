@@ -16,6 +16,8 @@ volatile int vol1_int = 127;
 volatile int vol2_int = 127;
 volatile float volt = 127; // Lowpass-fft用
 // PID
+volatile float newpos1 = 0;
+volatile float newpos2 = 0;
 volatile int newpos1_int = 0;
 volatile int newpos2_int = 0;
 
@@ -23,7 +25,7 @@ float pretime = 0;
 float preP1 = 0;
 float preP2 = 0;
 float Kd1 = 0.005; // 発振用ダンパ係数
-float Kp2 = 0.05;  // PIDをゆるく
+float Kp2 = 0.08;  // PIDをゆるく
 float Kd2 = 0.005;
 float dt = 0.005;
 float P1;
@@ -47,8 +49,10 @@ void subProcess(void *pvParameters)
 { // 並列処理の関数
   while (1)
   {
-    newpos1_int = (int)encoder1.getPosition(); // 元々のgetPositionはintで拾う？ → 確認したらlong型でした．実機で動かしてから修正したい．
-    newpos2_int = (int)encoder2.getPosition(); // 腹を括って並列処理を削除．動かなかったら戻す．
+    newpos1 = encoder1.getPosition();
+    newpos2 = encoder2.getPosition();
+    newpos1_int = int(newpos1 / 2200 * 2800);
+    newpos2_int = int(newpos2);
 
     if (Serial.available())
     {
@@ -61,7 +65,7 @@ void subProcess(void *pvParameters)
     preP2 = P2;
     volt = a * volt + (1 - a) * loadcell_rec;
     vol1_int = int(volt + Kd1 * D1);
-    vol2_int = int(Kp2 * P2 + Kd2 * D2 + 127); // サポート側はスクイーズで反力くる
+    vol2_int = int(Kp2 * P2 + Kd2 * D2 + 127);
 
     if (vol1_int > 255)
     {
@@ -95,7 +99,7 @@ void setup()
   pinMode(DAC_PIN_2, OUTPUT);
   Serial.begin(115200);
   Serial.println("SimplePollRotator example for the RotaryEncoder library.");
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_1), ISR, CHANGE); // 割り込み処理はできるだけ簡単にINPUTしてないのにできてるのは気持ち悪い、
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_1), ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_2), ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_3), ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_4), ISR, CHANGE);
