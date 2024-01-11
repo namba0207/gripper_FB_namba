@@ -1,4 +1,4 @@
-# 反力そのままフィードバック
+# Arduino_gripper_con.inoとセット！！
 import csv  # 記録用
 import sys
 import threading
@@ -8,6 +8,7 @@ import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
 from xarm.wrapper import XArmAPI
+
 
 class Text_class:
     def __init__(self):
@@ -39,11 +40,8 @@ class Text_class:
             line = self.ser.readline().decode("utf-8").rstrip()
             self.data_parts = line.split(",")
             self.bendingValue_int = int(
-                    400
-                    - int(self.data_parts[0].rstrip())
-                    / 2600
-                    * 400
-                )
+                400 - int(self.data_parts[0].rstrip()) / 2600 * 400
+            )
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
             elif self.bendingValue_int < 0:
@@ -51,6 +49,7 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.bendingValue_int)
             )
+            print(self.data_parts[0].rstrip())
 
     def loop(self):
         try:
@@ -74,8 +73,8 @@ class Text_class:
 if __name__ == "__main__":
     text_class = Text_class()
 
-    header = ['400','0']  # 任意の列名を指定
-    with open("data.csv", 'w', newline='') as file:
+    header = ["0", "0"]  # 任意の列名を指定
+    with open("data.csv", "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(header)
     time.sleep(0.5)
@@ -85,10 +84,10 @@ if __name__ == "__main__":
             data1 = text_class.data_parts[0].rstrip()
             data2 = time.perf_counter() - start_time
             # 新しいデータをCSVファイルに追記
-            with open("data.csv", 'a', newline='') as file:
+            with open("data4.csv", "a", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow([data1,data2])
-            time.sleep(0.5)
+                writer.writerow([data1, data2])
+            time.sleep(0.005)
         except KeyboardInterrupt:
-                print("KeyboardInterrupt Stop:text")
-                break
+            print("KeyboardInterrupt Stop:text")
+            break
