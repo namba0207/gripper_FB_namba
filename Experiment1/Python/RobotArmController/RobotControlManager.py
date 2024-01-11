@@ -10,12 +10,10 @@ from ctypes import windll
 import numpy as np
 import RobotArmController.Robotconfig as RC
 import RobotArmController.Robotconfig_pos as RP
-from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
-    CyberneticAvatarMotionBehaviour,
-)
+from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import \
+    CyberneticAvatarMotionBehaviour
 from ParticipantMotion.ParticipantMotionManager import ParticipantMotionManager
 from Recorder.DataRecordManager import DataRecordManager
-
 # from VibrotactileFeedback.VibrationFeedback import Vibrotactile
 # ----- Custom class ----- #
 from RobotArmController.xArmTransform import xArmTransform
@@ -147,11 +145,8 @@ class RobotControlManager:
         isPrintFrameRate = False  # For debug
         isPrintData = False  # For debug
 
-        # loadCellManager = LoadCellManager(True, self.xArmIpAddress)
         self.arm.set_tgpio_modbus_baudrate(2000000)
         self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
-        # self.loadcell_thr = threading.Thread(target=self.get_loadcell_val, daemon=True)
-        # self.loadcell_thr.start()
         try:
             while True:
                 if time.perf_counter() - taskStartTime > executionTime:
@@ -261,11 +256,6 @@ class RobotControlManager:
                     #         - float(self.init_loadcell_val)
                     #     )
                     #     * 1000
-                    # )
-
-                    # # ----- Data recording ----- #
-                    # dataRecordManager.Record(
-                    #     localPosition, localRotation, dictBendingValue
                     # )
 
                     # ----- If xArm error has occured ----- #
@@ -425,25 +415,25 @@ class RobotControlManager:
         time.sleep(0.5)
         print("Initialized > xArm")
 
-    def InitGripper(self, robotArm):
-        """
-        Initialize the gripper
+    # def InitGripper(self, robotArm):
+    #     """
+    #     Initialize the gripper
 
-        Parameters
-        ----------
-        robotArm: XArmAPI
-            XArmAPI object.
-        """
+    #     Parameters
+    #     ----------
+    #     robotArm: XArmAPI
+    #         XArmAPI object.
+    #     """
 
-        robotArm.set_tgpio_modbus_baudrate(2000000)
-        robotArm.set_gripper_mode(0)
-        robotArm.set_gripper_enable(True)
-        robotArm.set_gripper_position(0, speed=5000)
+    #     robotArm.set_tgpio_modbus_baudrate(2000000)
+    #     robotArm.set_gripper_mode(0)
+    #     robotArm.set_gripper_enable(True)
+    #     robotArm.set_gripper_position(0, speed=5000)
 
-        robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(425))
+    #     robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(300))
 
-        time.sleep(0.5)
-        print("Initialized > xArm gripper")
+    #     time.sleep(0.5)
+    #     print("Initialized > xArm gripper")
 
     def ConvertToModbusData(self, value: int):
         """
@@ -541,7 +531,7 @@ class RobotControlManager:
         robotArm.set_gripper_position(
             850, speed=1500
         )  # デバイスの可動域チェックした？可動域変化したら最大値変換を変更！
-        robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(425))
+        robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(400))
         print("Initialized > xArm gripper")
 
         robotArm.set_mode(1)

@@ -33,7 +33,8 @@ if __name__ == "__main__":
     # audioDeviceIndexes = AudioDeviceIndexes()
     # audioDeviceIndexes.FindWithName('Real')
 
-    # while True:
+    # while True:s
+
     #     try:
     #         with open("data.txt", mode="a") as txt_file:
     #             txt_file.write(
@@ -56,6 +57,5 @@ if __name__ == "__main__":
     #     except KeyboardInterrupt:
     #         print("KeyboardInterrupt Stop:text")
     #         break
-    print("halo")
 
     print("\n----- End program: ExManager.py -----")

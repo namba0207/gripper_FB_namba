@@ -19,7 +19,7 @@ class BendingSensorManager:
     def __init__(self, ip, port) -> None:
         self.ip = ip
         self.port = port
-        self.bendingValue = 850
+        self.bendingValue = 400
         self.bendingValue_sub = 0
         self.ser = serial.Serial(ip, port)
         self.not_used = self.ser.readline()
@@ -43,13 +43,13 @@ class BendingSensorManager:
                 line = self.ser.readline().decode("utf-8").rstrip()
                 self.data_parts = line.split(",")
                 self.bendingValue_int = int(
-                    500
+                    400
                     - int(self.data_parts[0].rstrip())
                     / 2600
-                    * 500  # 発振するときデバイスの可動域の大きさ注意！!
+                    * 400  # 発振するときデバイスの可動域の大きさ注意！!
                 )
-                if self.bendingValue_int > 500:
-                    self.bendingValue_int = 500
+                if self.bendingValue_int > 400:
+                    self.bendingValue_int = 400
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
