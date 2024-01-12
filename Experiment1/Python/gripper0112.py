@@ -1,6 +1,6 @@
 # Arduino_gripper_out.inoとセット！！
 import csv  # 記録用
-import sys
+import struct
 import threading
 import time
 
@@ -41,14 +41,14 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_randam.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_100BPM.csv"
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
         self.count = 0
         self.start_time = time.perf_counter()
         while True:
-            self.bendingValue_int = int(400 - int(self.l1[self.count][0]) * 400 / 2800)
+            self.bendingValue_int = int(400 - int(self.l1[self.count][0]) / 2600 * 400)
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
             elif self.bendingValue_int < 0:
@@ -64,28 +64,15 @@ class Text_class:
     # 記録データをArduinoへ送る
     def sendloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_randam.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_100BPM.csv",
+            "r",
         ) as f2:
             reader = csv.reader(f2)
-            self.l2 = [row for row in reader]
-        self.count2 = 0
-        while True:
-            self.counter = 0
-            self.counter2 = 0
-            self.num = int(int(self.l2[self.count2][0]) * 255 / 2800)
-            if self.num > 255:
-                self.num = 255
-            elif self.num < 0:
-                self.num = 0
-            while self.num >= 255:
-                self.num = self.num - 255
-                self.counter += 1
-            while self.counter > self.counter2:
-                self.ser.write(bytes([255]))
-                self.counter2 += 1
-            self.ser.write(bytes([self.num]))
-            self.count2 += 1
-            time.sleep(0.005)
+            for row in reader:
+                value = int(row[0])
+                # print(value)
+                self.send_data(value)
+                time.sleep(0.005)
 
     # Arduinoからデータを受け取る
     def receiveloop(self):
@@ -93,8 +80,12 @@ class Text_class:
             self.line = self.ser.readline().decode("utf-8").rstrip()
             # self.data_parts = self.line.split(",")
             # self.bendingValue = self.data_parts[0].rstrip()
-            print(int(self.l2[self.count2][0]), self.line)
+            print(self.line)
             # time.sleep(0.000001)
+
+    def send_data(self, data):
+        self.binary_data = struct.pack("!i", data)
+        self.ser.write(self.binary_data)
 
 
 if __name__ == "__main__":

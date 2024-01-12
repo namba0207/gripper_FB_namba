@@ -16,7 +16,6 @@ class Text_class:
         self.num_int = 127
         ip = "192.168.1.199"
         self.ser = serial.Serial("COM8", 115200)
-        # not_used = self.ser.readline()
         self.arm = XArmAPI(ip)
         time.sleep(0.5)
         if self.arm.warn_code != 0:
@@ -49,7 +48,7 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.bendingValue_int)
             )
-            print(self.data_parts[0].rstrip())
+            # print(self.data_parts[0].rstrip())
 
     def loop(self):
         try:
@@ -74,7 +73,7 @@ if __name__ == "__main__":
     text_class = Text_class()
 
     header = ["0", "0"]  # 任意の列名を指定
-    with open("data.csv", "w", newline="") as file:
+    with open("data0112_1.csv", "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(header)
     time.sleep(0.5)
@@ -84,7 +83,7 @@ if __name__ == "__main__":
             data1 = text_class.data_parts[0].rstrip()
             data2 = time.perf_counter() - start_time
             # 新しいデータをCSVファイルに追記
-            with open("data4.csv", "a", newline="") as file:
+            with open("data0112_1.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow([data1, data2])
             time.sleep(0.005)

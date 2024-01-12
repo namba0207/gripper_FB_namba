@@ -51,7 +51,7 @@ void subProcess(void *pvParameters)
   {
     newpos1 = encoder1.getPosition();
     newpos2 = encoder2.getPosition();
-    newpos1_int = int(newpos1 / 2200 * 2800);
+    newpos1_int = int(newpos1 * 2800 / 2300);
     newpos2_int = int(newpos2);
 
     if (Serial.available())
