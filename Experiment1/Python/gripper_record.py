@@ -68,24 +68,24 @@ class Text_class:
             self.ser.close()
             sys.exit()
 
-
 if __name__ == "__main__":
     text_class = Text_class()
 
-    header = ["0", "0"]  # 任意の列名を指定
-    with open("data0112_1.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(header)
+    # header = ["0", "0"]  # 任意の列名を指定
+    # with open("data0112_1.csv", "w", newline="") as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(header)
     time.sleep(0.5)
     start_time = time.perf_counter()
     while True:
         try:
             data1 = text_class.data_parts[0].rstrip()
-            data2 = time.perf_counter() - start_time
+            data2 = text_class.num_int
+            data3 = time.perf_counter() - start_time
             # 新しいデータをCSVファイルに追記
             with open("data0112_1.csv", "a", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow([data1, data2])
+                writer.writerow([data1, data2, data3])
             time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
