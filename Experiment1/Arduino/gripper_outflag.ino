@@ -82,8 +82,6 @@ void loop()
   Serial.print(',');
   Serial.print(-newpos2_int);
   Serial.print(',');
-  Serial.print(loadcell_rec);
-  Serial.print(',');
   Serial.println(vol2_int);
   delay(5); // 200Hz
 }

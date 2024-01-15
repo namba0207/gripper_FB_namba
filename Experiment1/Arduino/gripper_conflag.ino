@@ -57,24 +57,28 @@ void subProcess(void *pvParameters)
     {
       loadcell_rec = Serial.read();
     }
-    //掴み始めの位置記録・離し始めのフラグ回収130は要調整
-    if(loadcell_rec >= 130 and flag == 0){
+    // 掴み始めの位置記録・離し始めのフラグ回収130は要調整
+    if (loadcell_rec >= 130 && flag == 0)
+    {
       grippos_int = newpos1_int;
-      flag == 1;
+      flag = 1;
     }
-    if (loadcell_rec < 130){
+    if (loadcell_rec < 130)
+    {
       flag = 0;
     }
     // PID
     D1 = (preP1 - newpos1_int) / dt;
     preP1 = newpos1_int;
-    if (flag == 0){
+    if (flag == 0)
+    {
       P2 = 0 - newpos2_int;
       D2 = (P2 - preP2) / dt;
       preP2 = P2;
     }
-    else{
-      P2 = (newpos1_int - grippos_int)*(2800 - 0)/(2800 - grippos_int) - newpos2_int; //かっこ後二つは傾き
+    else
+    {
+      P2 = (newpos1_int - grippos_int) * (2800 - 0) / (2800 - grippos_int) - newpos2_int; // かっこ後二つは傾き
       D2 = (P2 - preP2) / dt;
       preP2 = P2;
     }

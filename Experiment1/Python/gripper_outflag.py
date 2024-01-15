@@ -13,8 +13,8 @@ from xarm.wrapper import XArmAPI
 class Text_class:
     def __init__(self):
         self.bendingValue2 = 0
-        self.flag = 0
         self.grippos = 0
+        self.flag = 0
         ip = "192.168.1.199"
         arduino_port = "COM8"
         baud_rate = 115200
@@ -43,7 +43,7 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_randam.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0115_1.csv"
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
@@ -66,34 +66,37 @@ class Text_class:
     # 記録データをArduinoへ送る
     def sendloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0112_randam.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0115_1.csv"
         ) as f2:
             reader = csv.reader(f2)
             self.l2 = [row for row in reader]
         self.count2 = 0
+        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
         while True:
             self.counter = 0
             self.counter2 = 0
             self.loadcell = (
-                float(self.arm.get_cgpio_analog(1)[1])
-                - float(self.init_loadcell_val)
+                float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
             ) * 1000
             if self.loadcell > 200:
                 self.loadcell = 200
             elif self.loadcell < 0:
                 self.loadcell = 0
-            self.loadcell_int = int(self.num / (200 - 0) * (255 - 127) + 127)
+            self.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
             # 掴み始め・離し始め
-            if self.loadcell_int >=130 & self.flag ==0:
+            if self.flag == 0 and self.loadcell_int >= 130:
                 self.grippos = int(int(self.l2[self.count2][0]) * 255 / 2800)
                 self.flag = 1
-            else:
+            elif self.loadcell_int < 130:
                 self.flag = 0
-            
             if self.flag == 0:
-                self.num = 0
+                self.num = int(0)
             else:
-                self.num = (int(int(self.l2[self.count2][0]) * 255 / 2800) - self.grippos) * (255 - 0) / (255 - self.grippos)
+                self.num = int(
+                    (int(self.l2[self.count2][0]) * 255 / 2800 - self.grippos)
+                    * (255 - 0)
+                    / (255 - self.grippos)
+                )
             if self.num > 255:
                 self.num = 255
             elif self.num < 0:

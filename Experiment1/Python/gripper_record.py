@@ -39,7 +39,7 @@ class Text_class:
             line = self.ser.readline().decode("utf-8").rstrip()
             self.data_parts = line.split(",")
             self.bendingValue_int = int(
-                400 - int(self.data_parts[0].rstrip()) / 2600 * 400
+                400 - int(self.data_parts[0].rstrip()) / 2200 * 400
             )
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
@@ -48,7 +48,6 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.bendingValue_int)
             )
-            # print(self.data_parts[0].rstrip())
 
     def loop(self):
         try:
@@ -60,7 +59,6 @@ class Text_class:
                 elif self.num < 0:
                     self.num = 0
                 self.num_int = int(self.num / (200 - 0) * (255 - 127) + 127)
-                # code6//loadcell送信
                 self.ser.write(bytes([self.num_int]))
                 time.sleep(0.005)
         except KeyboardInterrupt:
@@ -68,13 +66,9 @@ class Text_class:
             self.ser.close()
             sys.exit()
 
+
 if __name__ == "__main__":
     text_class = Text_class()
-
-    # header = ["0", "0"]  # 任意の列名を指定
-    # with open("data0112_1.csv", "w", newline="") as file:
-    #     writer = csv.writer(file)
-    #     writer.writerow(header)
     time.sleep(0.5)
     start_time = time.perf_counter()
     while True:
@@ -83,7 +77,7 @@ if __name__ == "__main__":
             data2 = text_class.num_int
             data3 = time.perf_counter() - start_time
             # 新しいデータをCSVファイルに追記
-            with open("data0112_1.csv", "a", newline="") as file:
+            with open("data0115_1.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow([data1, data2, data3])
             time.sleep(0.005)

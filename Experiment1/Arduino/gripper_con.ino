@@ -49,9 +49,9 @@ void subProcess(void *pvParameters)
 { // 並列処理の関数
   while (1)
   {
-    newpos1 = encoder1.getPosition();
-    newpos2 = encoder2.getPosition();
-    newpos1_int = int(newpos1 * 2800 / 2300);
+    newpos1 = encoder1.getPosition();         // 2200
+    newpos2 = encoder2.getPosition();         // 2800
+    newpos1_int = int(newpos1 * 2800 / 2300); // 2200で割ると閉め切れない
     newpos2_int = int(newpos2);
 
     if (Serial.available())

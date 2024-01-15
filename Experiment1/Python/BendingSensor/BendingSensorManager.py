@@ -45,7 +45,7 @@ class BendingSensorManager:
                 self.bendingValue_int = int(
                     400
                     - int(self.data_parts[0].rstrip())
-                    / 2600
+                    / 2200
                     * 400  # 発振するときデバイスの可動域の大きさ注意！!
                 )
                 if self.bendingValue_int > 400:
@@ -59,17 +59,6 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                # with open("data.txt", mode="a") as txt_file:
-                #     txt_file.write(
-                #         str(self.arm.get_gripper_position()[1])
-                #         + " "
-                #         + str(RC.num_int)
-                #         + " "
-                #         + str(self.data_parts[2])
-                #         + " "
-                #         + str(time.perf_counter())
-                #         + "\n"
-                #     )
                 print(self.data_parts, RC.num_int, self.arm.get_gripper_position()[1])
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
