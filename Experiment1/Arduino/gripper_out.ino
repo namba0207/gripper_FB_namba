@@ -1,4 +1,4 @@
-// 把持力フィードバック//1205
+// step1B用
 #include <RotaryEncoder.h>
 // ロードセル
 volatile int loadcell_rec = 0;
@@ -11,19 +11,22 @@ const int DAC_PIN_2 = 25;
 // ESP32並列処理
 volatile int vol1_int = 127;
 volatile int vol2_int = 127;
+volatile float volt = 0; // Lowpass-fft用
 // PID
-volatile float newpos1 = 0;
 volatile float newpos2 = 0;
 volatile int newpos1_int = 0;
 volatile int newpos2_int = 0;
+// newpos1把持位置
+volatile int grippos_int = 0;
+volatile int flag = 0;
 
-float pretime = 0;
 float preP2 = 0;
-float Kp2 = 0.1; // PIDをゆるく
+float Kp2 = 0.08; // PIDをゆるく
 float Kd2 = 0.005;
 float dt = 0.01;
-float P2;
-float D2;
+float P2 = 0;
+float D2 = 0;
+float a = 0.9; // Lowpass-filter用
 
 RotaryEncoder encoder2(ENCODER_PIN_3, ENCODER_PIN_4, RotaryEncoder::LatchMode::TWO03);
 
@@ -40,8 +43,9 @@ void subProcess(void *pvParameters)
     {
       loadcell_rec = Serial.read();
     }
+    volt = a * volt + (1 - a) * loadcell_rec;
     newpos2 = encoder2.getPosition();
-    newpos1_int = int(-loadcell_rec * 2600 / 255);
+    newpos1_int = int(-volt * 2800 / 255);
     newpos2_int = int(newpos2);
     P2 = newpos1_int - newpos2_int;
     D2 = (P2 - preP2) / dt;
@@ -82,6 +86,6 @@ void loop()
   Serial.print(-newpos2_int);
   Serial.print(',');
   Serial.println(vol2_int);
-  delay(5); // 200Hz
+  delay(10); // 200Hz
 }
 // エンコーダリセットすると一回目は不都合になる
