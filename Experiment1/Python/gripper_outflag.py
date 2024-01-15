@@ -44,7 +44,7 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0115_3.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul4.csv"
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
