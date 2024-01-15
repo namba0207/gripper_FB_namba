@@ -1,4 +1,4 @@
-// 把持すると相方PID
+// step2用
 #include <RotaryEncoder.h>
 // ロードセル
 volatile int loadcell_rec = 127;

@@ -1,4 +1,4 @@
-// 把持力フィードバック//1205
+// step1B用
 #include <RotaryEncoder.h>
 // ロードセル
 volatile int loadcell_rec = 0;
@@ -42,7 +42,7 @@ void subProcess(void *pvParameters)
       loadcell_rec = Serial.read();
     }
     newpos2 = encoder2.getPosition();
-    newpos1_int = int(-loadcell_rec * 2600 / 255);
+    newpos1_int = int(-loadcell_rec * 2800 / 255);
     newpos2_int = int(newpos2);
     P2 = newpos1_int - newpos2_int;
     D2 = (P2 - preP2) / dt;
