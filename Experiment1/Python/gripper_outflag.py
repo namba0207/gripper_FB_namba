@@ -44,7 +44,7 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_250.csv"
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
@@ -104,9 +104,10 @@ class Text_class:
         while True:
             self.line = self.ser.readline().decode("utf-8").rstrip()
             print(
-                2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-                self.line,
+                # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
+                int(self.arm.get_gripper_position()[1]),
                 self.loadcell_int,
+                self.line,
             )
 
 
