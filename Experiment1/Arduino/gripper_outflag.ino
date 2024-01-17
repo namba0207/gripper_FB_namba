@@ -45,8 +45,8 @@ void subProcess(void *pvParameters)
     }
     volt = a * volt + (1 - a) * loadcell_rec;
     newpos2 = encoder2.getPosition();
-    newpos1_int = int(-volt * 2800 / 255);
-    newpos2_int = int(newpos2);
+    newpos1_int = int(-volt * 2300 / 255);
+    newpos2_int = int(newpos2 * 2300 / 2800);
     P2 = newpos1_int - newpos2_int;
     D2 = (P2 - preP2) / dt;
     preP2 = P2;

@@ -1,4 +1,4 @@
-# Arduino_gripper_out.inoとセット！！
+# Arduino_gripper_out.inoとセット！！,押し込み表現拡大，ロボtグリッパー掴みから100まで
 import csv  # 記録用
 import sys
 import threading
@@ -9,10 +9,9 @@ import serial
 from ArmWrapper1000 import ArmWrapper
 from xarm.wrapper import XArmAPI
 
-
 class Text_class:
     def __init__(self):
-        self.bendingValue2 = 0
+        self.num = 0
         self.grippos = 0
         self.flag = 0
         self.loadcell_int = 127
@@ -30,18 +29,53 @@ class Text_class:
         self.arm.motion_enable(True)
         self.arm.set_mode(0)
         self.arm.set_state(0)
-        self.datal = ArmWrapper(True, ip)
-        thr1 = threading.Thread(target=self.moveloop)
+        
+        thr1 = threading.Thread(target=self.loadcellloop)
         thr1.setDaemon(True)
         thr1.start()
         thr2 = threading.Thread(target=self.sendloop)
         thr2.setDaemon(True)
         thr2.start()
-        thr3 = threading.Thread(target=self.receiveloop)
+        thr3 = threading.Thread(target=self.moveloop)
         thr3.setDaemon(True)
         thr3.start()
+    
+    def loadcellloop(self):
+        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
+        while True:
+            self.loadcell = (float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)) * 1000
+            if self.loadcell > 200:
+                self.loadcell = 200
+            elif self.loadcell < 0:
+                self.loadcell = 0
+            self.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
+            time.sleep(0.005)
 
-    # 記録データからグリッパー動かす
+    # グリッパーの値をArduinoへ送る
+    def sendloop(self):
+        while True:
+            # 掴み始め・離し始め
+            if self.flag == 0 and self.loadcell_int >= 129:
+                self.grippos = self.arm.get_gripper_position()[1]
+                self.flag = 1
+            elif self.loadcell_int < 129:
+                self.grippos = 0
+                self.flag = 0
+            if self.flag == 0:
+                self.num = int(0)
+            else:
+                self.num = int(
+                    (self.grippos - self.arm.get_gripper_position()[1])
+                    * (255 - 0)
+                    / (self.grippos - 100)  #止まるところでグリッパー閉じ切る
+                )
+            if self.num > 255:
+                self.num = 255
+            elif self.num < 0:
+                self.num = 0
+            self.ser.write(bytes([self.num]))
+            time.sleep(0.01)
+
     def moveloop(self):
         with open(
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_100.csv"
@@ -57,9 +91,7 @@ class Text_class:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
         self.count = 0
-        self.start_time = time.perf_counter()
         while True:
-            # self.bendingValue_int = int(400 - int(self.l1[self.count][0]) * 400 / 2800)
             self.bendingValue_int = int(float(self.l1[self.count][1]))
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
@@ -69,61 +101,20 @@ class Text_class:
                 self.datal.ConvertToModbusData(self.bendingValue_int)
             )
             self.count += 1
-            time.sleep(0.00005)
-
-    # 記録データをArduinoへ送る
-    def sendloop(self):
-        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
-        while True:
-            self.loadcell = (
-                float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
-            ) * 1000
-            if self.loadcell > 200:
-                self.loadcell = 200
-            elif self.loadcell < 0:
-                self.loadcell = 0
-            self.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
-            # 掴み始め・離し始め
-            if self.flag == 0 and self.loadcell_int >= 130:
-                # self.grippos = int(self.bendingValue_int * 255 / 2800)
-                self.grippos = self.arm.get_gripper_position()[1] / 400 * 255
-                self.flag = 1
-            elif self.loadcell_int < 130:
-                self.grippos = 0
-                self.flag = 0
-            if self.flag == 0:
-                self.num = int(0)
-            else:
-                # self.num = int((int(self.l2[self.count2][0]) * 255 / 2800 - self.grippos) * (255 - 0)/ (255 - self.grippos))
-                self.num = int(
-                    (self.grippos - self.arm.get_gripper_position()[1] / 400 * 255)
-                    * (255 - 0)
-                    / (self.grippos - 0)
-                )
-            if self.num > 255:
-                self.num = 255
-            elif self.num < 0:
-                self.num = 0
-            self.ser.write(bytes([self.num]))
-            time.sleep(0.005)
-
-    # Arduinoからデータを受け取る
-    def receiveloop(self):
-        while True:
-            self.line = self.ser.readline().decode("utf-8").rstrip()
-            print(
-                # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-                int(self.arm.get_gripper_position()[1]),
-                self.loadcell_int,
-                self.line,
-            )
-
-
+            time.sleep(0.01)
+    
 if __name__ == "__main__":
     text_class = Text_class()
     while True:
         try:
-            time.sleep(0.005)
+            text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
+            print(
+                # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
+                int(text_class.arm.get_gripper_position()[1]),
+                text_class.loadcell_int,
+                text_class.line,
+            )
+            time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break

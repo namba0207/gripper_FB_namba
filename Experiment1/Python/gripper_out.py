@@ -55,9 +55,7 @@ class Text_class:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
         self.count = 0
-        self.start_time = time.perf_counter()
         while True:
-            # self.bendingValue_int = int(400 - int(self.l1[self.count][0]) * 400 / 2800)
             self.bendingValue_int = int(float(self.l1[self.count][1]))
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
@@ -86,7 +84,6 @@ class Text_class:
             self.line = self.ser.readline().decode("utf-8").rstrip()
             print(self.line)
             # time.sleep(0.005)
-
 
 if __name__ == "__main__":
     text_class = Text_class()
