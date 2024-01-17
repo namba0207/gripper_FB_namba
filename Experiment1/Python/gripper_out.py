@@ -12,7 +12,7 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        self.bendingValue2 = 0
+        self.bendingValue_int = 0
         ip = "192.168.1.199"
         arduino_port = "COM8"
         baud_rate = 115200
@@ -41,14 +41,24 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0115_4.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_100.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_150.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_200.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_100.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_150.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_200.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_100.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_150.csv"  # 中間、硬いが力位置ほぼ同じ
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv"  # 中間、硬いが力位置ほぼ同じ
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_250.csv"    #力なし
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
         self.count = 0
         self.start_time = time.perf_counter()
         while True:
-            self.bendingValue_int = int(self.l1[self.count][0])
+            # self.bendingValue_int = int(400 - int(self.l1[self.count][0]) * 400 / 2800)
+            self.bendingValue_int = int(float(self.l1[self.count][1]))
             if self.bendingValue_int > 400:
                 self.bendingValue_int = 400
             elif self.bendingValue_int < 0:
@@ -56,36 +66,26 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.bendingValue_int)
             )
-            self.timer = time.perf_counter() - self.start_time
-            # print(self.l[self.count][0], self.l[self.count][1], self.timer)
             self.count += 1
-            time.sleep(0.0005)
+            time.sleep(0.00005)
 
     # 記録データをArduinoへ送る
     def sendloop(self):
-        with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\data0115_4.csv"
-        ) as f2:
-            reader = csv.reader(f2)
-            self.l2 = [row for row in reader]
-        self.count2 = 0
         while True:
-            self.counter = 0
-            self.counter2 = 0
-            self.num = int(255 - int(self.l2[self.count2][0]) * 255 / 400)
+            self.num = int(255 - self.bendingValue_int * 255 / 400)
             if self.num > 255:
                 self.num = 255
             elif self.num < 0:
                 self.num = 0
             self.ser.write(bytes([self.num]))
-            self.count2 += 1
             time.sleep(0.005)
 
     # Arduinoからデータを受け取る
     def receiveloop(self):
         while True:
             self.line = self.ser.readline().decode("utf-8").rstrip()
-            print(int(self.l2[self.count2][0]), self.line)
+            print(self.line)
+            # time.sleep(0.005)
 
 
 if __name__ == "__main__":
