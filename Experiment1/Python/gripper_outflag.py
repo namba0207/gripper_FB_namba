@@ -44,7 +44,13 @@ class Text_class:
     # 記録データからグリッパー動かす
     def moveloop(self):
         with open(
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_250.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_150.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul10_200.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_150.csv"
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_200.csv"
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_150.csv"  # 中間、硬いが力位置ほぼ同じ
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv"  # 中間、硬いが力位置ほぼ同じ
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_250.csv"    #力なし
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
