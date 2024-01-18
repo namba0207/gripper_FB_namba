@@ -13,11 +13,11 @@ class ArmWrapper:
     def __init__(self, enable, armIP=None):
         if enable:
             self.arm = XArmAPI(armIP)
-            # self.loadcell_setup()
+            self.loadcell_setup()
             # self.gripper_setup()
-            # self.loadcell_val = 0
+            self.loadcell_val = 0
 
-    # def loadcell_setup(self):
+    def loadcell_setup(self):
     #     self.arm.set_tgpio_modbus_baudrate(2000000)
     #     self.init_loadcell_val = self.arm.get_cgpio_analog(1)[
     #         1
@@ -30,17 +30,28 @@ class ArmWrapper:
     #         self.loadcell_val = (
     #             self.arm.get_cgpio_analog(1)[1] - self.init_loadcell_val
     #         )  # (0)と(1)はピンの違い#get_cgpio_analogが読む関数coreは成功してるか
-    #         time.sleep(0.01)
+    #         time.sleep(0.005)
+        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
+        while True:
+            self.loadcell = (
+                float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
+            ) * 1000
+            if self.loadcell > 200:
+                self.loadcell = 200
+            elif self.loadcell < 0:
+                self.loadcell = 0
+            self.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
+            time.sleep(0.001)
 
-    def gripper_setup(self):
-        code = self.arm.set_gripper_mode(0)
-        print("set gripper mode: location mode, code={}".format(code))
+    # def gripper_setup(self):
+    #     code = self.arm.set_gripper_mode(0)
+    #     print("set gripper mode: location mode, code={}".format(code))
 
-        code = self.arm.set_gripper_enable(True)
-        print("set gripper enable, code={}".format(code))
+    #     code = self.arm.set_gripper_enable(True)
+    #     print("set gripper enable, code={}".format(code))
 
-        code = self.arm.set_gripper_speed(5000)
-        print("set gripper speed, code={}".format(code))
+    #     code = self.arm.set_gripper_speed(5000)
+    #     print("set gripper speed, code={}".format(code))
 
         # self.t = time.perf_counter()
 

@@ -16,7 +16,7 @@ class Text_class:
         self.num = 0
         self.grippos = 0
         self.flag = 0
-        self.loadcell_int = 127
+        
         ip = "192.168.1.199"
         arduino_port = "COM8"
         baud_rate = 115200
@@ -24,6 +24,7 @@ class Text_class:
         not_used = self.ser.readline()
         self.arm = XArmAPI(ip)
         self.datal = ArmWrapper(True, ip)
+        self.datal.loadcell_int = 127
         time.sleep(0.5)
         if self.arm.warn_code != 0:
             self.arm.clean_warn()
@@ -33,9 +34,9 @@ class Text_class:
         self.arm.set_mode(0)
         self.arm.set_state(0)
 
-        thr1 = threading.Thread(target=self.loadcellloop)
-        thr1.setDaemon(True)
-        thr1.start()
+        # thr1 = threading.Thread(target=self.loadcellloop)
+        # thr1.setDaemon(True)
+        # thr1.start()
         thr2 = threading.Thread(target=self.sendloop)
         thr2.setDaemon(True)
         thr2.start()
@@ -43,18 +44,18 @@ class Text_class:
         thr3.setDaemon(True)
         thr3.start()
 
-    def loadcellloop(self):
-        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
-        while True:
-            self.loadcell = (
-                float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
-            ) * 1000
-            if self.loadcell > 200:
-                self.loadcell = 200
-            elif self.loadcell < 0:
-                self.loadcell = 0
-            self.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
-            time.sleep(0.001)
+    # def loadcellloop(self):
+    #     self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
+    #     while True:
+    #         self.loadcell = (
+    #             float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
+    #         ) * 1000
+    #         if self.loadcell > 200:
+    #             self.loadcell = 200
+    #         elif self.loadcell < 0:
+    #             self.loadcell = 0
+    #         self.datal.loadcell_int = int(self.loadcell / (200 - 0) * (255 - 127) + 127)
+    #         time.sleep(0.001)
 
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
@@ -67,7 +68,7 @@ class Text_class:
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_200.csv"
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_100.csv"
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_150.csv"  # 中間、硬いが力同じ位置ほぼ同じ
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv"  # 中間、硬いが力同じ位置ほぼ同じ
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv" 
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
@@ -79,10 +80,10 @@ class Text_class:
             elif self.bendingValue_int < 0:
                 self.bendingValue_int = 0
             # 掴み始め・離し始め
-            if self.flag == 0 and self.loadcell_int >= 129:
+            if self.flag == 0 and self.datal.loadcell_int >= 129:
                 self.grippos = self.arm.get_gripper_position()[1]
                 self.flag = 1
-            elif self.loadcell_int < 129:
+            elif self.datal.loadcell_int < 129:
                 self.grippos = 0
                 self.flag = 0
             if self.flag == 0:
@@ -117,7 +118,7 @@ if __name__ == "__main__":
             text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
             print(
                 # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-                # text_class.loadcell_int,
+                # text_class.datal.loadcell_int,
                 int(text_class.arm.get_gripper_position()[1]),
                 text_class.line,
             )
