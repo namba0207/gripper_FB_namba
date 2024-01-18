@@ -15,23 +15,20 @@ class ArmWrapper:
             self.arm = XArmAPI(armIP)
             self.loadcell_setup()
             # self.gripper_setup()
-            self.loadcell_val = 0
+            self.loadcell_int = 0
 
     def loadcell_setup(self):
-    #     self.arm.set_tgpio_modbus_baudrate(2000000)
-    #     self.init_loadcell_val = self.arm.get_cgpio_analog(1)[
-    #         1
-    #     ]  # 初期値ofssetと同じ//cはコントロールボックスのc
-    #     self.loadcell_thr = threading.Thread(target=self.get_loadcell_val, daemon=True)
-    #     self.loadcell_thr.start()
+        self.arm.set_tgpio_modbus_baudrate(2000000)
+        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[
+            1
+        ]  # 初期値ofssetと同じ//cはコントロールボックスのc
+        self.loadcell_thr = threading.Thread(target=self.get_loadcell_val, daemon=True)
+        self.loadcell_thr.start()
 
-    # def get_loadcell_val(self):
-    #     while True:
-    #         self.loadcell_val = (
-    #             self.arm.get_cgpio_analog(1)[1] - self.init_loadcell_val
-    #         )  # (0)と(1)はピンの違い#get_cgpio_analogが読む関数coreは成功してるか
-    #         time.sleep(0.005)
-        self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
+    def get_loadcell_val(self):
+        #         self.loadcell_val = (
+        #             self.arm.get_cgpio_analog(1)[1] - self.init_loadcell_val
+        #         )  # (0)と(1)はピンの違い#get_cgpio_analogが読む関数coreは成功してるか
         while True:
             self.loadcell = (
                 float(self.arm.get_cgpio_analog(1)[1]) - float(self.init_loadcell_val)
@@ -53,10 +50,10 @@ class ArmWrapper:
     #     code = self.arm.set_gripper_speed(5000)
     #     print("set gripper speed, code={}".format(code))
 
-        # self.t = time.perf_counter()
+    # self.t = time.perf_counter()
 
-        # self.gripper_thr = threading.Thread(target=self.set_gripper_val, daemon=True)
-        # self.gripper_thr.start()
+    # self.gripper_thr = threading.Thread(target=self.set_gripper_val, daemon=True)
+    # self.gripper_thr.start()
 
     # def set_gripper_val(self):
     def ConvertToModbusData(self, value: int):

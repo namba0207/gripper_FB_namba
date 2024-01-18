@@ -16,7 +16,7 @@ class Text_class:
         self.num = 0
         self.grippos = 0
         self.flag = 0
-        
+
         ip = "192.168.1.199"
         arduino_port = "COM8"
         baud_rate = 115200
@@ -67,8 +67,8 @@ class Text_class:
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_150.csv"
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul20_200.csv"
             # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_100.csv"
-            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_150.csv"  # 中間、硬いが力同じ位置ほぼ同じ
-            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv" 
+            "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_150.csv"  # 中間、硬いが力同じ位置ほぼ同じ
+            # "C:\\Users\\SANOLAB\\Documents\\GitHub\\gripper_FB_namba\\cul40_200.csv"
         ) as f1:
             reader = csv.reader(f1)
             self.l1 = [row for row in reader]
@@ -118,7 +118,7 @@ if __name__ == "__main__":
             text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
             print(
                 # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-                # text_class.datal.loadcell_int,
+                text_class.datal.loadcell_int,
                 int(text_class.arm.get_gripper_position()[1]),
                 text_class.line,
             )
