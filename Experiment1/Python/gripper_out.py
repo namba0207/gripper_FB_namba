@@ -85,6 +85,7 @@ class Text_class:
             print(self.line)
             # time.sleep(0.005)
 
+
 if __name__ == "__main__":
     text_class = Text_class()
     while True:
