@@ -13,16 +13,13 @@ from xarm.wrapper import XArmAPI
 class Text_class:
     def __init__(self):
         self.number = 10
-        self.oshikomi = 100
 
-        # self.oshikomi = 240
-        # self.oshikomi = 235
-        # self.oshikomi = 210
-        # self.oshikomi = 203
-        # self.oshikomi = 198
-        # self.oshikomi = 188
-        # self.oshikomi = 180
-        # self.oshikomi = 160
+        self.oshikomi = 150
+        self.oshikomi = 170
+        self.oshikomi = 190
+        self.oshikomi = 210
+        self.oshikomi = 230
+        self.oshikomi = 250
 
         self.data2 = 400
         self.num = 0
