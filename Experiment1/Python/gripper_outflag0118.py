@@ -12,42 +12,60 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        # 条件1
-        self.number, self.oshikomi = 20, 190
-        self.number, self.oshikomi = 20, 150
-        self.number, self.oshikomi = 20, 170
+        # [[2, 2, 2], [4, 2, 1]]
+        # self.oshikomi, self.number = 250, 20
+        # self.oshikomi, self.number =230, 20
+        self.oshikomi, self.number = 0, 10
 
-        self.number, self.oshikomi = 20, 150
-        self.number, self.oshikomi = 40, 190
-        self.number, self.oshikomi = 10, 230
+        # [[1, 1, 2], [1, 4, 2]]
+        # self.oshikomi, self.number =  210 , 10
+        # self.oshikomi, self.number = 190, 40
+        # self.oshikomi, self.number = 230, 40
 
-        self.number, self.oshikomi = 20, 230
-        self.number, self.oshikomi = 40, 210
-        self.number, self.oshikomi = 10, 250
-        # 条件２
-        self.number, self.oshikomi = 40, 190
-        self.number, self.oshikomi = 20, 230
-        self.number, self.oshikomi = 20, 150
+        # [[2, 2, 2], [2, 1, 4]]
+        # self.oshikomi, self.number =  230 , 20
+        # self.oshikomi, self.number =  210 , 40
+        # self.oshikomi, self.number =  190 , 10
 
-        self.number, self.oshikomi = 20, 230
-        self.number, self.oshikomi = 40, 250
-        self.number, self.oshikomi = 10, 150
+        # [[1, 1, 2], [2, 4, 1]]
+        # self.oshikomi, self.number =  170 , 10
+        # self.oshikomi, self.number =  250 , 40
+        # self.oshikomi, self.number =  150 , 10
 
-        self.number, self.oshikomi = 40, 170
-        self.number, self.oshikomi = 20, 210
-        self.number, self.oshikomi = 20, 190
-        # 条件３
-        self.number, self.oshikomi = 20, 230
-        self.number, self.oshikomi = 20, 250
-        self.number, self.oshikomi = 40, 150
+        # [[2, 1, 1], [4, 1, 2]]
+        # self.oshikomi, self.number =  250 , 40
+        # self.oshikomi, self.number =  150 , 10
+        # self.oshikomi, self.number =  170 , 10
 
-        self.number, self.oshikomi = 20, 230
-        self.number, self.oshikomi = 20, 250
-        self.number, self.oshikomi = 20, 150
+        # [[2, 1, 1], [1, 2, 4]]
+        # self.oshikomi, self.number =  150 , 10
+        # self.oshikomi, self.number =  170 , 20
+        # self.oshikomi, self.number =  190 , 10
 
-        self.number, self.oshikomi = 10, 250
-        self.number, self.oshikomi = 40, 150
-        self.number, self.oshikomi = 40, 170
+        # [[2, 1, 1], [2, 1, 4]]
+        # self.oshikomi, self.number =  170 , 40
+        # self.oshikomi, self.number =  150 , 10
+        # self.oshikomi, self.number =  190 , 20
+
+        # [[2, 1, 2], [1, 2, 4]]
+        # self.oshikomi, self.number =  150 , 10
+        # self.oshikomi, self.number =  170 , 40
+        # self.oshikomi, self.number =  250 , 40
+
+        # [[2, 2, 2], [4, 2, 1]]
+        # self.oshikomi, self.number =  190 , 20
+        # self.oshikomi, self.number =  230 , 10
+        # self.oshikomi, self.number =  210 , 20
+
+        # [2, 2, 2] [4, 2, 1]
+        # [1, 1, 2] [1, 4, 2]
+        # [2, 2, 2] [2, 1, 4]
+        # [1, 1, 2] [2, 4, 1]
+        # [2, 1, 1] [4, 1, 2]
+        # [2, 1, 1] [1, 2, 4]
+        # [2, 1, 1] [2, 1, 4]
+        # [2, 1, 2] [1, 2, 4]
+        # [2, 2, 2] [4, 2, 1]
 
         self.data2 = 400
         self.num = 0
