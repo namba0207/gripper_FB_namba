@@ -12,26 +12,17 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        # self.number = 10
-        # self.oshikomi = 100  # 練習
-        # self.number = 40
-        # self.oshikomi = 150  # 条件1
-        # self.number = 20
-        # self.oshikomi = 100
-        # self.number = 10
-        # self.oshikomi = 200
-        # self.number = 10
-        # self.oshikomi = 100  # 条件2
-        # self.number = 20
-        # self.oshikomi = 150
-        # self.number = 40
-        # self.oshikomi = 200
-        # self.number = 10
-        # self.oshikomi = 150  # 条件3
-        # self.number = 40
-        # self.oshikomi = 100
-        self.number = 20
-        self.oshikomi = 200
+        self.number = 10
+        self.oshikomi = 100
+
+        # self.oshikomi = 240
+        # self.oshikomi = 235
+        # self.oshikomi = 210
+        # self.oshikomi = 203
+        # self.oshikomi = 198
+        # self.oshikomi = 188
+        # self.oshikomi = 180
+        # self.oshikomi = 160
 
         self.data2 = 400
         self.num = 0
@@ -108,6 +99,7 @@ class Text_class:
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.data2)
             )
+            # print(self.data2)
             time.sleep(0.005)
 
 
