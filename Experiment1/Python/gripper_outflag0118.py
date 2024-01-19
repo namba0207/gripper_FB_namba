@@ -12,14 +12,42 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        self.number = 10
+        # 条件1
+        self.number, self.oshikomi = 20, 190
+        self.number, self.oshikomi = 20, 150
+        self.number, self.oshikomi = 20, 170
 
-        self.oshikomi = 150
-        self.oshikomi = 170
-        self.oshikomi = 190
-        self.oshikomi = 210
-        self.oshikomi = 230
-        self.oshikomi = 250
+        self.number, self.oshikomi = 20, 150
+        self.number, self.oshikomi = 40, 190
+        self.number, self.oshikomi = 10, 230
+
+        self.number, self.oshikomi = 20, 230
+        self.number, self.oshikomi = 40, 210
+        self.number, self.oshikomi = 10, 250
+        # 条件２
+        self.number, self.oshikomi = 40, 190
+        self.number, self.oshikomi = 20, 230
+        self.number, self.oshikomi = 20, 150
+
+        self.number, self.oshikomi = 20, 230
+        self.number, self.oshikomi = 40, 250
+        self.number, self.oshikomi = 10, 150
+
+        self.number, self.oshikomi = 40, 170
+        self.number, self.oshikomi = 20, 210
+        self.number, self.oshikomi = 20, 190
+        # 条件３
+        self.number, self.oshikomi = 20, 230
+        self.number, self.oshikomi = 20, 250
+        self.number, self.oshikomi = 40, 150
+
+        self.number, self.oshikomi = 20, 230
+        self.number, self.oshikomi = 20, 250
+        self.number, self.oshikomi = 20, 150
+
+        self.number, self.oshikomi = 10, 250
+        self.number, self.oshikomi = 40, 150
+        self.number, self.oshikomi = 40, 170
 
         self.data2 = 400
         self.num = 0
