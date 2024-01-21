@@ -12,66 +12,74 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        # [[2, 2, 2], [4, 2, 1]]
-        # self.oshikomi, self.speed = 250, 20
-        # self.oshikomi, self.speed =230, 20
-        self.oshikomi, self.speed = 200, 1
-
-        # [[1, 1, 2], [1, 4, 2]]
-        # self.oshikomi, self.speed =  210 , 10
-        # self.oshikomi, self.speed = 190, 40
-        # self.oshikomi, self.speed = 230, 40
-
-        # [[2, 2, 2], [2, 1, 4]]
-        # self.oshikomi, self.speed =  230 , 20
-        # self.oshikomi, self.speed =  210 , 40
-        # self.oshikomi, self.speed =  190 , 10
-
-        # [[1, 1, 2], [2, 4, 1]]
-        # self.oshikomi, self.speed =  170 , 10
-        # self.oshikomi, self.speed =  250 , 40
-        # self.oshikomi, self.speed =  150 , 10
-
-        # [[2, 1, 1], [4, 1, 2]]
-        # self.oshikomi, self.speed =  250 , 40
-        # self.oshikomi, self.speed =  150 , 10
-        # self.oshikomi, self.speed =  170 , 10
-
-        # [[2, 1, 1], [1, 2, 4]]
-        # self.oshikomi, self.speed =  150 , 10
-        # self.oshikomi, self.speed =  170 , 20
-        # self.oshikomi, self.speed =  190 , 10
-
-        # [[2, 1, 1], [2, 1, 4]]
-        # self.oshikomi, self.speed =  170 , 40
-        # self.oshikomi, self.speed =  150 , 10
-        # self.oshikomi, self.speed =  190 , 20
-
+        # [5, 1]
+        # self.oshikomi, self.speed = 250, 1
+        # self.oshikomi, self.speed = 160, 2
+        # [1, 5]
+        # self.oshikomi, self.speed =  160 , 2
+        # self.oshikomi, self.speed =  210 , 2
+        # [5, 1]
+        # self.oshikomi, self.speed =  250 , 2
+        # self.oshikomi, self.speed =  220 , 2
+        # 1
+        # [[2, 2, 1], [1, 2, 4]]
+        # self.oshikomi, self.speed = 220, 2
+        # self.oshikomi, self.speed =  180 , 2
+        # self.oshikomi, self.speed =  240 , 0.5
+        # 2
+        # [[2, 1, 2], [1, 4, 2]]
+        # self.oshikomi, self.speed =  160 , 1
+        # self.oshikomi, self.speed =  240 , 1
+        # self.oshikomi, self.speed =  230 , 0.5
+        # 3
+        # [[1, 1, 1], [2, 4, 1]]
+        # self.oshikomi, self.speed =  180 , 1
+        # self.oshikomi, self.speed =  240 , 1
+        # self.oshikomi, self.speed =  220 , 0.5
+        # 4
+        # [[1, 1, 1], [2, 4, 1]]
+        # self.oshikomi, self.speed =  180 , 0.5
+        # self.oshikomi, self.speed =  240 , 1
+        # self.oshikomi, self.speed =  220 , 1
+        # 5
         # [[2, 1, 2], [1, 2, 4]]
-        # self.oshikomi, self.speed =  150 , 10
-        # self.oshikomi, self.speed =  170 , 40
-        # self.oshikomi, self.speed =  250 , 40
-
-        # [[2, 2, 2], [4, 2, 1]]
-        # self.oshikomi, self.speed =  190 , 20
-        # self.oshikomi, self.speed =  230 , 10
-        # self.oshikomi, self.speed =  210 , 20
-
-        # [2, 2, 2] [4, 2, 1]
-        # [1, 1, 2] [1, 4, 2]
-        # [2, 2, 2] [2, 1, 4]
-        # [1, 1, 2] [2, 4, 1]
-        # [2, 1, 1] [4, 1, 2]
-        # [2, 1, 1] [1, 2, 4]
-        # [2, 1, 1] [2, 1, 4]
+        # self.oshikomi, self.speed =  220 , 1
+        # self.oshikomi, self.speed =  230 , 1
+        # self.oshikomi, self.speed =  240 , 0.5
+        # 6
+        # [[2, 2, 2], [4, 1, 2]]
+        # self.oshikomi, self.speed =  240 , 2
+        # self.oshikomi, self.speed =  220 , 0.5
+        # self.oshikomi, self.speed =  180 , 0.5
+        # 7
+        # [[1, 1, 2], [4, 2, 1]]
+        # self.oshikomi, self.speed =  200 , 0.5
+        # self.oshikomi, self.speed =  230 , 0.5
+        # self.oshikomi, self.speed =  160 , 1
+        # 8
+        # [[2, 1, 2], [1, 2, 4]]
+        # self.oshikomi, self.speed =  160 , 2
+        # self.oshikomi, self.speed =  180 , 1
+        # self.oshikomi, self.speed =  200 , 0.5
+        # 9
+        # [[2, 1, 1], [4, 1, 2]]
+        # self.oshikomi, self.speed =  200 , 0.5
+        # self.oshikomi, self.speed =  160 , 2
+        # self.oshikomi, self.speed =  180 , 2
+        # [2, 2, 1] [1, 2, 4]
+        # [2, 1, 2] [1, 4, 2]
+        # [1, 1, 1] [2, 4, 1]
+        # [1, 1, 1] [2, 4, 1]
         # [2, 1, 2] [1, 2, 4]
-        # [2, 2, 2] [4, 2, 1]
-
+        # [2, 2, 2] [4, 1, 2]
+        # [1, 1, 2] [4, 2, 1]
+        # [2, 1, 2] [1, 2, 4]
+        # [2, 1, 1] [4, 1, 2]
         self.data2 = 400
         self.num = 0
         self.grippos = 0
         self.flag = 0
-        self.start_time = time.perf_counter()
+
         self.e = math.e
         ip = "192.168.1.199"
         arduino_port = "COM8"
@@ -113,7 +121,7 @@ class Text_class:
                 self.num = int(
                     (self.grippos - self.arm.get_gripper_position()[1])
                     * (255 - 0)
-                    / (self.grippos - 120)  # 止まるところでグリッパー閉じ切る
+                    / (self.grippos - 175)  # 止まるところでグリッパー閉じ切る
                 )
             if self.num > 255:
                 self.num = 255
@@ -123,20 +131,21 @@ class Text_class:
             time.sleep(0.01)
 
     def moveloop(self):
+        self.start_time = time.perf_counter()
         while True:
             self.data1 = time.perf_counter() - self.start_time
             if self.data1 < 1 / self.speed:
                 self.data2 = 400 - (400 - self.oshikomi) / (
-                    1 + self.e ** -((self.data1) * self.speed - 10)
+                    1 + self.e ** -(self.data1 * self.speed * 20 - 10)
                 )
-            elif self.data1 < 1 / self.speed * 2:
+            else:
                 self.data2 = 400 - (400 - self.oshikomi) / (
-                    1 + self.e ** ((self.data1) * self.speed - 30)
+                    1 + self.e ** (self.data1 * self.speed * 20 - 30)
                 )
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.data2)
             )
-            # print(self.data2)
+            # print(self.data1, self.data2)
             time.sleep(0.005)
 
 
