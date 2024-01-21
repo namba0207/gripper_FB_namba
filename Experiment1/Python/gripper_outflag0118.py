@@ -13,49 +13,49 @@ from xarm.wrapper import XArmAPI
 class Text_class:
     def __init__(self):
         # [[2, 2, 2], [4, 2, 1]]
-        # self.oshikomi, self.number = 250, 20
-        # self.oshikomi, self.number =230, 20
-        self.oshikomi, self.number = 0, 10
+        # self.oshikomi, self.speed = 250, 20
+        # self.oshikomi, self.speed =230, 20
+        self.oshikomi, self.speed = 200, 1
 
         # [[1, 1, 2], [1, 4, 2]]
-        # self.oshikomi, self.number =  210 , 10
-        # self.oshikomi, self.number = 190, 40
-        # self.oshikomi, self.number = 230, 40
+        # self.oshikomi, self.speed =  210 , 10
+        # self.oshikomi, self.speed = 190, 40
+        # self.oshikomi, self.speed = 230, 40
 
         # [[2, 2, 2], [2, 1, 4]]
-        # self.oshikomi, self.number =  230 , 20
-        # self.oshikomi, self.number =  210 , 40
-        # self.oshikomi, self.number =  190 , 10
+        # self.oshikomi, self.speed =  230 , 20
+        # self.oshikomi, self.speed =  210 , 40
+        # self.oshikomi, self.speed =  190 , 10
 
         # [[1, 1, 2], [2, 4, 1]]
-        # self.oshikomi, self.number =  170 , 10
-        # self.oshikomi, self.number =  250 , 40
-        # self.oshikomi, self.number =  150 , 10
+        # self.oshikomi, self.speed =  170 , 10
+        # self.oshikomi, self.speed =  250 , 40
+        # self.oshikomi, self.speed =  150 , 10
 
         # [[2, 1, 1], [4, 1, 2]]
-        # self.oshikomi, self.number =  250 , 40
-        # self.oshikomi, self.number =  150 , 10
-        # self.oshikomi, self.number =  170 , 10
+        # self.oshikomi, self.speed =  250 , 40
+        # self.oshikomi, self.speed =  150 , 10
+        # self.oshikomi, self.speed =  170 , 10
 
         # [[2, 1, 1], [1, 2, 4]]
-        # self.oshikomi, self.number =  150 , 10
-        # self.oshikomi, self.number =  170 , 20
-        # self.oshikomi, self.number =  190 , 10
+        # self.oshikomi, self.speed =  150 , 10
+        # self.oshikomi, self.speed =  170 , 20
+        # self.oshikomi, self.speed =  190 , 10
 
         # [[2, 1, 1], [2, 1, 4]]
-        # self.oshikomi, self.number =  170 , 40
-        # self.oshikomi, self.number =  150 , 10
-        # self.oshikomi, self.number =  190 , 20
+        # self.oshikomi, self.speed =  170 , 40
+        # self.oshikomi, self.speed =  150 , 10
+        # self.oshikomi, self.speed =  190 , 20
 
         # [[2, 1, 2], [1, 2, 4]]
-        # self.oshikomi, self.number =  150 , 10
-        # self.oshikomi, self.number =  170 , 40
-        # self.oshikomi, self.number =  250 , 40
+        # self.oshikomi, self.speed =  150 , 10
+        # self.oshikomi, self.speed =  170 , 40
+        # self.oshikomi, self.speed =  250 , 40
 
         # [[2, 2, 2], [4, 2, 1]]
-        # self.oshikomi, self.number =  190 , 20
-        # self.oshikomi, self.number =  230 , 10
-        # self.oshikomi, self.number =  210 , 20
+        # self.oshikomi, self.speed =  190 , 20
+        # self.oshikomi, self.speed =  230 , 10
+        # self.oshikomi, self.speed =  210 , 20
 
         # [2, 2, 2] [4, 2, 1]
         # [1, 1, 2] [1, 4, 2]
@@ -125,20 +125,14 @@ class Text_class:
     def moveloop(self):
         while True:
             self.data1 = time.perf_counter() - self.start_time
-            if self.data1 < 1:
-                self.data2 = 400
-            elif self.data1 < 20 / self.number + 1:
+            if self.data1 < 1 / self.speed:
                 self.data2 = 400 - (400 - self.oshikomi) / (
-                    1 + self.e ** -((self.data1 - 1) * self.number - 10)
+                    1 + self.e ** -((self.data1) * self.speed - 10)
                 )
-            elif self.data1 < 20 / self.number + 2:
-                self.data2 = self.oshikomi
-            elif self.data1 < 20 / self.number * 2 + 2:
+            elif self.data1 < 1 / self.speed * 2:
                 self.data2 = 400 - (400 - self.oshikomi) / (
-                    1 + self.e ** (((self.data1 - 1) * self.number - 31 - self.number))
+                    1 + self.e ** ((self.data1) * self.speed - 30)
                 )
-            else:
-                self.data2 = 400
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.data2)
             )
