@@ -16,16 +16,16 @@ class Text_class:
         # self.oshikomi, self.speed = 250, 1
         # self.oshikomi, self.speed = 160, 2
         # [1, 5]
-        # self.oshikomi, self.speed =  160 , 2
-        # self.oshikomi, self.speed =  210 , 2
+        # self.oshikomi, self.speed = 160, 2
+        # self.oshikomi, self.speed = 210, 2
         # [5, 1]
         # self.oshikomi, self.speed =  250 , 2
-        # self.oshikomi, self.speed =  220 , 2
+        # self.oshikomi, self.speed = 220, 2
         # 1
         # [[2, 2, 1], [1, 2, 4]]
-        # self.oshikomi, self.speed = 220, 2
-        # self.oshikomi, self.speed =  180 , 2
-        # self.oshikomi, self.speed =  240 , 0.5
+        self.oshikomi, self.speed = 220, 2
+        # self.oshikomi, self.speed = 180, 2
+        # self.oshikomi, self.speed = 240, 0.5
         # 2
         # [[2, 1, 2], [1, 4, 2]]
         # self.oshikomi, self.speed =  160 , 1
@@ -127,7 +127,9 @@ class Text_class:
                 self.num = 255
             elif self.num < 0:
                 self.num = 0
-            self.ser.write(bytes([self.num]))
+            # self.ser.write(bytes([self.num]))
+            self.num_str = str(self.num + 100) + "\n"  # 100-355
+            self.ser.write(self.num_str.encode())
             time.sleep(0.01)
 
     def moveloop(self):

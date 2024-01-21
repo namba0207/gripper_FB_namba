@@ -1,17 +1,20 @@
-const int vol_pin = 0;   // 圧力センサ用アナログピン
-
-void setup() {
+int A = 1;
+int B = 1;
+void setup()
+{
   Serial.begin(115200);
 }
 
-int force=0;
-int A;
-void loop() {
-  if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n');
-    force=analogRead(vol_pin);
-    A = 1023 - force;
-    //Serial.print("You sent me: ");
-    Serial.println(A);
+void loop()
+{
+  if (Serial.available() > 0)
+  {
+    String data1 = Serial.readStringUntil('\n');
+    String data2 = Serial.readStringUntil('\n');
+    A = data1.toInt() * 2;
+    B = data2.toInt() * 2;
   }
+  Serial.print(A);
+  Serial.print(',');
+  Serial.println(B);
 }

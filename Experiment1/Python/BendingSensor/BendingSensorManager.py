@@ -17,6 +17,7 @@ from xarm.wrapper import XArmAPI
 
 class BendingSensorManager:
     def __init__(self, ip, port) -> None:
+        self.flag = 0
         self.ip = ip
         self.port = port
         self.bendingValue = 400
@@ -27,7 +28,28 @@ class BendingSensorManager:
 
     def thread(self):
         while True:
-            self.ser.write(bytes([RC.num_int]))
+            # 掴み始め・離し始め
+            if self.flag == 0 and RC.num_int >= 129:
+                self.grip = self.arm.get_gripper_position()[1]
+                self.flag = 1
+            elif RC.num_int < 129:
+                self.grip = 0
+                self.flag = 0
+            if self.flag == 0:
+                self.pos2 = int(0)
+            else:
+                self.pos2 = int(
+                    (self.grip - self.arm.get_gripper_position()[1])
+                    * (255 - 0)
+                    / (self.grip - 175)  # 止まるところでグリッパー閉じ切る
+                )
+            if self.pos2 > 255:
+                self.pos2 = 255
+            elif self.pos2 < 0:
+                self.pos2 = 0
+            self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
+            self.ser.write(self.num_str.encode())
+            # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.0005)
 
     def StartReceiving(self):
