@@ -1,22 +1,24 @@
 # Arduino_gripper_out.inoとセット！！,押し込み表現拡大，ロボtグリッパー掴みから100まで
-# import csv
+import csv
 import math
-import threading
-import time
-from pynput import mouse, keyboard
 # import sys
 import random
+import threading
+import time
 from random import randint
+
 # import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
+from pynput import keyboard, mouse
 from xarm.wrapper import XArmAPI
 
 
 class Text_class:
     def __init__(self):
-        self.oshikomi = []
-        self.speed = []
+        self.data1 = 0
+        self.oshikomi = [200,200,200]
+        self.speed = [1,1,1]
         self.sample_list = [1, 2, 4]
         self.data2 = 400
         self.num = 0
@@ -24,7 +26,7 @@ class Text_class:
         self.flag = 0
         self.e = math.e
         ip = "192.168.1.199"
-        arduino_port = "COM8"
+        arduino_port = "COM7"
         baud_rate = 115200
         self.ser = serial.Serial(arduino_port, baud_rate)
         not_used = self.ser.readline()
@@ -43,7 +45,7 @@ class Text_class:
         thr0 = threading.Thread(target=self.sendloop)
         thr0.setDaemon(True)
         thr0.start()
-        
+
     def press(self,key):
         try:
             print('アルファベット {0} が押されました'.format(key.char))
@@ -53,38 +55,45 @@ class Text_class:
                 self.num3 = randint(1, 2)
                 self.numlist = random.sample(self.sample_list, 3)
                 print(self.num1,self.num2,self.num3,self.numlist)
+                with open("data0122_1.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow([self.num1,self.num2,self.num3,self.numlist])
                 j = 0
-                
                 while j < 3:
                     if self.numlist[j] == 1:
-                        self.oshikomi += [random.choice((160, 220))]
+                        self.oshikomi[j] = random.choice((160, 220))
                     if self.numlist[j] == 2:
-                        self.oshikomi += [random.choice((180, 230))]
+                        self.oshikomi[j] = random.choice((180, 230))
                     if self.numlist[j] == 4:
-                        self.oshikomi += [random.choice((200, 240))]
+                        self.oshikomi[j] = random.choice((200, 240))
                     j += 1
                 self.speed = [
-                    random.choice((0.5, 1, 2)),
-                    random.choice((0.5, 1, 2)),
-                    random.choice((0.5, 1, 2)),
+                    random.choice((1, 2, 4)),
+                    random.choice((1, 2, 4)),
+                    random.choice((1, 2, 4)),
                 ]
                 k = 0
                 while k < 3:
+                    self.recode_data = str(self.oshikomi[k])+ ","+ str(self.speed[k])
                     print("self.oshikomi" + str(k) + ", self.speed"+ str(k) +" = "+ str(self.oshikomi[k])+ ","+ str(self.speed[k]))
+                    with open("data0122_1.csv", "a", newline="") as file:
+                        writer = csv.writer(file)
+                        writer.writerow([self.recode_data])
                     k += 1
-                
+
             if format(key.char) == '1':
+                print("thread_start")
                 thr1 = threading.Thread(target=self.moveloop)
                 thr1.setDaemon(True)
                 thr1.start()
-            
+
         except AttributeError:
             print('スペシャルキー {0} が押されました'.format(key))
 
     def release(self,key):
         if key == keyboard.Key.esc:     # escが押された場合
             return False    # listenerを止める
-        
+
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
         while True:
@@ -118,34 +127,36 @@ class Text_class:
             self.start_time = time.perf_counter()
             while self.data1 < 5:
                 self.data1 = time.perf_counter() - self.start_time
-                if self.data1 < 2:
+                if self.data1 < 2/self.speed[i]:
                     self.data2 = 400 - (400 - self.oshikomi[i]) / (
-                        1 + self.e ** -(self.data1 * self.speed[i] * 20 - 10)
+                        1 + self.e ** -(self.data1 * self.speed[i] * 10 - 10)
                     )
                 elif self.data1 < 4:
                     self.data2 = 400 - (400 - self.oshikomi[i]) / (
-                        1 + self.e ** (self.data1 * self.speed[i] * 20 - 30)
+                        1 + self.e ** (self.data1 * self.speed[i] * 10 - 30)
                     )
                 else:
                     self.data2 = 400
                 code, ret = self.arm.getset_tgpio_modbus_data(
                     self.datal.ConvertToModbusData(self.data2)
                 )
+                print(self.data2)
                 time.sleep(0.005)
+            self.data1 = 0
             i+=1
             print(i)
         print("mooveloop_finish")
-    
+
 if __name__ == "__main__":
     text_class = Text_class()
     listener = keyboard.Listener(
         on_press=text_class.press,
         on_release=text_class.release)
     listener.start()
-    time.sleep(2)
+    # time.sleep(2)
     while True:
         try:
-            pass
+            # pass
             # text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
             # print(
             #     # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
@@ -153,7 +164,7 @@ if __name__ == "__main__":
             #     int(text_class.arm.get_gripper_position()[1]),
             #     text_class.line,
             # )
-            # time.sleep(0.01)
+            time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break
