@@ -7,8 +7,9 @@
 import math
 
 import numpy as np
-import quaternion
-import scipy.spatial.transform as scitransform
+
+# import quaternion
+# import scipy.spatial.transform as scitransform
 
 """
 ##### IMPORTANT #####
@@ -20,7 +21,7 @@ SciKit-Surgery: compact libraries for surgical navigation.
 International Journal of Computer Assisted Radiology and Surgery. May 2020.
 DOI: 10.1007/s11548-020-02180-5
 """
-import sksurgerycore.algorithms.averagequaternions as aveq
+# import sksurgerycore.algorithms.averagequaternions as aveq
 
 
 class CyberneticAvatarMotionBehaviour:

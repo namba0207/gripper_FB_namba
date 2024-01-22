@@ -86,6 +86,9 @@ class Text_class:
                 thr1 = threading.Thread(target=self.moveloop)
                 thr1.setDaemon(True)
                 thr1.start()
+                thr2 = threading.Thread(target=self.displayloop)
+                thr2.setDaemon(True)
+                thr2.start()
 
         except AttributeError:
             print('スペシャルキー {0} が押されました'.format(key))
@@ -127,7 +130,7 @@ class Text_class:
             self.start_time = time.perf_counter()
             while self.data1 < 5:
                 self.data1 = time.perf_counter() - self.start_time
-                if self.data1 < 2/self.speed[i]:
+                if self.data1 < 2:
                     self.data2 = 400 - (400 - self.oshikomi[i]) / (
                         1 + self.e ** -(self.data1 * self.speed[i] * 10 - 10)
                     )
@@ -140,12 +143,22 @@ class Text_class:
                 code, ret = self.arm.getset_tgpio_modbus_data(
                     self.datal.ConvertToModbusData(self.data2)
                 )
-                print(self.data2)
+                print(self.data1,self.data2)
                 time.sleep(0.005)
             self.data1 = 0
             i+=1
             print(i)
         print("mooveloop_finish")
+
+    def displayloop(self):
+        self.line = self.ser.readline().decode("utf-8").rstrip()
+        print(
+            # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
+            text_class.datal.loadcell_int,
+            int(text_class.arm.get_gripper_position()[1]),
+            text_class.line,
+        )
+        time.sleep(0.01)
 
 if __name__ == "__main__":
     text_class = Text_class()
@@ -153,17 +166,9 @@ if __name__ == "__main__":
         on_press=text_class.press,
         on_release=text_class.release)
     listener.start()
-    # time.sleep(2)
     while True:
         try:
             # pass
-            # text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
-            # print(
-            #     # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-            #     text_class.datal.loadcell_int,
-            #     int(text_class.arm.get_gripper_position()[1]),
-            #     text_class.line,
-            # )
             time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
