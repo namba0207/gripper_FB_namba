@@ -3,6 +3,9 @@ import csv
 import math
 import threading
 import time
+import queue
+from pynput import mouse, keyboard
+import sys
 
 import numpy as np
 import serial
@@ -12,74 +15,10 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        # [5, 1]
-        # self.oshikomi, self.speed = 250, 1
-        # self.oshikomi, self.speed = 160, 2
-        # [1, 5]
-        # self.oshikomi, self.speed = 160, 2
-        # self.oshikomi, self.speed = 210, 2
-        # [5, 1]
-        # self.oshikomi, self.speed =  250 , 2
-        # self.oshikomi, self.speed = 220, 2
-        # 1
-        # [[2, 2, 1], [1, 2, 4]]
-        self.oshikomi, self.speed = 220, 2
-        # self.oshikomi, self.speed = 180, 2
-        # self.oshikomi, self.speed = 240, 0.5
-        # 2
-        # [[2, 1, 2], [1, 4, 2]]
-        # self.oshikomi, self.speed =  160 , 1
-        # self.oshikomi, self.speed =  240 , 1
-        # self.oshikomi, self.speed =  230 , 0.5
-        # 3
-        # [[1, 1, 1], [2, 4, 1]]
-        # self.oshikomi, self.speed =  180 , 1
-        # self.oshikomi, self.speed =  240 , 1
-        # self.oshikomi, self.speed =  220 , 0.5
-        # 4
-        # [[1, 1, 1], [2, 4, 1]]
-        # self.oshikomi, self.speed =  180 , 0.5
-        # self.oshikomi, self.speed =  240 , 1
-        # self.oshikomi, self.speed =  220 , 1
-        # 5
-        # [[2, 1, 2], [1, 2, 4]]
-        # self.oshikomi, self.speed =  220 , 1
-        # self.oshikomi, self.speed =  230 , 1
-        # self.oshikomi, self.speed =  240 , 0.5
-        # 6
-        # [[2, 2, 2], [4, 1, 2]]
-        # self.oshikomi, self.speed =  240 , 2
-        # self.oshikomi, self.speed =  220 , 0.5
-        # self.oshikomi, self.speed =  180 , 0.5
-        # 7
-        # [[1, 1, 2], [4, 2, 1]]
-        # self.oshikomi, self.speed =  200 , 0.5
-        # self.oshikomi, self.speed =  230 , 0.5
-        # self.oshikomi, self.speed =  160 , 1
-        # 8
-        # [[2, 1, 2], [1, 2, 4]]
-        # self.oshikomi, self.speed =  160 , 2
-        # self.oshikomi, self.speed =  180 , 1
-        # self.oshikomi, self.speed =  200 , 0.5
-        # 9
-        # [[2, 1, 1], [4, 1, 2]]
-        # self.oshikomi, self.speed =  200 , 0.5
-        # self.oshikomi, self.speed =  160 , 2
-        # self.oshikomi, self.speed =  180 , 2
-        # [2, 2, 1] [1, 2, 4]
-        # [2, 1, 2] [1, 4, 2]
-        # [1, 1, 1] [2, 4, 1]
-        # [1, 1, 1] [2, 4, 1]
-        # [2, 1, 2] [1, 2, 4]
-        # [2, 2, 2] [4, 1, 2]
-        # [1, 1, 2] [4, 2, 1]
-        # [2, 1, 2] [1, 2, 4]
-        # [2, 1, 1] [4, 1, 2]
         self.data2 = 400
         self.num = 0
         self.grippos = 0
         self.flag = 0
-
         self.e = math.e
         ip = "192.168.1.199"
         arduino_port = "COM8"
@@ -104,7 +43,19 @@ class Text_class:
         thr3 = threading.Thread(target=self.moveloop)
         thr3.setDaemon(True)
         thr3.start()
+        
+    def press(key):
+        try:
+            print('アルファベット {0} が押されました'.format(key.char))
+            if format(key.char) == '1':
+                print(1)
+        except AttributeError:
+            print('スペシャルキー {0} が押されました'.format(key))
 
+    def release(key):
+        if key == keyboard.Key.esc:     # escが押された場合
+            return False    # listenerを止める
+        
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
         while True:
@@ -136,22 +87,25 @@ class Text_class:
         self.start_time = time.perf_counter()
         while True:
             self.data1 = time.perf_counter() - self.start_time
-            if self.data1 < 1 / self.speed:
+            if self.data1 < 2:
                 self.data2 = 400 - (400 - self.oshikomi) / (
                     1 + self.e ** -(self.data1 * self.speed * 20 - 10)
                 )
-            else:
+            elif self.data1 < 4:
                 self.data2 = 400 - (400 - self.oshikomi) / (
                     1 + self.e ** (self.data1 * self.speed * 20 - 30)
                 )
             code, ret = self.arm.getset_tgpio_modbus_data(
                 self.datal.ConvertToModbusData(self.data2)
             )
-            # print(self.data1, self.data2)
             time.sleep(0.005)
 
 
 if __name__ == "__main__":
+    listener = keyboard.Listener(
+        on_press=press,
+        on_release=release)
+    listener.start()
     text_class = Text_class()
     while True:
         try:
