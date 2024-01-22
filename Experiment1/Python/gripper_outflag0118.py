@@ -102,11 +102,12 @@ class Text_class:
 
 
 if __name__ == "__main__":
-    listener = keyboard.Listener(
-        on_press=press,
-        on_release=release)
-    listener.start()
     text_class = Text_class()
+    listener = keyboard.Listener(
+        on_press=text_class.press,
+        on_release=text_class.release)
+    listener.start()
+    
     while True:
         try:
             text_class.line = text_class.ser.readline().decode("utf-8").rstrip()
