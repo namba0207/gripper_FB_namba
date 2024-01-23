@@ -22,4 +22,4 @@ if __name__ == "__main__":
     )
 
     print("\n----- End program: ExManager.py -----")
-# AttributeError: module 'numpy' has no attribute 'quaternion'
+# AttributeError: module 'numpy' has no attribute 'quaternion'の場合、何も設定いじってなければ一度全部電源切って再起動する！2024/01/23

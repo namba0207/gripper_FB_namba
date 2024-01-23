@@ -49,59 +49,67 @@ class Text_class:
 
     def press(self, key):
         try:
-            print("アルファベット {0} が押されました".format(key.char))
-            if format(key.char) == "0":
+            # print("アルファベット {0} が押されました".format(key.char))
+            if format(key.char) == "r":
                 self.num1 = randint(1, 2)
                 self.num2 = randint(1, 2)
                 self.num3 = randint(1, 2)
                 self.numlist = random.sample(self.sample_list, 3)
-                print(self.num1, self.num2, self.num3, self.numlist)
-                with open("data0122_2.csv", "a", newline="") as file:
+                # print(self.num1, self.num2, self.num3, self.numlist)
+                print("保存データの確認、スタートはs,ミスしたらm")
+                with open("data0123_1.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow([self.num1, self.num2, self.num3, self.numlist])
                 j = 0
                 while j < 3:
                     if self.numlist[j] == 1:
-                        self.oshikomi[j] = random.choice((10, 220))
+                        self.oshikomi[j] = 185
+                        # self.oshikomi[j] = random.choice((185, 220))  # 200-230
                     if self.numlist[j] == 2:
-                        self.oshikomi[j] = random.choice((190, 230))
+                        self.oshikomi[j] = 196
+                        # self.oshikomi[j] = random.choice((190, 230))  # 210-240
                     if self.numlist[j] == 4:
-                        self.oshikomi[j] = random.choice((200, 240))
+                        self.oshikomi[j] = 200
+                        # self.oshikomi[j] = random.choice((200, 240))  # 220-250
                     j += 1
                 self.speed = [
-                    random.choice((1, 2, 4)),
-                    random.choice((1, 2, 4)),
-                    random.choice((1, 2, 4)),
+                    random.choice((1, 2, 3)),
+                    random.choice((1, 2, 3)),
+                    random.choice((1, 2, 3)),
                 ]
                 k = 0
                 while k < 3:
                     self.recode_data = str(self.oshikomi[k]) + "," + str(self.speed[k])
-                    print(
-                        "self.oshikomi"
-                        + str(k)
-                        + ", self.speed"
-                        + str(k)
-                        + " = "
-                        + str(self.oshikomi[k])
-                        + ","
-                        + str(self.speed[k])
-                    )
-                    with open("data0122_2.csv", "a", newline="") as file:
+                    # print(
+                    #     "self.oshikomi"
+                    #     + str(k)
+                    #     + ", self.speed"
+                    #     + str(k)
+                    #     + " = "
+                    #     + str(self.oshikomi[k])
+                    #     + ","
+                    #     + str(self.speed[k])
+                    # )
+                    with open("data0123_1.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([self.recode_data])
                     k += 1
 
-            if format(key.char) == "1":
+            if format(key.char) == "s":
                 print("thread_start")
                 thr1 = threading.Thread(target=self.moveloop)
                 thr1.setDaemon(True)
                 thr1.start()
-                thr2 = threading.Thread(target=self.displayloop)
-                thr2.setDaemon(True)
-                thr2.start()
+
+            if format(key.char) == "m":
+                with open("data0123_1.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow(["miss"])
+                print("miss")
 
         except AttributeError:
-            print("スペシャルキー {0} が押されました".format(key))
+            # print("スペシャルキー {0} が押されました".format(key))
+            pass
 
     def release(self, key):
         if key == keyboard.Key.esc:  # escが押された場合
@@ -123,7 +131,7 @@ class Text_class:
                 self.num = int(
                     (self.grippos - self.arm.get_gripper_position()[1])
                     * (255 - 0)
-                    / (self.grippos - 175)  # 止まるところでグリッパー閉じ切る
+                    / (self.grippos - 200)  # 止まるところでグリッパー閉じ切る
                 )
             if self.num > 255:
                 self.num = 255
@@ -153,22 +161,16 @@ class Text_class:
                 code, ret = self.arm.getset_tgpio_modbus_data(
                     self.datal.ConvertToModbusData(self.data2)
                 )
-                print(self.data1, self.data2)
+                # print(self.data1, self.data2)
+                print(
+                    int(self.arm.get_gripper_position()[1]),
+                    self.datal.loadcell_int,
+                )
                 time.sleep(0.005)
             self.data1 = 0
             i += 1
             print(i)
         print("mooveloop_finish")
-
-    def displayloop(self):
-        self.line = self.ser.readline().decode("utf-8").rstrip()
-        print(
-            # 2200 - int(self.arm.get_gripper_position()[1] / 400 * 2200),
-            text_class.datal.loadcell_int,
-            int(text_class.arm.get_gripper_position()[1]),
-            text_class.line,
-        )
-        time.sleep(0.01)
 
 
 if __name__ == "__main__":
@@ -177,6 +179,7 @@ if __name__ == "__main__":
         on_press=text_class.press, on_release=text_class.release
     )
     listener.start()
+    print("rでランダム決める")
     while True:
         try:
             # pass
