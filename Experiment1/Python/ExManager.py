@@ -22,3 +22,4 @@ if __name__ == "__main__":
     )
 
     print("\n----- End program: ExManager.py -----")
+# AttributeError: module 'numpy' has no attribute 'quaternion'

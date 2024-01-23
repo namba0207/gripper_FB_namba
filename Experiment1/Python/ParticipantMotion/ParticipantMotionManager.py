@@ -11,6 +11,7 @@ import time
 import numpy as np
 from BendingSensor.BendingSensorManager import BendingSensorManager
 from OptiTrack.OptiTrackStreamingManager import OptiTrackStreamingManager
+
 # ----- Custom class ----- #
 from UDP.UDPManager import UDPManager
 
@@ -127,7 +128,7 @@ class ParticipantMotionManager:
         # ----- Initialize gripper control system ----- #
         if gripperInputSystem == "bendingsensor":
             self.bendingSensors = []
-            bendingSensorSerialCom = "COM7"
+            bendingSensorSerialCom = "COM8"
             bendingSensorSerialPort = 115200
 
             self.bendingSensorManager = BendingSensorManager(
