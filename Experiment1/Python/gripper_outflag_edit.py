@@ -63,14 +63,11 @@ class Text_class:
                 j = 0
                 while j < 3:
                     if self.numlist[j] == 1:
-                        self.oshikomi[j] = 185
-                        # self.oshikomi[j] = random.choice((185, 220))  # 200-230
+                        self.oshikomi[j] = random.choice((185, 220))  # 200-230
                     if self.numlist[j] == 2:
-                        self.oshikomi[j] = 196
-                        # self.oshikomi[j] = random.choice((190, 230))  # 210-240
+                        self.oshikomi[j] = random.choice((190, 230))  # 210-240
                     if self.numlist[j] == 4:
-                        self.oshikomi[j] = 200
-                        # self.oshikomi[j] = random.choice((200, 240))  # 220-250
+                        self.oshikomi[j] = random.choice((200, 240))  # 220-250
                     j += 1
                 self.speed = [
                     random.choice((1, 2, 3)),
@@ -79,6 +76,14 @@ class Text_class:
                 ]
                 k = 0
                 while k < 3:
+                    if self.oshikomi[k] == 185:
+                        self.oshikomi[k] = 200
+                    elif self.oshikomi[k] == 190:
+                        self.oshikomi[k] = 210
+                    elif self.oshikomi[k] == 200:
+                        self.oshikomi[k] = 220
+                    else:
+                        self.oshikomi[k] += 10
                     self.recode_data = str(self.oshikomi[k]) + "," + str(self.speed[k])
                     # print(
                     #     "self.oshikomi"

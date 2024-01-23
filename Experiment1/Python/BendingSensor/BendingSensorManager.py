@@ -41,7 +41,7 @@ class BendingSensorManager:
                 self.pos2 = int(
                     (self.grip - self.arm.get_gripper_position()[1])
                     * (255 - 0)
-                    / (self.grip - 175)  # 止まるところでグリッパー閉じ切る
+                    / (self.grip - 200)  # 止まるところでグリッパー閉じ切る
                 )
             if self.pos2 > 255:
                 self.pos2 = 255
