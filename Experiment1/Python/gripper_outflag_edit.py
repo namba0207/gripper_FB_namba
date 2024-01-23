@@ -57,7 +57,7 @@ class Text_class:
                 self.numlist = random.sample(self.sample_list, 3)
                 # print(self.num1, self.num2, self.num3, self.numlist)
                 print("保存データの確認、スタートはs,ミスしたらm")
-                with open("data0123_1.csv", "a", newline="") as file:
+                with open("data0123_3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow([self.num1, self.num2, self.num3, self.numlist])
                 j = 0
@@ -95,7 +95,7 @@ class Text_class:
                     #     + ","
                     #     + str(self.speed[k])
                     # )
-                    with open("data0123_1.csv", "a", newline="") as file:
+                    with open("data0123_3.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([self.recode_data])
                     k += 1
@@ -107,7 +107,7 @@ class Text_class:
                 thr1.start()
 
             if format(key.char) == "m":
-                with open("data0123_1.csv", "a", newline="") as file:
+                with open("data0123_3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(["miss"])
                 print("miss")
