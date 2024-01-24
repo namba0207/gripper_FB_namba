@@ -157,7 +157,14 @@ class Text_class:
             self.data1 = 0
             i += 1
             print(i)
-        print("mooveloop_finish")
+        print("movefinish")
+        self.finish_time = 0
+        self.start_time = time.perf_counter()
+        while self.finish_time < 10:
+            self.finish_time = time.perf_counter() - self.start_time
+            print(self.finish_time)
+            time.sleep(0.05)
+        print("moveloopfinish")
 
 
 if __name__ == "__main__":
