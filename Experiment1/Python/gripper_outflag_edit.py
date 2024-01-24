@@ -141,7 +141,7 @@ class Text_class:
                     )
                 elif self.data1 < 4:
                     self.data2 = 400 - (400 - self.oshikomi[i]) / (
-                        1 + self.e ** (self.data1 * self.speed[i] * 10 - 30)
+                        1 + self.e ** ((self.data1-2) * self.speed[i] * 10 - 10)
                     )
                 else:
                     self.data2 = 400
