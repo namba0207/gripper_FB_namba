@@ -65,13 +65,13 @@ class Text_class:
                     if self.numlist[j] == 1:
                         self.oshikomi[j] = random.choice((185, 220))  # 200-230
                     if self.numlist[j] == 2:
-                        self.oshikomi[j] = random.choice((190, 230))  # 210-240
+                        self.oshikomi[j] = random.choice((193, 230))  # 210-240
                     if self.numlist[j] == 4:
                         self.oshikomi[j] = random.choice((200, 240))  # 220-250
                     self.speed[j] = random.choice((1, 2, 3))
                     if self.oshikomi[j] == 185:
                         self.oshikomi_rec[j] = 200
-                    elif self.oshikomi[j] == 190:
+                    elif self.oshikomi[j] == 193:
                         self.oshikomi_rec[j] = 210
                     elif self.oshikomi[j] == 200:
                         self.oshikomi_rec[j] = 220
@@ -81,7 +81,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 print(self.oshikomi, self.oshikomi_rec)
-                with open("data0124_chikato.csv", "a", newline="") as file:
+                with open("data0124_kaho3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
@@ -137,12 +137,12 @@ class Text_class:
                 self.data1 = time.perf_counter() - self.start_time
                 if self.data1 < 2:
                     self.data2 = (400 - self.oshikomi[i]) / (
-                        1 + self.e ** -(self.data1 * self.speed[i] * 10 - 10)
-                    )+self.oshikomi[i]
+                        1 + self.e ** (self.data1 * self.speed[i] * 10 - 10)
+                    ) + self.oshikomi[i]
                 elif self.data1 < 4:
                     self.data2 = (400 - self.oshikomi[i]) / (
-                        1 + self.e ** ((self.data1-2) * self.speed[i] * 10 - 10)
-                    )+self.oshikomi[i]
+                        1 + self.e ** -((self.data1 - 2) * self.speed[i] * 10 - 10)
+                    ) + self.oshikomi[i]
                 else:
                     self.data2 = 400
                 code, ret = self.arm.getset_tgpio_modbus_data(
