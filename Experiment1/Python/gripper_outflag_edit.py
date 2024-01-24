@@ -81,7 +81,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 print(self.oshikomi, self.oshikomi_rec)
-                with open("data0124_3.csv", "a", newline="") as file:
+                with open("data0124_chikato.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
@@ -136,13 +136,13 @@ class Text_class:
             while self.data1 < 5:
                 self.data1 = time.perf_counter() - self.start_time
                 if self.data1 < 2:
-                    self.data2 = 400 - (400 - self.oshikomi[i]) / (
+                    self.data2 = (400 - self.oshikomi[i]) / (
                         1 + self.e ** -(self.data1 * self.speed[i] * 10 - 10)
-                    )
+                    )+self.oshikomi[i]
                 elif self.data1 < 4:
-                    self.data2 = 400 - (400 - self.oshikomi[i]) / (
+                    self.data2 = (400 - self.oshikomi[i]) / (
                         1 + self.e ** ((self.data1-2) * self.speed[i] * 10 - 10)
-                    )
+                    )+self.oshikomi[i]
                 else:
                     self.data2 = 400
                 code, ret = self.arm.getset_tgpio_modbus_data(
