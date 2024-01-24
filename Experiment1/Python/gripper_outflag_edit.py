@@ -17,10 +17,10 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
-        self.recode_list = [0,0,0,0,0,0]
+        self.recode_list = [0, 0, 0, 0, 0, 0]
         self.data1 = 0
         self.oshikomi = [200, 200, 200]
-        self.oshikomi_rec = [200,200,200]
+        self.oshikomi_rec = [200, 200, 200]
         self.speed = [1, 1, 1]
         self.sample_list = [1, 2, 4]
         self.data2 = 400
@@ -75,14 +75,22 @@ class Text_class:
                     elif self.oshikomi[j] == 200:
                         self.oshikomi_rec[j] = 220
                     else:
-                        self.oshikomi_rec[j] += self.oshikomi[j] + 10
-                    self.recode_list[2*j] = self.oshikomi_rec[j]
-                    self.recode_list[2*j+1] = self.speed[j]
+                        self.oshikomi_rec[j] = self.oshikomi[j] + 10
+                    self.recode_list[2 * j] = self.oshikomi_rec[j]
+                    self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
-                with open("data0123_3.csv", "a", newline="") as file:
+                print(self.oshikomi, self.oshikomi_rec)
+                with open("data0124_3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
-                    writer.writerow([self.num1, self.num2, self.num3,self.numlist, self.recode_list])
-                
+                    writer.writerow(
+                        [
+                            self.num1,
+                            self.num2,
+                            self.num3,
+                            self.numlist,
+                            self.recode_list,
+                        ]
+                    )
 
             if format(key.char) == "s":
                 print("thread_start")
