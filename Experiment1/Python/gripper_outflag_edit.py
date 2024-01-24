@@ -19,7 +19,8 @@ class Text_class:
     def __init__(self):
         self.recode_list = [0, 0, 0, 0, 0, 0]
         self.data1 = 0
-        self.oshikomi = [200, 200, 200]
+        self.oshikomi = [185, 190, 200]
+        self.oshikomi = [220, 230, 240]
         self.oshikomi_rec = [200, 200, 200]
         self.speed = [1, 1, 1]
         self.sample_list = [1, 2, 4]
