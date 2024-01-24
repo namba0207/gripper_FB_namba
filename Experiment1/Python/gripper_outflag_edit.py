@@ -17,8 +17,10 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
+        self.recode_list = [0,0,0,0,0,0]
         self.data1 = 0
         self.oshikomi = [200, 200, 200]
+        self.oshikomi_rec = [200,200,200]
         self.speed = [1, 1, 1]
         self.sample_list = [1, 2, 4]
         self.data2 = 400
@@ -56,10 +58,7 @@ class Text_class:
                 self.num3 = randint(1, 2)
                 self.numlist = random.sample(self.sample_list, 3)
                 # print(self.num1, self.num2, self.num3, self.numlist)
-                print("保存データの確認、スタートはs,ミスしたらm")
-                with open("data0123_3.csv", "a", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow([self.num1, self.num2, self.num3, self.numlist])
+                print("保存データの確認、スタートはs,ミスしたら再起動")
                 j = 0
                 while j < 3:
                     if self.numlist[j] == 1:
@@ -68,37 +67,22 @@ class Text_class:
                         self.oshikomi[j] = random.choice((190, 230))  # 210-240
                     if self.numlist[j] == 4:
                         self.oshikomi[j] = random.choice((200, 240))  # 220-250
-                    j += 1
-                self.speed = [
-                    random.choice((1, 2, 3)),
-                    random.choice((1, 2, 3)),
-                    random.choice((1, 2, 3)),
-                ]
-                k = 0
-                while k < 3:
-                    if self.oshikomi[k] == 185:
-                        self.oshikomi[k] = 200
-                    elif self.oshikomi[k] == 190:
-                        self.oshikomi[k] = 210
-                    elif self.oshikomi[k] == 200:
-                        self.oshikomi[k] = 220
+                    self.speed[j] = random.choice((1, 2, 3))
+                    if self.oshikomi[j] == 185:
+                        self.oshikomi_rec[j] = 200
+                    elif self.oshikomi[j] == 190:
+                        self.oshikomi_rec[j] = 210
+                    elif self.oshikomi[j] == 200:
+                        self.oshikomi_rec[j] = 220
                     else:
-                        self.oshikomi[k] += 10
-                    self.recode_data = str(self.oshikomi[k]) + "," + str(self.speed[k])
-                    # print(
-                    #     "self.oshikomi"
-                    #     + str(k)
-                    #     + ", self.speed"
-                    #     + str(k)
-                    #     + " = "
-                    #     + str(self.oshikomi[k])
-                    #     + ","
-                    #     + str(self.speed[k])
-                    # )
-                    with open("data0123_3.csv", "a", newline="") as file:
-                        writer = csv.writer(file)
-                        writer.writerow([self.recode_data])
-                    k += 1
+                        self.oshikomi_rec[j] += self.oshikomi[j] + 10
+                    self.recode_list[2*j] = self.oshikomi_rec[j]
+                    self.recode_list[2*j+1] = self.speed[j]
+                    j += 1
+                with open("data0123_3.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow([self.num1, self.num2, self.num3,self.numlist, self.recode_list])
+                
 
             if format(key.char) == "s":
                 print("thread_start")
@@ -106,19 +90,8 @@ class Text_class:
                 thr1.setDaemon(True)
                 thr1.start()
 
-            if format(key.char) == "m":
-                with open("data0123_3.csv", "a", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow(["miss"])
-                print("miss")
-
         except AttributeError:
-            # print("スペシャルキー {0} が押されました".format(key))
             pass
-
-    def release(self, key):
-        if key == keyboard.Key.esc:  # escが押された場合
-            return False  # listenerを止める
 
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
@@ -180,9 +153,7 @@ class Text_class:
 
 if __name__ == "__main__":
     text_class = Text_class()
-    listener = keyboard.Listener(
-        on_press=text_class.press, on_release=text_class.release
-    )
+    listener = keyboard.Listener(on_press=text_class.press)
     listener.start()
     print("rでランダム決める")
     while True:
