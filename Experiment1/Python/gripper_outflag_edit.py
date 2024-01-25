@@ -63,13 +63,13 @@ class Text_class:
                 j = 0
                 while j < 3:
                     if self.numlist[j] == 1:
-                        self.oshikomi[j] = random.choice((185, 220))  # 200-230
+                        self.oshikomi[j] = random.choice((188, 220))  # 200-230
                     if self.numlist[j] == 2:
                         self.oshikomi[j] = random.choice((193, 230))  # 210-240
                     if self.numlist[j] == 4:
                         self.oshikomi[j] = random.choice((200, 240))  # 220-250
                     self.speed[j] = random.choice((1, 2, 3))
-                    if self.oshikomi[j] == 185:
+                    if self.oshikomi[j] == 188:
                         self.oshikomi_rec[j] = 200
                     elif self.oshikomi[j] == 193:
                         self.oshikomi_rec[j] = 210
@@ -81,7 +81,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 print(self.oshikomi, self.oshikomi_rec)
-                with open("data0124_chikato3.csv", "a", newline="") as file:
+                with open("data0125_rope_3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
@@ -163,7 +163,7 @@ class Text_class:
         while self.finish_time < 10:
             self.finish_time = time.perf_counter() - self.start_time
             print(self.finish_time)
-            time.sleep(0.05)
+            time.sleep(1)
         print("moveloopfinish")
 
 
