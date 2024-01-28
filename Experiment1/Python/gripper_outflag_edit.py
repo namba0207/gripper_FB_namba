@@ -68,7 +68,7 @@ class Text_class:
                         self.oshikomi[j] = random.choice((193, 230))  # 210-240
                     if self.numlist[j] == 4:
                         self.oshikomi[j] = random.choice((200, 240))  # 220-250
-                    self.speed[j] = random.choice((1, 2, 3))
+                    self.speed[j] = random.choice((10, 20, 30))
                     if self.oshikomi[j] == 188:
                         self.oshikomi_rec[j] = 200
                     elif self.oshikomi[j] == 193:
@@ -137,11 +137,11 @@ class Text_class:
                 self.data1 = time.perf_counter() - self.start_time
                 if self.data1 < 2:
                     self.data2 = (400 - self.oshikomi[i]) / (
-                        1 + self.e ** (self.data1 * self.speed[i] * 10 - 10)
+                        1 + self.e ** (self.data1 * self.speed[i] - 10)
                     ) + self.oshikomi[i]
                 elif self.data1 < 4:
                     self.data2 = (400 - self.oshikomi[i]) / (
-                        1 + self.e ** -((self.data1 - 2) * self.speed[i] * 10 - 10)
+                        1 + self.e ** -((self.data1 - 2) * self.speed[i] - 10)
                     ) + self.oshikomi[i]
                 else:
                     self.data2 = 400
