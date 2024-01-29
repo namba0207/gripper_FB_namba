@@ -81,7 +81,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 print(self.oshikomi, self.oshikomi_rec)
-                with open("data0125_rope_3.csv", "a", newline="") as file:
+                with open("data0129_oshita3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [

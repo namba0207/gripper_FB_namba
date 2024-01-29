@@ -10,10 +10,12 @@ from ctypes import windll
 import numpy as np
 import RobotArmController.Robotconfig as RC
 import RobotArmController.Robotconfig_pos as RP
-from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import \
-    CyberneticAvatarMotionBehaviour
+from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
+    CyberneticAvatarMotionBehaviour,
+)
 from ParticipantMotion.ParticipantMotionManager import ParticipantMotionManager
 from Recorder.DataRecordManager import DataRecordManager
+
 # from VibrotactileFeedback.VibrationFeedback import Vibrotactile
 # ----- Custom class ----- #
 from RobotArmController.xArmTransform import xArmTransform
@@ -195,6 +197,11 @@ class RobotControlManager:
                         position[1],
                         -position[0],
                     )
+                    # print(
+                    #     position[2],
+                    #     position[1],
+                    #     -position[0],
+                    # )
                     transform.roll, transform.pitch, transform.yaw = (
                         rotation[0],
                         rotation[2],
