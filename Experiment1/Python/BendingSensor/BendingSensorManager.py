@@ -24,13 +24,13 @@ class BendingSensorManager:
         self.bendingValue = 400
         self.bendingValue_sub = 0
         self.ser = serial.Serial(ip, port)
-        self.ser2 = serial.Serial("COM8", 115200)
+        self.ser2 = serial.Serial("COM7", 115200)
         self.not_used = self.ser.readline()
         self.not_used = self.ser2.readline()
         self.arm = XArmAPI("192.168.1.199")
 
     def sendloop(self):
-        slope = 0
+        self.slope_h = 0
         self.x_data = np.array([])
         self.x_data = np.array([])
         while True:
@@ -52,8 +52,8 @@ class BendingSensorManager:
                 #     / (self.grip - 200)  # 止まるところでグリッパー閉じ切る
                 # )
                 self.x_list = np.append(
-                        self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
-                    )
+                    self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
+                )
                 self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
@@ -73,9 +73,9 @@ class BendingSensorManager:
             #     self.pos2 = 255
             # elif self.pos2 < 0:
             #     self.pos2 = 0
-            
+
             # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
-            self.num_str = str(RC.num_int) +  "\n"
+            self.num_str = str(RC.num_int) + "\n"
             self.ser.write(self.num_str.encode())
             self.ser2.write(bytes([self.slope_h]))
             # self.ser.write(bytes([RC.num_int]))
@@ -110,6 +110,6 @@ class BendingSensorManager:
                 RV.num_v = self.bendingVelocity
                 self.pretime = time.perf_counter()
                 self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                # print(self.data_parts, RC.num_int, self.arm.get_gripper_position()[1])
+                print(self.data_parts, RC.num_int, self.arm.get_gripper_position()[1])
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")

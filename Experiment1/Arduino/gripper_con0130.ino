@@ -1,4 +1,4 @@
-// 実験2用シリアル通信２変数
+// 実験1C用シリアル通信1変数
 #include <RotaryEncoder.h>
 // シリアル通信
 volatile int loadcell_data = 0;
@@ -65,7 +65,7 @@ void subProcess(void *pvParameters)
     }
     newpos1 = encoder1.getPosition(); // 2300
     // newpos2 = encoder2.getPosition(); // 2800
-    newpos1_int = int(newpos1);       // * 2800 / 2300,,2200で割ると閉め切れない
+    newpos1_int = int(newpos1); // * 2800 / 2300,,2200で割ると閉め切れない
     // newpos2_int = int(newpos2 * 2300 / 2800);
 
     volt1 = a1 * volt1 + (1 - a1) * loadcell_rec;
