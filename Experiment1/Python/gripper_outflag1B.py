@@ -1,14 +1,14 @@
 # Arduino_gripper_out.inoとセット！！,押し込み表現拡大，ロボtグリッパー掴みから100まで
 import csv
 import math
-# 最小二乗法
-from scipy import stats as st
-import numpy as np
 
+# import sys
 import random
 import threading
 import time
 from random import randint
+
+# import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
 from HardnessManager import Hardness_class
@@ -30,13 +30,11 @@ class Text_class:
         self.grippos = 0
         self.flag = 0
         self.e = math.e
-        self.x_list = []
-        self.y_list = []
         ip = "192.168.1.199"
-        # self.ser1 = serial.Serial("COM8", 115200)
-        self.ser2 = serial.Serial("COM7", 115200)
-        # not_used1 = self.ser1.readline()
-        not_used2 = self.ser2.readline()
+        arduino_port = "COM8"
+        baud_rate = 115200
+        self.ser = serial.Serial(arduino_port, baud_rate)
+        not_used = self.ser.readline()
         self.arm = XArmAPI(ip)
         self.datal = ArmWrapper(True, ip)
         self.datal.loadcell_int = 127
@@ -84,7 +82,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 print(self.oshikomi, self.oshikomi_rec)
-                with open("data0130.csv", "a", newline="") as file:
+                with open("data0129_oshita3.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
@@ -107,7 +105,6 @@ class Text_class:
 
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
-        slope = 0
         while True:
             # 掴み始め・離し始め
             if self.flag == 0 and self.datal.loadcell_int >= 129:
@@ -117,25 +114,20 @@ class Text_class:
                 self.grippos = 0
                 self.flag = 0
             if self.flag == 0:
-                self.x_list = np.array([])
-                self.y_list = np.array([])
                 self.num = int(0)
             else:
-                self.x_list = np.append(self.x_list,self.grippos - self.arm.get_gripper_position()[1])
-                self.y_list = np.append(self.y_list,self.datal.loadcell_int - 129)
-                if len(self.x_list) == 10:
-                    self.x_data = np.array([self.x_list])
-                    self.y_data = np.array([self.y_list])
-                    slope, intercept, r_value, p_value, std_err = st.linregress(self.x_data,self.y_data)
-                    print("傾き:{0}\n切片{1}".format(slope,intercept))
-                self.num = int(slope)
+                self.num = int(
+                    (self.grippos - self.arm.get_gripper_position()[1])
+                    * (255 - 0)
+                    / (self.grippos - 200)  # 止まるところでグリッパー閉じ切る
+                )
             if self.num > 255:
                 self.num = 255
             elif self.num < 0:
                 self.num = 0
-            # self.num_str = str(self.num + 100) + "\n"  # 100-355
-            # self.ser1.write(self.num_str.encode())
-            self.ser2.write(bytes([self.num]))
+            # self.ser.write(bytes([self.num]))
+            self.num_str = str(self.num + 100) + "\n"  # 100-355
+            self.ser.write(self.num_str.encode())
             time.sleep(0.01)
 
     def moveloop(self):

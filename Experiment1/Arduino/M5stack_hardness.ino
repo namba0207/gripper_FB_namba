@@ -3,9 +3,10 @@
 #include <math.h>
 
 GoPlus2 goPlus;
-float sensorValue_init = 0;
+// int raw_data = 0;
 int val = 0;
 int angle = 0;
+// float a = 0.8;//lowpassfft
 
 void setup()
 {
@@ -19,18 +20,19 @@ void loop()
 {
   if (Serial.available())
   {
-    val = Serial.read();
+    val = Serial.read();//data取得
   }
-  if (val > 250)
+  // val = a * val + (1 - a) * raw_data;//lowpassfft
+  if (val > 255)
   {
-    val = 250;
+    val = 255;
   }
-  else if (val < 5)
+  else if (val < 0)
   {
-    val = 5;
+    val = 0;
   }
   Serial.println(val);
-  angle = map(val, 5, 250, 0, 180);
+  angle = map(val, 0, 255, 0, 180);
   goPlus.Servo_write_angle(SERVO_NUM0, angle);
   delay(30);
   M5.Lcd.setCursor(0, 0);
