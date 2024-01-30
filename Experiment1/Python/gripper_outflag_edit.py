@@ -123,7 +123,7 @@ class Text_class:
             if self.flag == 0:
                 self.x_list = np.array([])
                 self.y_list = np.array([])
-                self.num = int(0)
+                self.slope_h = int(0)
                 # print("hello")
             else:
                 self.x_list = np.append(
@@ -131,30 +131,36 @@ class Text_class:
                 )
                 self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
                 # データ数が10を超えたら古いデータを削除
-                if len(self.x_list) > 10:
-                    self.x_list = self.x_list[1:]
-                    self.y_list = self.y_list[1:]
+                # if len(self.y_list) > 10:
+                #     self.x_list = self.x_list[1:]
+                #     self.y_list = self.y_list[1:]
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
                     if np.std(self.x_data) == 0:
-                        self.x_data = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
-                    slope, intercept, r_value, p_value, std_err = st.linregress(
-                        self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
-                    )
+                        slope = 2.5
+                    else:
+                        slope, intercept, r_value, p_value, std_err = st.linregress(
+                            self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                        )
                     print("傾き:{0}".format(slope))
-                    self.num = int(1 / slope * (255 - 0) / (3 - 0))
-                    print(self.num)
-            if self.num > 100:
-                self.num = 100
-            elif self.num < 0:
-                self.num = 0
+                    if slope < 0.1:
+                        slope = 0.1
+                    if slope > 3:
+                        slope = 3
+                    slope = 1 / slope - 0.5
+                    self.slope_h = int(slope * (200 - 0) / (3 - 0))
+                    # print(self.num)
+                if self.slope_h > 200:
+                    self.slope_h = 200
+                elif self.slope_h < 0:
+                    self.slope_h = 0
             # self.num_str = str(self.num + 100) + "\n"  # 100-355
             # self.ser1.write(self.num_str.encode())
-            self.ser2.write(bytes([self.num]))
-            # print(self.num)
+            self.ser2.write(bytes([self.slope_h]))
+            # print(self.slope_h)
             # print(self.x_list, self.y_list)
-            time.sleep(0.01)
+            time.sleep(0.001)
 
     def moveloop(self):
         i = 0

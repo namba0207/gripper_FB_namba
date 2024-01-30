@@ -49,6 +49,7 @@ class BendingSensorManager:
             if self.flag == 0:
                 self.x_list = np.array([])
                 self.y_list = np.array([])
+                self.slope_h = 0
             else:
                 self.pos2 = int(
                     (self.grip - self.arm.get_gripper_position()[1])
@@ -59,6 +60,10 @@ class BendingSensorManager:
                     self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
                 )
                 self.y_list = np.append(self.y_list, [RC.num_int - 129])
+                # データ数が10を超えたら古いデータを削除
+                if len(self.x_list) > 10:
+                    self.x_list = self.x_list[1:]
+                    self.y_list = self.y_list[1:]
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
@@ -67,17 +72,19 @@ class BendingSensorManager:
                     slope, intercept, r_value, p_value, std_err = st.linregress(
                         self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                     )
-                    print("傾き:{0}".format(slope))
-                    self.slope_h = int(1 / slope * (255 - 0) / (3 - 0))
+                    # print("傾き:{0}".format(slope))
+                    if slope < 0.1:
+                        slope = 0.1
+                    if slope > 3:
+                        slope = 3
+                    slope = 1 / slope
+                    self.slope_h = int((slope - 0.3) * (255 - 0) / (10 - 0.3))
                     if self.slope_h > 100:
                         self.slope_h = 100
                     elif self.slope_h < 0:
                         self.slope_h = 0
-                if self.pos2 > 255:
-                    self.pos2 = 255
-                elif self.pos2 < 0:
-                    self.pos2 = 0
             self.ser2.write(bytes([self.slope_h]))
+            print(self.slope_h)
             # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.005)
 
