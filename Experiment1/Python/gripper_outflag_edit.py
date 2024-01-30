@@ -1,18 +1,18 @@
 # Arduino_gripper_out.inoとセット！！,押し込み表現拡大，ロボtグリッパー掴みから100まで
 import csv
 import math
-# 最小二乗法
-from scipy import stats as st
-import numpy as np
-
 import random
 import threading
 import time
 from random import randint
+
+import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
-from HardnessManager import Hardness_class
 from pynput import keyboard, mouse
+
+# 最小二乗法
+from scipy import stats as st
 from xarm.wrapper import XArmAPI
 
 
@@ -30,8 +30,8 @@ class Text_class:
         self.grippos = 0
         self.flag = 0
         self.e = math.e
-        self.x_list = []
-        self.y_list = []
+        self.x_list = np.array([])
+        self.y_list = np.array([])
         ip = "192.168.1.199"
         # self.ser1 = serial.Serial("COM8", 115200)
         self.ser2 = serial.Serial("COM7", 115200)
@@ -121,14 +121,20 @@ class Text_class:
                 self.y_list = np.array([])
                 self.num = int(0)
             else:
-                self.x_list = np.append(self.x_list,self.grippos - self.arm.get_gripper_position()[1])
-                self.y_list = np.append(self.y_list,self.datal.loadcell_int - 129)
-                if len(self.x_list) == 10:
+                self.x_list = np.append(
+                    self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
+                )
+                self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
+                if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
-                    slope, intercept, r_value, p_value, std_err = st.linregress(self.x_data,self.y_data)
-                    print("傾き:{0}\n切片{1}".format(slope,intercept))
-                self.num = int(slope)
+                    if np.std(self.x_data) == 0:
+                        self.x_data = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+                    slope, intercept, r_value, p_value, std_err = st.linregress(
+                        self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                    )
+                    # print("傾き:{0}".format(slope))
+                    self.num = int(slope * (255 - 0) / (3 - 0))
             if self.num > 255:
                 self.num = 255
             elif self.num < 0:
@@ -136,6 +142,8 @@ class Text_class:
             # self.num_str = str(self.num + 100) + "\n"  # 100-355
             # self.ser1.write(self.num_str.encode())
             self.ser2.write(bytes([self.num]))
+            print(self.num)
+            # print(self.x_list, self.y_list)
             time.sleep(0.01)
 
     def moveloop(self):
@@ -158,10 +166,7 @@ class Text_class:
                     self.datal.ConvertToModbusData(self.data2)
                 )
                 # print(self.data1, self.data2)
-                print(
-                    int(self.arm.get_gripper_position()[1]),
-                    self.datal.loadcell_int,
-                )
+
                 time.sleep(0.005)
             self.data1 = 0
             i += 1
@@ -178,15 +183,18 @@ class Text_class:
 
 if __name__ == "__main__":
     text_class = Text_class()
-    print(111)
-    hard_class = Hardness_class()
-    # print(000)
     listener = keyboard.Listener(on_press=text_class.press)
     listener.start()
     print("rでランダム決める")
     while True:
         try:
-            # pass
+            line2 = text_class.ser2.readline().decode("utf-8").rstrip()
+
+            # print(
+            #     line2,
+            #     int(text_class.arm.get_gripper_position()[1]),
+            #     text_class.datal.loadcell_int,
+            # )
             time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
