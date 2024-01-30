@@ -142,7 +142,7 @@ class Text_class:
             # self.num_str = str(self.num + 100) + "\n"  # 100-355
             # self.ser1.write(self.num_str.encode())
             self.ser2.write(bytes([self.num]))
-            print(self.num)
+            # print(self.num)
             # print(self.x_list, self.y_list)
             time.sleep(0.01)
 
@@ -167,7 +167,7 @@ class Text_class:
                 )
                 # print(self.data1, self.data2)
 
-                time.sleep(0.005)
+                time.sleep(0.01)
             self.data1 = 0
             i += 1
             print(i)
@@ -188,14 +188,8 @@ if __name__ == "__main__":
     print("rでランダム決める")
     while True:
         try:
-            line2 = text_class.ser2.readline().decode("utf-8").rstrip()
-
-            # print(
-            #     line2,
-            #     int(text_class.arm.get_gripper_position()[1]),
-            #     text_class.datal.loadcell_int,
-            # )
-            time.sleep(0.01)
+            pass
+            # time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break

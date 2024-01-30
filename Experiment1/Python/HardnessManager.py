@@ -14,16 +14,16 @@ from ArmWrapper1000 import ArmWrapper
 from pynput import keyboard, mouse
 from xarm.wrapper import XArmAPI
 
-ser1 = serial.Serial("COM7", 115200)
-ser2 = serial.Serial("COM8", 115200)
+ser1 = serial.Serial("COM8", 115200)
+ser2 = serial.Serial("COM7", 115200)
 
 while True:
     try:
-        ser1.write(bytes([118]))
-        ser2.write(bytes([117]))
-        line1 = ser1.readline().decode("utf-8").rstrip()
+        # ser1.write(bytes([118]))
+        ser2.write(bytes([0]))
+        # line1 = ser1.readline().decode("utf-8").rstrip()
         line2 = ser2.readline().decode("utf-8").rstrip()
-        print(line1, line2)
+        print(line2)
         time.sleep(0.001)
     except KeyboardInterrupt:
         print("finish")
