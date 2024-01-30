@@ -127,13 +127,11 @@ class ParticipantMotionManager:
 
         # ----- Initialize gripper control system ----- #
         if gripperInputSystem == "bendingsensor":
-            self.bendingSensors = []
-            bendingSensorSerialCom = "COM8"
-            bendingSensorSerialPort = 115200
+            # self.bendingSensors = []
+            # bendingSensorSerialCom = "COM8"
+            # bendingSensorSerialPort = 115200
 
-            self.bendingSensorManager = BendingSensorManager(
-                ip=bendingSensorSerialCom, port=bendingSensorSerialPort
-            )
+            self.bendingSensorManager = BendingSensorManager()
 
             # ----- Start receiving bending sensor value from UDP socket ----- #
             bendingSensorThread = threading.Thread(

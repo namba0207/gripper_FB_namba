@@ -17,22 +17,27 @@ from xarm.wrapper import XArmAPI
 
 
 class BendingSensorManager:
-    def __init__(self, ip, port) -> None:
+    def __init__(self) -> None:
+        self.slope_h = 0
+        self.x_data = np.array([])
+        self.x_data = np.array([])
         self.flag = 0
-        self.ip = ip
-        self.port = port
         self.bendingValue = 400
         self.bendingValue_sub = 0
-        self.ser = serial.Serial(ip, port)
+        self.ser = serial.Serial("COM8", 115200)
         self.ser2 = serial.Serial("COM7", 115200)
         self.not_used = self.ser.readline()
         self.not_used = self.ser2.readline()
         self.arm = XArmAPI("192.168.1.199")
 
     def sendloop(self):
-        self.slope_h = 0
-        self.x_data = np.array([])
-        self.x_data = np.array([])
+        while True:
+            # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
+            self.num_str = str(RC.num_int) + "\n"
+            self.ser.write(self.num_str.encode())
+            time.sleep(0.005)
+
+    def sendloop2(self):
         while True:
             # 掴み始め・離し始め
             if self.flag == 0 and RC.num_int >= 129:
@@ -44,17 +49,16 @@ class BendingSensorManager:
             if self.flag == 0:
                 self.x_list = np.array([])
                 self.y_list = np.array([])
-                # self.pos2 = int(0)
             else:
-                # self.pos2 = int(
-                #     (self.grip - self.arm.get_gripper_position()[1])
-                #     * (255 - 0)
-                #     / (self.grip - 200)  # 止まるところでグリッパー閉じ切る
-                # )
-                self.x_list = np.append(
-                    self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
+                self.pos2 = int(
+                    (self.grip - self.arm.get_gripper_position()[1])
+                    * (255 - 0)
+                    / (self.grip - 200)  # 止まるところでグリッパー閉じ切る
                 )
-                self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
+                self.x_list = np.append(
+                    self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
+                )
+                self.y_list = np.append(self.y_list, [RC.num_int - 129])
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
@@ -69,14 +73,10 @@ class BendingSensorManager:
                         self.slope_h = 100
                     elif self.slope_h < 0:
                         self.slope_h = 0
-            # if self.pos2 > 255:
-            #     self.pos2 = 255
-            # elif self.pos2 < 0:
-            #     self.pos2 = 0
-
-            # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
-            self.num_str = str(RC.num_int) + "\n"
-            self.ser.write(self.num_str.encode())
+                if self.pos2 > 255:
+                    self.pos2 = 255
+                elif self.pos2 < 0:
+                    self.pos2 = 0
             self.ser2.write(bytes([self.slope_h]))
             # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.005)
@@ -89,9 +89,12 @@ class BendingSensorManager:
             thr = threading.Thread(target=self.sendloop)
             thr.setDaemon(True)
             thr.start()
-            self.pretime = time.perf_counter()
+            thr = threading.Thread(target=self.sendloop2)
+            thr.setDaemon(True)
+            thr.start()
             while True:
                 line = self.ser.readline().decode("utf-8").rstrip()
+                # # line2 = self.ser2.readline().decode("utf-8").rstrip()
                 self.data_parts = line.split(",")
                 self.bendingValue_int = int(
                     400
@@ -104,12 +107,12 @@ class BendingSensorManager:
                 elif self.bendingValue_int < 0:
                     self.bendingValue_int = 0
                 self.bendingValue = self.bendingValue_int
-                self.bendingVelocity = (
-                    int(self.data_parts[1].rstrip()) - self.bendingValue_sub
-                ) / (time.perf_counter() - self.pretime)
-                RV.num_v = self.bendingVelocity
-                self.pretime = time.perf_counter()
-                self.bendingValue_sub = int(self.data_parts[1].rstrip())
-                print(self.data_parts, RC.num_int, self.arm.get_gripper_position()[1])
+                # print(
+                #     self.data_parts,
+                #     # line2,
+                #     RC.num_int,
+                #     self.arm.get_gripper_position()[1],
+                # )
+                # time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
