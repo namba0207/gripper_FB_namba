@@ -130,6 +130,10 @@ class Text_class:
                     self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
                 )
                 self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
+                # データ数が10を超えたら古いデータを削除
+                if len(self.x_list) > 10:
+                    self.x_list = self.x_list[1:]
+                    self.y_list = self.y_list[1:]
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
