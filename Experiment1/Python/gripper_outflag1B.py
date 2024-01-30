@@ -11,7 +11,8 @@ from random import randint
 # import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
-from HardnessManager import Hardness_class
+
+# from HardnessManager import Hardness_class
 from pynput import keyboard, mouse
 from xarm.wrapper import XArmAPI
 
@@ -170,8 +171,8 @@ class Text_class:
 
 if __name__ == "__main__":
     text_class = Text_class()
-    print(111)
-    hard_class = Hardness_class()
+    # print(111)
+    # hard_class = Hardness_class()
     # print(000)
     listener = keyboard.Listener(on_press=text_class.press)
     listener.start()

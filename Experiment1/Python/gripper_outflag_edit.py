@@ -33,10 +33,12 @@ class Text_class:
         self.x_list = np.array([])
         self.y_list = np.array([])
         ip = "192.168.1.199"
+        print("シリアル通信開始予定")
         # self.ser1 = serial.Serial("COM8", 115200)
         self.ser2 = serial.Serial("COM7", 115200)
         # not_used1 = self.ser1.readline()
         not_used2 = self.ser2.readline()
+        print("シリアル通信開始完了")
         self.arm = XArmAPI(ip)
         self.datal = ArmWrapper(True, ip)
         self.datal.loadcell_int = 127
@@ -83,7 +85,7 @@ class Text_class:
                     self.recode_list[2 * j] = self.oshikomi_rec[j]
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
-                print(self.oshikomi, self.oshikomi_rec)
+                # print(self.oshikomi, self.oshikomi_rec)
                 with open("data0130.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
@@ -108,6 +110,8 @@ class Text_class:
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
         slope = 0
+        self.x_data = np.array([])
+        self.x_data = np.array([])
         while True:
             # 掴み始め・離し始め
             if self.flag == 0 and self.datal.loadcell_int >= 129:
@@ -120,6 +124,7 @@ class Text_class:
                 self.x_list = np.array([])
                 self.y_list = np.array([])
                 self.num = int(0)
+                # print("hello")
             else:
                 self.x_list = np.append(
                     self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
@@ -133,10 +138,11 @@ class Text_class:
                     slope, intercept, r_value, p_value, std_err = st.linregress(
                         self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                     )
-                    # print("傾き:{0}".format(slope))
-                    self.num = int(slope * (255 - 0) / (3 - 0))
-            if self.num > 255:
-                self.num = 255
+                    print("傾き:{0}".format(slope))
+                    self.num = int(1 / slope * (255 - 0) / (3 - 0))
+                    print(self.num)
+            if self.num > 100:
+                self.num = 100
             elif self.num < 0:
                 self.num = 0
             # self.num_str = str(self.num + 100) + "\n"  # 100-355
@@ -188,8 +194,8 @@ if __name__ == "__main__":
     print("rでランダム決める")
     while True:
         try:
-            pass
-            # time.sleep(0.01)
+            # print(111)
+            time.sleep(0.01)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break
