@@ -197,12 +197,12 @@ class RobotControlManager:
                         position[1],
                         -position[0],
                     )
-                    # print(
-                    #     position[2],
-                    #     position[1],
-                    #     -position[0],
-                    # )
                     transform.roll, transform.pitch, transform.yaw = (
+                        rotation[0],
+                        rotation[2],
+                        -rotation[1],
+                    )
+                    print(
                         rotation[0],
                         rotation[2],
                         -rotation[1],
@@ -312,22 +312,8 @@ class RobotControlManager:
                     keycode = input(
                         'Input > "q": quit, "r": Clean error and init arm, "s": start control \n'
                     )
-                    # ----- Quit program ----- #
-                    if keycode == "q":
-                        if isEnablexArm:
-                            self.arm.disconnect()
-                        self.PrintProcessInfo()
-
-                        windll.winmm.timeEndPeriod(1)
-                        break
-
-                    # ----- Reset xArm and gripper ----- #
-                    elif keycode == "r":
-                        if isEnablexArm:
-                            self.InitializeAll(self.arm, transform)
-
                     # ----- Start streaming ----- #
-                    elif keycode == "s":
+                    if keycode == "s":
                         caBehaviour.SetOriginPosition(
                             participantMotionManager.LocalPosition()
                         )
@@ -421,26 +407,6 @@ class RobotControlManager:
 
         time.sleep(0.5)
         print("Initialized > xArm")
-
-    # def InitGripper(self, robotArm):
-    #     """
-    #     Initialize the gripper
-
-    #     Parameters
-    #     ----------
-    #     robotArm: XArmAPI
-    #         XArmAPI object.
-    #     """
-
-    #     robotArm.set_tgpio_modbus_baudrate(2000000)
-    #     robotArm.set_gripper_mode(0)
-    #     robotArm.set_gripper_enable(True)
-    #     robotArm.set_gripper_position(0, speed=5000)
-
-    #     robotArm.getset_tgpio_modbus_data(self.ConvertToModbusData(300))
-
-    #     time.sleep(0.5)
-    #     print("Initialized > xArm gripper")
 
     def ConvertToModbusData(self, value: int):
         """

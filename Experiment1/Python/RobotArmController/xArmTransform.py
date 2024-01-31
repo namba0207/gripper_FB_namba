@@ -20,7 +20,7 @@ class xArmTransform:
 
     # ----- ロボットが縦の場合、前にｘ、右にｙ、上にｚそれぞれにｒｐｙ、双腕だと回転 ----- #
     __initX, __initY, __initZ = 500, -195, 170
-    __initRoll, __initPitch, __initYaw = 90, 90, 0
+    __initRoll, __initPitch, __initYaw = 80, 90, 0
 
     # ----- Minimum limitation ----- #
     __minX, __minY, __minZ = 200, -200, 0

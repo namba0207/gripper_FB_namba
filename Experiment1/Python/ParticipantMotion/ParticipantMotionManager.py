@@ -168,17 +168,6 @@ class ParticipantMotionManager:
                     "gripperValue" + str(bendingSensorNum + i + 1)
                 ] = data
 
-    # def SetInitialBendingValue(self):
-    #     """
-    #     Set init bending value
-    #     """
-
-    #     if self.gripperInputSystem == "bendingsensor":
-    #         self.InitBendingSensorValues = 0
-
-    #         for i in range(self.bendingSensorNum):
-    #             self.InitBendingSensorValues.append(self.bendingSensor.bendingValue)
-
     def LocalPosition(self, loopCount: int = 0):
         """
         Local position
@@ -199,20 +188,6 @@ class ParticipantMotionManager:
         dictPos = {}
         if self.motionInputSystem == "optitrack":
             dictPos = self.optiTrackStreamingManager.position
-        # elif self.motionInputSystem == 'unity':
-        #     data = self.udpManager.data
-        #     position = np.array([float(data[data.index('pos')+1]), float(data[data.index('pos')+2]), float(data[data.index('pos')+3])])
-        #     dictPos['participant1'] = position
-
-        # If the data is ended, the last value is returned.
-        # for i in range(self.recordedParticipantNum):
-        #     recordedParticipantNum = self.defaultParticipantNum + i+1
-        #     if loopCount >= self.recordedMotionLength[i]:
-        #         dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][0:3])
-        #         continue
-
-        #     dictPos['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][0:3])
-
         return dictPos
 
     def LocalRotation(self, loopCount: int = 0):
@@ -234,24 +209,6 @@ class ParticipantMotionManager:
         dictRot = {}
         if self.motionInputSystem == "optitrack":
             dictRot = self.optiTrackStreamingManager.rotation
-        # elif self.motionInputSystem == 'unity':
-        #     data = self.udpManager.data
-        #     # ----- Rotation (x, y, z, w) or (x, y, z) ----- #
-        #     if 'rotEuler' in data:
-        #         rotation = float(data[data.index('rotEuler')+1]), float(data[data.index('rotEuler')+2]), float(data[data.index('rotEuler')+3])
-        #     elif 'rotQuaternion' in data:
-        #         rotation = np.array([float(data[data.index('rotQuaternion')+1]), float(data[data.index('rotQuaternion')+2]), float(data[data.index('rotQuaternion')+3]), float(data[data.index('rotQuaternion')+4])])
-        #     dictRot['participant1'] = rotation
-
-        # # If the data is ended, the last value is returned.
-        # for i in range(self.recordedParticipantNum):
-        #     recordedParticipantNum = self.defaultParticipantNum + i+1
-        #     if loopCount >= self.recordedMotionLength[i]:
-        #         dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][-1][3:8])
-        #         continue
-
-        #     dictRot['participant'+str(recordedParticipantNum)] = np.array(self.recordedMotion['participant'+str(recordedParticipantNum)][loopCount][3:8])
-
         return dictRot
 
     def GripperControlValue(self, loopCount: int = 0):
@@ -269,37 +226,8 @@ class ParticipantMotionManager:
         Value for control of the xArm gripper: dict
         {'gripperValue1': float value}
         """
-        # dictGripperValue = 850
+
         if self.gripperInputSystem == "bendingsensor":
             dictGripperValue = self.bendingSensorManager.bendingValue
-            # print(dictGripperValue)
-        #     for i in range(self.bendingSensorNum):
-        #         bendingVal = self.bendingSensors[i].bendingValue
-        #         bendingValueNorm = (bendingVal - bendingSensorMin) / (self.InitBendingSensorValues[i] - bendingSensorMin) * (targetMax - targetMin) + targetMin
-
-        #         if bendingValueNorm > targetMax:
-        #             bendingValueNorm = targetMax
-        #         dictGripperValue['gripperValue'+str(i+1)] = bendingValueNorm
-
-        # elif self.gripperInputSystem == 'unity':
-        #     dictGripperValue = {}
-        #     data = self.udpManager.data
-        #     if 'trigger' in data:
-        #         triggerValue = float(data[data.index('trigger')+1])
-        #         triggerValueNorm = (triggerValue - originalMin) / (originalMax - originalMin) * (targetMax - targetMin) + targetMin
-        #         dictGripperValue['gripperValue1'] = targetMax - triggerValueNorm
-
-        # elif self.gripperInputSystem == 'debug':
-        #     dictGripperValue = {}
-        #     dictGripperValue['gripperValue1'] = targetMax / 2
-
-        # # If the data is ended, the last value is returned.
-        # for i in range(self.recordedGripperValueNum):
-        #     recordedGripperNum = self.bendingSensorNum + i+1
-        #     if loopCount >= self.recordedMotionLength[i]:
-        #         dictGripperValue['gripperValue'+str(recordedGripperNum)] = np.array(self.recordedGripperValue['gripperValue'+str(recordedGripperNum)][-1][0])
-        #         continue
-
-        #     dictGripperValue['gripperValue'+str(recordedGripperNum)] = np.array(self.recordedGripperValue['gripperValue'+str(recordedGripperNum)][loopCount][0])
 
         return dictGripperValue
