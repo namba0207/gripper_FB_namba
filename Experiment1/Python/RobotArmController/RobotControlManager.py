@@ -202,11 +202,6 @@ class RobotControlManager:
                         rotation[2],
                         -rotation[1],
                     )
-                    print(
-                        rotation[0],
-                        rotation[2],
-                        -rotation[1],
-                    )
                     # ----- Safety check (Position) ---- #
                     diffX = transform.x - beforeX
                     diffY = transform.y - beforeY

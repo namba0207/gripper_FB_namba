@@ -75,15 +75,15 @@ class BendingSensorManager:
                         slope, intercept, r_value, p_value, std_err = st.linregress(
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
-                    # print("傾き:{0}".format(slope))
-                    if slope < 0.1:
-                        slope = 0.1
+                    print("傾き:{0}".format(slope))
+                    if slope < 0.5:
+                        slope = 0.5
                     if slope > 3:
                         slope = 3
                     slope = 1 / slope
-                    self.slope_h = int((slope - 0.3) * (255 - 0) / (10 - 0.3))
-                    if self.slope_h > 100:
-                        self.slope_h = 100
+                    self.slope_h = int((slope - 1 / 3) * (255 - 0) / (2 - 1 / 3))
+                    if self.slope_h > 150:
+                        self.slope_h = 150
                     elif self.slope_h < 0:
                         self.slope_h = 0
             self.ser2.write(bytes([self.slope_h]))

@@ -13,7 +13,7 @@ from . import NatNetClient
 
 class OptiTrackStreamingManager:
     # ---------- Settings: Optitrack streaming address ---------- #
-    serverAddress = "192.168.1.1"               #いる?下で変わらん？
+    serverAddress = "192.168.1.1"  # いる?下で変わらん？
     localAddress = "192.168.1.2"
 
     # ---------- Variables ---------- #
