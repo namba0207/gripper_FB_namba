@@ -60,18 +60,21 @@ class BendingSensorManager:
                     self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
                 )
                 self.y_list = np.append(self.y_list, [RC.num_int - 129])
-                # データ数が10を超えたら古いデータを削除
+                # データ数が10を超えたら古いデータを削除!!!最初の数字を(0,0)にしないと最小二乗法ですべての点が同じ時に傾きがぶれやすくなる！！
                 if len(self.x_list) > 10:
-                    self.x_list = self.x_list[1:]
-                    self.y_list = self.y_list[1:]
+                    self.x_list = self.x_list[2:]
+                    self.y_list = self.y_list[2:]
+                    self.x_list = np.insert(self.x_list, 0, 0)
+                    self.y_list = np.insert(self.y_list, 0, 0)
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
                     if np.std(self.x_data) == 0:
-                        self.x_data = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
-                    slope, intercept, r_value, p_value, std_err = st.linregress(
-                        self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
-                    )
+                        pass
+                    else:
+                        slope, intercept, r_value, p_value, std_err = st.linregress(
+                            self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                        )
                     # print("傾き:{0}".format(slope))
                     if slope < 0.1:
                         slope = 0.1

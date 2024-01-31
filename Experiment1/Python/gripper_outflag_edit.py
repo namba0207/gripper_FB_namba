@@ -32,6 +32,7 @@ class Text_class:
         self.e = math.e
         self.x_list = np.array([])
         self.y_list = np.array([])
+        self.slope_h = 0
         ip = "192.168.1.199"
         print("シリアル通信開始予定")
         # self.ser1 = serial.Serial("COM8", 115200)
@@ -68,12 +69,20 @@ class Text_class:
                 j = 0
                 while j < 3:
                     if self.numlist[j] == 1:
-                        self.oshikomi[j] = random.choice((188, 220))  # 200-230
+                        self.oshikomi[j] = random.choice((188, 188))  # 200-230
                     if self.numlist[j] == 2:
-                        self.oshikomi[j] = random.choice((193, 230))  # 210-240
+                        self.oshikomi[j] = random.choice((193, 193))  # 210-240
                     if self.numlist[j] == 4:
-                        self.oshikomi[j] = random.choice((200, 240))  # 220-250
-                    self.speed[j] = random.choice((10, 20, 30))
+                        self.oshikomi[j] = random.choice((200, 200))  # 220-250
+                    self.speed[j] = random.choice((10, 10, 10))
+
+                    # if self.numlist[j] == 1:
+                    #     self.oshikomi[j] = random.choice((188, 220))  # 200-230
+                    # if self.numlist[j] == 2:
+                    #     self.oshikomi[j] = random.choice((193, 230))  # 210-240
+                    # if self.numlist[j] == 4:
+                    #     self.oshikomi[j] = random.choice((200, 240))  # 220-250
+                    # self.speed[j] = random.choice((10, 20, 30))
                     if self.oshikomi[j] == 188:
                         self.oshikomi_rec[j] = 200
                     elif self.oshikomi[j] == 193:
@@ -110,8 +119,8 @@ class Text_class:
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
         slope = 0
-        self.x_data = np.array([])
-        self.x_data = np.array([])
+        self.x_data = np.array([0])
+        self.x_data = np.array([0])
         while True:
             # 掴み始め・離し始め
             if self.flag == 0 and self.datal.loadcell_int >= 129:
@@ -121,9 +130,9 @@ class Text_class:
                 self.grippos = 0
                 self.flag = 0
             if self.flag == 0:
-                self.x_list = np.array([])
-                self.y_list = np.array([])
-                self.slope_h = int(0)
+                self.x_list = np.array([0])
+                self.y_list = np.array([0])
+                self.slope_h = 0
                 # print("hello")
             else:
                 self.x_list = np.append(
@@ -131,17 +140,22 @@ class Text_class:
                 )
                 self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
                 # データ数が10を超えたら古いデータを削除
-                # if len(self.y_list) > 10:
-                #     self.x_list = self.x_list[1:]
-                #     self.y_list = self.y_list[1:]
+                if len(self.y_list) > 10:
+                    self.x_list = self.x_list[2:]
+                    self.y_list = self.y_list[2:]
+                    self.x_list = np.insert(self.x_list, 0, 0)
+                    self.y_list = np.insert(self.y_list, 0, 0)
                 if len(self.x_list) >= 10:
                     self.x_data = np.array([self.x_list])
                     self.y_data = np.array([self.y_list])
                     if np.std(self.x_data) == 0:
-                        slope = 2.5
+                        pass
                     else:
                         slope, intercept, r_value, p_value, std_err = st.linregress(
-                            self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                            self.x_data[-1:-11:-1],
+                            self.y_data[
+                                -1:-11:-1
+                            ],  # 1個めの「-1」1番後ろの数字の座標、２個目の「‐10」は後ろから10番目の座標、3個目の「-1」は順番を反転させる
                         )
                     print("傾き:{0}".format(slope))
                     if slope < 0.1:
@@ -151,16 +165,21 @@ class Text_class:
                     slope = 1 / slope - 0.5
                     self.slope_h = int(slope * (200 - 0) / (3 - 0))
                     # print(self.num)
-                if self.slope_h > 200:
-                    self.slope_h = 200
-                elif self.slope_h < 0:
-                    self.slope_h = 0
+                    if self.slope_h > 200:
+                        self.slope_h = 200
+                    elif self.slope_h < 0:
+                        self.slope_h = 0
             # self.num_str = str(self.num + 100) + "\n"  # 100-355
             # self.ser1.write(self.num_str.encode())
-            self.ser2.write(bytes([self.slope_h]))
+            # self.ser2.write(bytes([self.slope_h]))
             # print(self.slope_h)
             # print(self.x_list, self.y_list)
-            time.sleep(0.001)
+            # print(
+            #     self.grippos,
+            #     self.arm.get_gripper_position()[1],
+            #     self.datal.loadcell_int,
+            # )
+            time.sleep(0.01)
 
     def moveloop(self):
         i = 0
