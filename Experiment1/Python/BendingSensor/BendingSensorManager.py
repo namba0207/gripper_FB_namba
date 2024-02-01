@@ -19,6 +19,7 @@ from xarm.wrapper import XArmAPI
 class BendingSensorManager:
     def __init__(self) -> None:
         self.slope_h = 0
+        self.pos2 = 0
         self.x_data = np.array([])
         self.x_data = np.array([])
         self.flag = 0
@@ -38,12 +39,13 @@ class BendingSensorManager:
             time.sleep(0.005)
 
     def sendloop2(self):
+        slope = 0
         while True:
             # 掴み始め・離し始め
-            if self.flag == 0 and RC.num_int >= 129:
+            if self.flag == 0 and RC.num_int >= 130:
                 self.grip = self.arm.get_gripper_position()[1]
                 self.flag = 1
-            elif RC.num_int < 129:
+            elif RC.num_int < 130:
                 self.grip = 0
                 self.flag = 0
             if self.flag == 0:
@@ -54,7 +56,7 @@ class BendingSensorManager:
                 self.pos2 = int(
                     (self.grip - self.arm.get_gripper_position()[1])
                     * (255 - 0)
-                    / (self.grip - 200)  # 止まるところでグリッパー閉じ切る
+                    / (280 - 200)  # 止まるところでグリッパー閉じ切る
                 )
                 self.x_list = np.append(
                     self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
@@ -76,18 +78,22 @@ class BendingSensorManager:
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
                     print("傾き:{0}".format(slope))
-                    if slope < 0.5:
+                    if slope < 0.1:
+                        pass
+                    elif slope < 0.5:
                         slope = 0.5
-                    if slope > 3:
+                    elif slope > 3:
                         slope = 3
                     slope = 1 / slope
-                    self.slope_h = int((slope - 1 / 3) * (255 - 0) / (2 - 1 / 3))
+                    self.slope_h = int((slope - 1 / 3) * (255 - 0))
                     if self.slope_h > 150:
                         self.slope_h = 150
                     elif self.slope_h < 0:
                         self.slope_h = 0
             self.ser2.write(bytes([self.slope_h]))
-            # print(self.slope_h)
+            print(self.slope_h)
+            self.pos1_str = str(RC.num_int) + "\n"
+            self.ser.write(self.pos1_str.encode())
             # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.005)
 
@@ -114,8 +120,8 @@ class BendingSensorManager:
                 )
                 if self.bendingValue_int > 400:
                     self.bendingValue_int = 400
-                elif self.bendingValue_int < 0:
-                    self.bendingValue_int = 0
+                elif self.bendingValue_int < 200:
+                    self.bendingValue_int = 200
                 self.bendingValue = self.bendingValue_int
                 # print(
                 #     self.data_parts,

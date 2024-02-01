@@ -5,23 +5,31 @@ import threading
 import time
 from random import randint
 
+import numpy as np
+
 # import numpy as np
 import serial
 from ArmWrapper1000 import ArmWrapper
 from pynput import keyboard, mouse
+from scipy import stats as st
 from xarm.wrapper import XArmAPI
 
 
 class Text_class:
     def __init__(self):
+        self.x_data = np.array([])
+        self.x_data = np.array([])
+        self.x_list = np.array([])
+        self.y_list = np.array([])
+        self.slope_h = 0
         self.grippos = 0
         self.flag = 0
         self.sample_list = [1, 2, 4]
         ip = "192.168.1.199"
-        arduino_port = "COM8"
-        baud_rate = 115200
-        self.ser = serial.Serial(arduino_port, baud_rate)
+        self.ser = serial.Serial("COM8", 115200)
         not_used = self.ser.readline()
+        self.ser2 = serial.Serial("COM7", 115200)
+        self.not_used = self.ser2.readline()
         self.arm = XArmAPI(ip)
         self.datal = ArmWrapper(True, ip)
         self.datal.loadcell_int = 127
@@ -49,7 +57,7 @@ class Text_class:
             self.num3 = randint(1, 2)
             self.numlist = random.sample(self.sample_list, 3)
             # print(self.num1, self.num2, self.num3, self.numlist)
-            with open("data0126_kaiyu2.csv", "a", newline="") as file:
+            with open("data0201chikao1.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [
@@ -61,29 +69,61 @@ class Text_class:
                 )
 
     def sendloop(self):
+        slope = 0
         while True:
             # 掴み始め・離し始め
-            if self.flag == 0 and self.datal.loadcell_int >= 129:
-                self.grippos = self.arm.get_gripper_position()[1]
+            if self.flag == 0 and self.datal.loadcell_int >= 130:
+                self.grip = self.arm.get_gripper_position()[1]
                 self.flag = 1
-            elif self.datal.loadcell_int < 129:
-                self.grippos = 0
+            elif self.datal.loadcell_int < 130:
+                self.grip = 0
                 self.flag = 0
             if self.flag == 0:
-                self.pos2 = int(0)
+                self.x_list = np.array([])
+                self.y_list = np.array([])
+                self.slope_h = 0
             else:
                 self.pos2 = int(
-                    (self.grippos - self.arm.get_gripper_position()[1])
+                    (self.grip - self.arm.get_gripper_position()[1])
                     * (255 - 0)
-                    / (self.grippos - 200)  # 止まるところでグリッパー閉じ切る
+                    / (280 - 200)  # 止まるところでグリッパー閉じ切る
                 )
-            if self.pos2 > 255:
-                self.pos2 = 255
-            elif self.pos2 < 0:
-                self.pos2 = 0
-            self.pos1_str = str(self.datal.loadcell_int) + "," + str(self.pos2) + "\n"
+                self.x_list = np.append(
+                    self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
+                )
+                self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
+                # データ数が10を超えたら古いデータを削除!!!最初の数字を(0,0)にしないと最小二乗法ですべての点が同じ時に傾きがぶれやすくなる！！
+                if len(self.x_list) > 10:
+                    self.x_list = self.x_list[2:]
+                    self.y_list = self.y_list[2:]
+                    self.x_list = np.insert(self.x_list, 0, 0)
+                    self.y_list = np.insert(self.y_list, 0, 0)
+                if len(self.x_list) >= 10:
+                    self.x_data = np.array([self.x_list])
+                    self.y_data = np.array([self.y_list])
+                    if np.std(self.x_data) == 0:
+                        pass
+                    else:
+                        slope, intercept, r_value, p_value, std_err = st.linregress(
+                            self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                        )
+                    print("傾き:{0}".format(slope))
+                    if slope < 0.1:
+                        pass
+                    elif slope < 0.5:
+                        slope = 0.5
+                    elif slope > 2.5:
+                        slope = 2.5
+                    slope = 1 / slope
+                    self.slope_h = int((slope - 1 / 2.5) * (255 - 0))
+                    if self.slope_h > 150:
+                        self.slope_h = 150
+                    elif self.slope_h < 0:
+                        self.slope_h = 0
+                    # print(self.slope_h)
+            self.ser2.write(bytes([self.slope_h]))
+            self.pos1_str = str(self.datal.loadcell_int) + "\n"
             self.ser.write(self.pos1_str.encode())
-            # self.ser.write(bytes([RC.pos1_int]))
             time.sleep(0.0005)
 
     def receiveloop(self):
@@ -103,13 +143,14 @@ class Text_class:
                 )
                 if self.bendingValue_int > 400:
                     self.bendingValue_int = 400
-                elif self.bendingValue_int < 0:
-                    self.bendingValue_int = 0
+                elif self.bendingValue_int < 200:
+                    self.bendingValue_int = 200
                 self.bendingValue = self.bendingValue_int
                 code, ret = self.arm.getset_tgpio_modbus_data(
                     self.datal.ConvertToModbusData(self.bendingValue)
                 )
-                print(self.line)
+                # time.sleep((0.00005))
+                print(self.slope_h)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 

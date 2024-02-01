@@ -197,11 +197,14 @@ class RobotControlManager:
                         position[1],
                         -position[0],
                     )
-                    transform.roll, transform.pitch, transform.yaw = (
-                        rotation[0],
-                        rotation[2],
-                        -rotation[1],
-                    )
+                    # transform.roll, transform.pitch, transform.yaw = (
+                    #     rotation[0],
+                    #     rotation[1],
+                    #     -rotation[2],
+                    # )
+
+                    transform.q = rotation
+
                     # ----- Safety check (Position) ---- #
                     diffX = transform.x - beforeX
                     diffY = transform.y - beforeY
@@ -245,11 +248,11 @@ class RobotControlManager:
                         float(self.arm.get_cgpio_analog(1)[1])
                         - float(self.init_loadcell_val)
                     ) * 1000
-                    if self.num > 200:
-                        self.num = 200
+                    if self.num > 100:
+                        self.num = 100
                     elif self.num < 0:
                         self.num = 0
-                    RC.num_int = int(self.num / (200 - 0) * (255 - 127) + 127)
+                    RC.num_int = int(self.num / (100 - 0) * (255 - 127) + 127)
                     # RC.num_int = 127
 
                     # print(
@@ -316,7 +319,10 @@ class RobotControlManager:
                             participantMotionManager.LocalRotation()
                         )
 
-                        position, rotation = caBehaviour.GetSharedTransform(
+                        (
+                            position,
+                            rotation,
+                        ) = caBehaviour.GetSharedTransform(
                             participantMotionManager.LocalPosition(),
                             participantMotionManager.LocalRotation(),
                             sharedMethod,

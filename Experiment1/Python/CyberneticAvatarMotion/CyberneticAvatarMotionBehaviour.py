@@ -200,6 +200,7 @@ class CyberneticAvatarMotionBehaviour:
         # ----- Shared transform ----- #
         sharedPosition = [0, 0, 0]
         sharedRotation_euler = [0, 0, 0]
+        sharedRotation_q = [0, 0, 0, 1]
 
         weightListDim = np.array(weight).ndim
 
@@ -208,13 +209,33 @@ class CyberneticAvatarMotionBehaviour:
                 sharedPosition += pos["participant" + str(i + 1)] * weight[i]
                 rot["participant" + str(i + 1)] = [
                     rot["participant" + str(i + 1)][2],
-                    rot["participant" + str(i + 1)][0],
                     rot["participant" + str(i + 1)][1],
+                    -rot["participant" + str(i + 1)][0],
                     rot["participant" + str(i + 1)][3],
                 ]
-                sharedRotation_euler += (
-                    self.Quaternion2Euler(rot["participant" + str(i + 1)]) * weight[i]
+
+                # print(rot["participant" + str(i + 1)])
+                # sharedRotation_euler = (
+                #     self.Quaternion2Euler(rot["participant" + str(i + 1)]) * weight[i]
+                # )
+
+                if rot["participant" + str(i + 1)][3] < 0:
+                    rot["participant" + str(i + 1)][3] = -rot[
+                        "participant" + str(i + 1)
+                    ][3]
+                q_slerp = self.Slerp_Quaternion(
+                    rot["participant" + str(i + 1)],
+                    [0, 0, 0, 1],
+                    0.5,
                 )
+
+                sharedRotation_q = np.dot(
+                    self.Convert2Matrix(q_slerp),
+                    sharedRotation_q,
+                )
+
+            # print(sharedRotation_q)
+
         elif weightListDim == 2:
             for i in range(self.participantNum):
                 # ----- Position ----- #
@@ -292,7 +313,7 @@ class CyberneticAvatarMotionBehaviour:
                 # sharedPosition += pos['participant'+str(i+1)] * weight[0][i]
                 # sharedRotation_euler += self.Quaternion2Euler(rot['participant'+str(i+1)]) * weight[1][i]
 
-        return sharedPosition, sharedRotation_euler
+        return sharedPosition, sharedRotation_q
 
     def DualArmTransform(
         self,
@@ -1075,3 +1096,38 @@ class CyberneticAvatarMotionBehaviour:
             return
 
         return dictionary
+
+    def Convert2Matrix(self, quaternion):
+        qw, qx, qy, qz = quaternion[3], quaternion[1], quaternion[2], quaternion[0]
+        matrix = np.array(
+            [
+                [qw, -qy, qx, qz],
+                [qy, qw, -qz, qx],
+                [-qx, qz, qw, qy],
+                [-qz, -qx, -qy, qw],
+            ]
+        )
+
+        return matrix
+
+    def Slerp_Quaternion(self, Quaternion, initQuaternion, weight):
+        if weight == 1:
+            return Quaternion
+
+        elif weight == 0:
+            return initQuaternion
+
+        else:
+            e = 10e-30
+            dot = np.dot(initQuaternion, Quaternion)
+            if dot > 1:
+                dot = 1
+            elif dot < -1:
+                dot = -1
+            theta = math.acos(dot)
+            # print(theta)
+            return (math.sin((1 - weight) * theta) / (math.sin(theta) + e)) * np.array(
+                initQuaternion
+            ) + (math.sin(weight * theta) / (math.sin(theta) + e)) * np.array(
+                Quaternion
+            )
