@@ -57,7 +57,7 @@ class Text_class:
             self.num3 = randint(1, 2)
             self.numlist = random.sample(self.sample_list, 3)
             # print(self.num1, self.num2, self.num3, self.numlist)
-            with open("data0201chikao1.csv", "a", newline="") as file:
+            with open("data0201chikao4.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [
