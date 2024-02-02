@@ -57,7 +57,7 @@ class Text_class:
             self.num3 = randint(1, 2)
             self.numlist = random.sample(self.sample_list, 3)
             # print(self.num1, self.num2, self.num3, self.numlist)
-            with open("data0201chikao4.csv", "a", newline="") as file:
+            with open("data0202ogura4.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [
@@ -78,16 +78,10 @@ class Text_class:
             elif self.datal.loadcell_int < 130:
                 self.grip = 0
                 self.flag = 0
-            if self.flag == 0:
                 self.x_list = np.array([])
                 self.y_list = np.array([])
                 self.slope_h = 0
-            else:
-                self.pos2 = int(
-                    (self.grip - self.arm.get_gripper_position()[1])
-                    * (255 - 0)
-                    / (280 - 200)  # 止まるところでグリッパー閉じ切る
-                )
+            if self.flag == 1:
                 self.x_list = np.append(
                     self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
                 )
@@ -108,11 +102,7 @@ class Text_class:
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
                     print("傾き:{0}".format(slope))
-                    if slope < 0.1:
-                        pass
-                    elif slope < 0.5:
-                        slope = 0.5
-                    elif slope > 2.5:
+                    if slope < 0.5 or slope > 2.5:
                         slope = 2.5
                     slope = 1 / slope
                     self.slope_h = int((slope - 1 / 2.5) * (255 - 0))
@@ -121,9 +111,14 @@ class Text_class:
                     elif self.slope_h < 0:
                         self.slope_h = 0
                     # print(self.slope_h)
-            self.ser2.write(bytes([self.slope_h]))
             self.pos1_str = str(self.datal.loadcell_int) + "\n"
             self.ser.write(self.pos1_str.encode())
+            self.ser2.write(bytes([self.slope_h]))
+            # print(
+            #     self.arm.get_gripper_position()[1],
+            #     self.datal.loadcell_int,
+            #     self.slope_h,
+            # )
             time.sleep(0.0005)
 
     def receiveloop(self):
@@ -150,7 +145,7 @@ class Text_class:
                     self.datal.ConvertToModbusData(self.bendingValue)
                 )
                 # time.sleep((0.00005))
-                print(self.slope_h)
+                # print(self.arm.get_gripper_position()[1], self.datal.loadcell_int)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 

@@ -147,14 +147,10 @@ class Text_class:
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
                     print("傾き:{0}".format(slope))
-                    if slope < 0.1:
-                        pass
-                    elif slope < 0.5:
-                        slope = 0.5
-                    elif slope > 3:
-                        slope = 3
+                    if slope < 0.2 or slope > 2.5:
+                        slope = 2.5
                     slope = 1 / slope
-                    self.slope_h = int((slope - 1 / 3) * (255 - 0))
+                    self.slope_h = int((slope - 1 / 2.5) * (255 - 0))
                     if self.slope_h > 150:
                         self.slope_h = 150
                     elif self.slope_h < 0:
