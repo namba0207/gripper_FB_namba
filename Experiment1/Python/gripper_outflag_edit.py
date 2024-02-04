@@ -18,15 +18,14 @@ from xarm.wrapper import XArmAPI
 
 class Text_class:
     def __init__(self):
+        self.num = 0
         self.recode_list = [0, 0, 0, 0, 0, 0]
         self.data1 = 0
-        self.oshikomi = [185, 190, 200]
-        self.oshikomi = [220, 230, 240]
+        self.oshikomi = [240, 240, 240]
         self.oshikomi_rec = [200, 200, 200]
         self.speed = [1, 1, 1]
         self.sample_list = [1, 2, 4]
         self.data2 = 400
-        self.num = 0
         self.grippos = 0
         self.flag = 0
         self.e = math.e
@@ -64,10 +63,17 @@ class Text_class:
                 self.num2 = randint(1, 2)
                 self.num3 = randint(1, 2)
                 self.numlist = random.sample(self.sample_list, 3)
+                # self.numlist = [1, 2, 4]
                 # print(self.num1, self.num2, self.num3, self.numlist)
                 print("保存データの確認、スタートはs,ミスしたら再起動")
                 j = 0
                 while j < 3:
+                    # if self.numlist[j] == 1:
+                    #     self.oshikomi[j] = random.choice((220, 220))  # 200-230
+                    # if self.numlist[j] == 2:
+                    #     self.oshikomi[j] = random.choice((230, 230))  # 210-240
+                    # if self.numlist[j] == 4:
+                    #     self.oshikomi[j] = random.choice((240, 240))  # 220-250
                     if self.numlist[j] == 1:
                         self.oshikomi[j] = random.choice((188, 220))  # 200-230
                     if self.numlist[j] == 2:
@@ -87,7 +93,7 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 # print(self.oshikomi, self.oshikomi_rec)
-                with open("data0201.csv", "a", newline="") as file:
+                with open("data0204turuoka2.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
@@ -111,24 +117,40 @@ class Text_class:
     # グリッパーの値をArduinoへ送る
     def sendloop(self):
         slope = 0
+        slope_recode = 0
         self.x_data = np.array([0])
         self.x_data = np.array([0])
         while True:
             # 掴み始め・離し始め
-            if self.flag == 0 and self.datal.loadcell_int >= 129:
+            if (
+                self.flag == 0
+                and self.datal.loadcell_int >= 128
+                and self.arm.get_gripper_position()[1] < 270
+            ):
                 self.grippos = self.arm.get_gripper_position()[1]
                 self.flag = 1
-            elif self.datal.loadcell_int < 129:
+            elif (
+                self.datal.loadcell_int < 129
+                or self.arm.get_gripper_position()[1] > self.grippos
+            ):
                 self.grippos = 0
                 self.flag = 0
             if self.flag == 0:
                 self.x_list = np.array([0])
                 self.y_list = np.array([0])
                 self.slope_h = 0
-                # print("hello")
+                self.num = 0
+                slope_recode = 0
             else:
+                self.num = int(
+                    (self.grippos - self.arm.get_gripper_position()[1])
+                    * (255 - 0)
+                    / (self.grippos - 200)  # 止まるところでグリッパー閉じ切る
+                )
                 self.x_list = np.append(
-                    self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
+                    self.x_list,
+                    [270 - self.arm.get_gripper_position()[1]],
+                    # self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
                 )
                 self.y_list = np.append(self.y_list, [self.datal.loadcell_int - 129])
                 # データ数が10を超えたら古いデータを削除!!!最初の数字を(0,0)にしないと最小二乗法ですべての点が同じ時に傾きがぶれやすくなる！！
@@ -146,26 +168,52 @@ class Text_class:
                         slope, intercept, r_value, p_value, std_err = st.linregress(
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
-                    print("傾き:{0}".format(slope))
-                    if slope < 0.2 or slope > 2.5:
-                        slope = 2.5
+                    print(
+                        "傾き:{0}".format(slope),
+                        self.grippos,
+                        self.datal.loadcell_int,
+                        self.arm.get_gripper_position()[1],
+                    )
+
+                    if slope < 0.2 or slope > 3:
+                        slope = 3
                     slope = 1 / slope
-                    self.slope_h = int((slope - 1 / 2.5) * (255 - 0))
-                    if self.slope_h > 150:
-                        self.slope_h = 150
+                    self.slope_h = int((slope - 1 / 3) * (255 - 0))
+                    if self.slope_h > 200:
+                        self.slope_h = 200
                     elif self.slope_h < 0:
                         self.slope_h = 0
+                # if slope > slope_recode:
+                #     slope_recode = slope
+                #     with open("data0204.csv", "a", newline="") as file:
+                #         writer = csv.writer(file)
+                #         writer.writerow(
+                #             [
+                #                 slope_recode,
+                #                 self.grippos,
+                #                 self.datal.loadcell_int,
+                #                 self.arm.get_gripper_position()[1],
+                #             ]
+                #         )
+            if self.num > 255:
+                self.num = 255
+            elif self.num < 0:
+                self.num = 0
             self.num_str = str(self.num + 100) + "\n"  # 100-355
             self.ser1.write(self.num_str.encode())
             self.ser2.write(bytes([self.slope_h]))
-            # print(self.slope_h)
-            # print(self.x_list, self.y_list)
+            # test = 0
+            # if self.arm.get_gripper_position()[1] - self.grippos != 0:
+            #     test = (self.datal.loadcell_int - 127) / (
+            #         self.grippos - self.arm.get_gripper_position()[1]
+            #     )
             # print(
             #     self.grippos,
-            #     self.arm.get_gripper_position()[1],
             #     self.datal.loadcell_int,
+            #     self.arm.get_gripper_position()[1],
             # )
-            time.sleep(0.01)
+
+            time.sleep(0.001)
 
     def moveloop(self):
         i = 0
@@ -209,8 +257,10 @@ if __name__ == "__main__":
     print("rでランダム決める")
     while True:
         try:
-            # print(111)
-            time.sleep(0.01)
+            # text_class.line = text_class.ser1.readline().decode("utf-8").rstrip()
+            # data_parts = text_class.line.split(",")
+            # print(data_parts)
+            time.sleep(0.005)
         except KeyboardInterrupt:
             print("KeyboardInterrupt Stop:text")
             break
