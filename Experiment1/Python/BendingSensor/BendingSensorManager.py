@@ -89,7 +89,7 @@ class BendingSensorManager:
                     elif self.slope_h < 0:
                         self.slope_h = 0
             self.ser2.write(bytes([self.slope_h]))
-            print(self.slope_h)
+            # print(self.slope_h)
             time.sleep(0.005)
 
     def StartReceiving(self):

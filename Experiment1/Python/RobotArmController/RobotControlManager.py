@@ -4,6 +4,7 @@
 # Summary:  Robot arm motion control manager
 # -----------------------------------------------------------------------
 
+import csv
 import time
 from ctypes import windll
 
@@ -182,6 +183,15 @@ class RobotControlManager:
                     localRotation = participantMotionManager.LocalRotation(
                         loopCount=self.loopCount
                     )
+                    print(localPosition["participant1"], localPosition["participant2"])
+
+                    # print(localPosition["participant1"], "a")
+
+                    # with open("data0206.csv", "a", newline="") as file:
+                    #     writer = csv.writer(file)
+                    #     writer.writerow(
+                    #         [time.perf_counter(), localPosition["participant1"]]
+                    #     )
 
                     weightSlider = [0.5, 0.5]
 
@@ -197,6 +207,7 @@ class RobotControlManager:
                         position[1],
                         -position[0],
                     )
+                    # print(position)
                     # transform.roll, transform.pitch, transform.yaw = (
                     #     rotation[0],
                     #     rotation[1],
