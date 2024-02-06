@@ -152,6 +152,10 @@ class RobotControlManager:
         self.init_loadcell_val = self.arm.get_cgpio_analog(1)[1]
         try:
             while True:
+                print(time.perf_counter() - taskStartTime)
+                # 60秒で強制終了
+                if time.perf_counter() - taskStartTime > 60:
+                    isMoving = False
                 if time.perf_counter() - taskStartTime > executionTime:
                     # ----- Exit processing after task time elapses ----- #
                     isMoving = False
