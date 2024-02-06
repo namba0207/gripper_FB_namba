@@ -25,18 +25,18 @@ class BendingSensorManager:
         self.flag = 0
         self.bendingValue = 400
         self.bendingValue_sub = 0
-        self.ser = serial.Serial("COM8", 115200)
+        self.ser = serial.Serial("COM6", 115200)
         self.ser2 = serial.Serial("COM7", 115200)
         self.not_used = self.ser.readline()
         self.not_used = self.ser2.readline()
         self.arm = XArmAPI("192.168.1.199")
 
-    def sendloop(self):
-        while True:
-            # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
-            self.num_str = str(RC.num_int) + "\n"
-            self.ser.write(self.num_str.encode())
-            time.sleep(0.005)
+    # def sendloop(self):
+    #     while True:
+    #         # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
+    #         self.num_str = str(RC.num_int) + "\n"
+    #         self.ser.write(self.num_str.encode())
+    #         time.sleep(0.005)
 
     def sendloop2(self):
         slope = 0
@@ -93,7 +93,7 @@ class BendingSensorManager:
             self.ser2.write(bytes([self.slope_h]))
             print(self.slope_h)
             self.pos1_str = str(RC.num_int) + "\n"
-            self.ser.write(self.pos1_str.encode())
+            # self.ser.write(self.pos1_str.encode())
             # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.005)
 
@@ -102,21 +102,16 @@ class BendingSensorManager:
         Receiving data from bending sensor and update self.bendingValue
         """
         try:
-            thr = threading.Thread(target=self.sendloop)
-            thr.setDaemon(True)
-            thr.start()
+            # thr = threading.Thread(target=self.sendloop)
+            # thr.setDaemon(True)
+            # thr.start()
             thr = threading.Thread(target=self.sendloop2)
             thr.setDaemon(True)
             thr.start()
             while True:
-                line = self.ser.readline().decode("utf-8").rstrip()
-                # # line2 = self.ser2.readline().decode("utf-8").rstrip()
-                self.data_parts = line.split(",")
+                self.line = self.ser.readline().decode("utf-8").rstrip()
                 self.bendingValue_int = int(
-                    400
-                    - int(self.data_parts[0].rstrip())
-                    / 2200
-                    * 400  # 発振するときデバイスの可動域の大きさ注意！!
+                    400 * int(self.line)  # 発振するときデバイスの可動域の大きさ注意！!
                 )
                 if self.bendingValue_int > 400:
                     self.bendingValue_int = 400
