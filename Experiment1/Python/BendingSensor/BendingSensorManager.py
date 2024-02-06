@@ -40,26 +40,29 @@ class BendingSensorManager:
 
     def sendloop2(self):
         slope = 0
+        self.x_data = np.array([0])
+        self.x_data = np.array([0])
         while True:
             # 掴み始め・離し始め
-            if self.flag == 0 and RC.num_int >= 130:
-                self.grip = self.arm.get_gripper_position()[1]
+            if (
+                self.flag == 0
+                and RC.num_int >= 128
+                and self.arm.get_gripper_position()[1] < 270
+            ):
+                self.grippos = self.arm.get_gripper_position()[1]
                 self.flag = 1
-            elif RC.num_int < 130:
-                self.grip = 0
+            elif RC.num_int < 129 or self.arm.get_gripper_position()[1] > self.grippos:
+                self.grippos = 0
                 self.flag = 0
             if self.flag == 0:
-                self.x_list = np.array([])
-                self.y_list = np.array([])
+                self.x_list = np.array([0])
+                self.y_list = np.array([0])
                 self.slope_h = 0
             else:
-                self.pos2 = int(
-                    (self.grip - self.arm.get_gripper_position()[1])
-                    * (255 - 0)
-                    / (280 - 200)  # 止まるところでグリッパー閉じ切る
-                )
                 self.x_list = np.append(
-                    self.x_list, [self.grip - self.arm.get_gripper_position()[1]]
+                    self.x_list,
+                    [270 - self.arm.get_gripper_position()[1]],
+                    # self.x_list, [self.grippos - self.arm.get_gripper_position()[1]]
                 )
                 self.y_list = np.append(self.y_list, [RC.num_int - 129])
                 # データ数が10を超えたら古いデータを削除!!!最初の数字を(0,0)にしないと最小二乗法ですべての点が同じ時に傾きがぶれやすくなる！！
@@ -77,24 +80,16 @@ class BendingSensorManager:
                         slope, intercept, r_value, p_value, std_err = st.linregress(
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
-                    print("傾き:{0}".format(slope))
-                    if slope < 0.1:
-                        pass
-                    elif slope < 0.5:
-                        slope = 0.5
-                    elif slope > 3:
+                    if slope < 0.2 or slope > 3:
                         slope = 3
                     slope = 1 / slope
                     self.slope_h = int((slope - 1 / 3) * (255 - 0))
-                    if self.slope_h > 150:
-                        self.slope_h = 150
+                    if self.slope_h > 200:
+                        self.slope_h = 200
                     elif self.slope_h < 0:
                         self.slope_h = 0
             self.ser2.write(bytes([self.slope_h]))
             print(self.slope_h)
-            self.pos1_str = str(RC.num_int) + "\n"
-            # self.ser.write(self.pos1_str.encode())
-            # self.ser.write(bytes([RC.num_int]))
             time.sleep(0.005)
 
     def StartReceiving(self):
@@ -111,8 +106,8 @@ class BendingSensorManager:
             while True:
                 self.line = self.ser.readline().decode("utf-8").rstrip()
                 self.bendingValue_int = int(
-                    400 * int(self.line)  # 発振するときデバイスの可動域の大きさ注意！!
-                )
+                    400 * float(self.line)
+                )  # 発振するときデバイスの可動域の大きさ注意！!
                 if self.bendingValue_int > 400:
                     self.bendingValue_int = 400
                 elif self.bendingValue_int < 200:
