@@ -51,7 +51,7 @@ class CenterDisplayApp(QWidget):
             # クリアしていない場合
             if (self.sum_time < 3 and self.flag !=3):
                 # flag = 1 から flag = 0のとき変換
-                if (received_number < 3000 and self.flag == 1):
+                if (received_number < 2000 and self.flag == 1):
                     self.flag = 0
                     print_str = str(received_number)+ " "+ str(int(self.sum_time))
                     self.sum_time_recode = self.sum_time
@@ -60,7 +60,7 @@ class CenterDisplayApp(QWidget):
                     self.flag = 0
                     print_str = str(received_number)+ " " + str(int(self.sum_time))
                 # flag = 0 から flag = 1のとき変換、タイマースタート
-                if (received_number >= 3000 and self.flag == 0):
+                if (received_number >= 2000 and self.flag == 0):
                     self.flag = 1
                     self.start_time_float = time.perf_counter()
                 # flag = 1 から flag = 2のとき変換、やり直し出力、カウントリセット
@@ -77,6 +77,7 @@ class CenterDisplayApp(QWidget):
             # 3秒以上キープした場合
             elif self.flag == 1:
                 self.sum_time = 0
+                self.sum_time_recode = 0
                 self.flag = 3
                 self.next_time = time.perf_counter()
 
@@ -86,10 +87,12 @@ class CenterDisplayApp(QWidget):
             if (time.perf_counter() - self.next_time > 2 and self.count < 3 and self.flag == 3):
                 self.flag = 0
                 self.count += 1
-            elif (self.count == 3 and self.flag == 3):
+            elif (time.perf_counter() - self.next_time > 2 and self.count == 3 and self.flag == 3):
+                sys.exit(app.exec_())
+            elif ( self.count == 3 and self.flag == 3):
                 print_str = "FINISH"
 
-            print(self.flag, self.next_time)
+            print(self.flag)
             self.center_label.setText(print_str)
 
 
