@@ -93,17 +93,17 @@ class Text_class:
                     self.recode_list[2 * j + 1] = self.speed[j]
                     j += 1
                 # print(self.oshikomi, self.oshikomi_rec)
-                with open("data0204turuoka2.csv", "a", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow(
-                        [
-                            self.num1,
-                            self.num2,
-                            self.num3,
-                            self.numlist,
-                            self.recode_list,
-                        ]
-                    )
+                # with open("data0204turuoka2.csv", "a", newline="") as file:
+                #     writer = csv.writer(file)
+                #     writer.writerow(
+                #         [
+                #             self.num1,
+                #             self.num2,
+                #             self.num3,
+                #             self.numlist,
+                #             self.recode_list,
+                #         ]
+                #     )
 
             if format(key.char) == "s":
                 print("thread_start")

@@ -183,15 +183,19 @@ class RobotControlManager:
                     localRotation = participantMotionManager.LocalRotation(
                         loopCount=self.loopCount
                     )
-                    print(localPosition["participant1"], localPosition["participant2"])
+                    # print(localPosition["participant1"], localPosition["participant2"])
 
                     # print(localPosition["participant1"], "a")
 
-                    # with open("data0206.csv", "a", newline="") as file:
-                    #     writer = csv.writer(file)
-                    #     writer.writerow(
-                    #         [time.perf_counter(), localPosition["participant1"]]
-                    #     )
+                    with open("data0206_3.csv", "a", newline="") as file:
+                        writer = csv.writer(file)
+                        writer.writerow(
+                            [
+                                time.perf_counter(),
+                                localPosition["participant1"],
+                                localPosition["participant2"],
+                            ]
+                        )
 
                     weightSlider = [0.5, 0.5]
 
@@ -330,15 +334,22 @@ class RobotControlManager:
                             participantMotionManager.LocalRotation()
                         )
 
-                        (
-                            position,
-                            rotation,
-                        ) = caBehaviour.GetSharedTransform(
-                            participantMotionManager.LocalPosition(),
-                            participantMotionManager.LocalRotation(),
-                            sharedMethod,
-                            0.5,
+                        position, rotation = (
+                            caBehaviour.GetSharedTransformWithCustomWeight(
+                                participantMotionManager.LocalPosition(),
+                                participantMotionManager.LocalRotation(),
+                                [0.5, 0.5],
+                            )
                         )
+                        # (
+                        #     position,
+                        #     rotation,
+                        # ) = caBehaviour.GetSharedTransform(
+                        #     participantMotionManager.LocalPosition(),
+                        #     participantMotionManager.LocalRotation(),
+                        #     sharedMethod,
+                        #     0.5,
+                        # )
                         beforeX, beforeY, beforeZ = (
                             position[2],
                             position[0],

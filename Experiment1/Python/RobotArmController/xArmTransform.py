@@ -24,7 +24,7 @@ class xArmTransform:
 
     # ----- ロボットが縦の場合、前にｘ、右にｙ、上にｚそれぞれにｒｐｙ、双腕だと回転 ----- #
     # __initX, __initY, __initZ = 520, -150, 250
-    __initX, __initY, __initZ = 520, -195, 250
+    __initX, __initY, __initZ = 500, -195, 250
     __initRoll, __initPitch, __initYaw = 90, 90, 0  # 90, 0, 0
 
     # ----- Minimum limitation ----- #
@@ -34,7 +34,7 @@ class xArmTransform:
 
     # ----- Maximum limitation ----- #
     # __maxX, __maxY, __maxZ = 550, -20, 280
-    __maxX, __maxY, __maxZ = 650, 300, 500
+    __maxX, __maxY, __maxZ = 720, 300, 500
     __maxRoll, __maxPitch, __maxYaw = 95, 180, 90  # 90, 180, 90
 
     def __init__(self):
