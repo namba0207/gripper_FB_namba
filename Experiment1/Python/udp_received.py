@@ -95,7 +95,7 @@ class CenterDisplayApp(QWidget):
 
             print(self.flag)
             self.center_label.setText(print_str)
-            with open("pressuredata0207.csv", "a", newline="") as file:
+            with open("pressuredata0207_3.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow([time.perf_counter(),received_number])
 
