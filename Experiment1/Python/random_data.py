@@ -12,7 +12,7 @@ while i < 9:
     num = random.sample(sample_list, 3)
     print(num1,num2,num3,num)
 
-    with open("data0206.csv", "a", newline="") as file:
+    with open("data0207.csv", "a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(
             [
