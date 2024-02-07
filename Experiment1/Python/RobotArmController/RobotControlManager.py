@@ -154,7 +154,7 @@ class RobotControlManager:
             while True:
                 print(time.perf_counter() - taskStartTime)
                 # 60秒で強制終了
-                if time.perf_counter() - taskStartTime > 60:
+                if time.perf_counter() - taskStartTime > 20:
                     isMoving = False
                 if time.perf_counter() - taskStartTime > executionTime:
                     # ----- Exit processing after task time elapses ----- #
@@ -191,7 +191,7 @@ class RobotControlManager:
 
                     # print(localPosition["participant1"], "a")
 
-                    with open("data0206_4.csv", "a", newline="") as file:
+                    with open("data0207_5.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow(
                             [
