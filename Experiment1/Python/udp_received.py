@@ -40,6 +40,7 @@ class CenterDisplayApp(QWidget):
         self.sum_time_recode = 0
         self.start_time = 0
         self.start_time_float = 0
+        self.finish_time = 0
         self.flag = 0
         self.flag_start = 0
         self.flag_display = 0
@@ -65,6 +66,9 @@ class CenterDisplayApp(QWidget):
                 print_str = str(received_number)+ " 0"
 
                 if self.flag_start == 1:
+                    self.finish_time = time.perf_counter()
+                    self.flag_start = 2
+                elif self.flag_start == 2:
 
                     # display用のプログラム
                     if self.flag_display == 0:
@@ -111,9 +115,14 @@ class CenterDisplayApp(QWidget):
                             print_str = "CLEAR" #+ str(self.count)
 
                         if time.perf_counter() - self.next_time > 1 and self.flag == 3:
+                            print("CLEAR")
                             sys.exit(app.exec_())
 
-                    with open("pressuredata0208_test.csv", "a", newline="") as file:
+                    if  time.perf_counter() - self.finish_time > 20:
+                        print("timeover")
+                        sys.exit(app.exec_())
+
+                    with open("pressuredata0208_yutokaiyu13.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([time.perf_counter(),received_number])
                 else:
