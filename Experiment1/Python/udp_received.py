@@ -123,7 +123,7 @@ class CenterDisplayApp(QWidget):
                         print("timeover")
                         sys.exit(app.exec_())
 
-                    with open("pressuredata0208_yutokaiyu43.csv", "a", newline="") as file:
+                    with open("pressuredata0208_nakadachikato11.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([time.perf_counter(),received_number])
                 else:
