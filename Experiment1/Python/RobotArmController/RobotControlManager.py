@@ -191,11 +191,11 @@ class RobotControlManager:
 
                     # print(localPosition["participant1"], "a")
 
-                    with open("data0207_5.csv", "a", newline="") as file:
+                    with open("xyzdata0208_test.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow(
                             [
-                                time.perf_counter(),
+                                time.perf_counter() - taskStartTime,
                                 localPosition["participant1"],
                                 localPosition["participant2"],
                             ]
