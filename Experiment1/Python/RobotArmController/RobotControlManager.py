@@ -154,7 +154,7 @@ class RobotControlManager:
             while True:
                 print(time.perf_counter() - taskStartTime)
                 # 60秒で強制終了
-                if time.perf_counter() - taskStartTime > 20:
+                if time.perf_counter() - taskStartTime > 300:
                     isMoving = False
                 if time.perf_counter() - taskStartTime > executionTime:
                     # ----- Exit processing after task time elapses ----- #
