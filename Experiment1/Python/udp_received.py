@@ -40,7 +40,7 @@ class CenterDisplayApp(QWidget):
         self.sum_time_recode = 0
         self.start_time = 0
         self.start_time_float = 0
-        self.finish_time = 0
+        # self.finish_time = 0
         self.flag = 0
         self.flag_start = 0
         self.flag_display = 0
@@ -97,7 +97,8 @@ class CenterDisplayApp(QWidget):
                             if (received_number >= 3500 or self.flag == 2):
                                 self.flag = 2
                                 print_str = "OUT"
-                                self.sum_time = 0
+                                # self.sum_time = 0
+                                sys.exit(app.exec_())
 
                             # メインの処理
                             if self.flag == 1:
@@ -122,7 +123,7 @@ class CenterDisplayApp(QWidget):
                         print("timeover")
                         sys.exit(app.exec_())
 
-                    with open("pressuredata0208_yutokaiyu33.csv", "a", newline="") as file:
+                    with open("pressuredata0208_yutokaiyu43.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([time.perf_counter(),received_number])
                 else:
