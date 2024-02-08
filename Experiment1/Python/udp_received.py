@@ -98,6 +98,7 @@ class CenterDisplayApp(QWidget):
                                 self.flag = 2
                                 print_str = "OUT"
                                 # self.sum_time = 0
+                                print("OUT")
                                 sys.exit(app.exec_())
 
                             # メインの処理
@@ -123,7 +124,7 @@ class CenterDisplayApp(QWidget):
                         print("timeover")
                         sys.exit(app.exec_())
 
-                    with open("pressuredata0208_nakadachikato11.csv", "a", newline="") as file:
+                    with open("pressuredata0208_nakadachikato13.csv", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow([time.perf_counter(),received_number])
                 else:
