@@ -126,7 +126,7 @@ class CenterDisplayApp(QWidget):
 
                     with open("pressuredata0208_nakadachikato43.csv", "a", newline="") as file:
                         writer = csv.writer(file)
-                        writer.writerow([time.perf_counter(),received_number])
+                        writer.writerow([time.perf_counter()-self.start_time,received_number])
                 else:
                     pass
                 # if (time.perf_counter() - self.next_time > 2 and self.count < 3 and self.flag == 3):
