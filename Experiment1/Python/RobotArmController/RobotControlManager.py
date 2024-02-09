@@ -192,7 +192,7 @@ class RobotControlManager:
                     # print(localPosition["participant1"], "a")
 
                     with open(
-                        "xyzdata0209=taisukekakeya43.csv", "a", newline=""
+                        "xyzdata0209shutaroutakashima13.csv", "a", newline=""
                     ) as file:
                         writer = csv.writer(file)
                         writer.writerow(
