@@ -2,11 +2,13 @@ import csv
 import sys
 import time
 
+import RobotArmController.Robotconfig_flag as RF
 from pynput import keyboard, mouse
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtNetwork import QUdpSocket
 from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from RobotArmController.RobotControlManager import RobotControlManager
 
 
 class CenterDisplayApp(QWidget):
@@ -65,6 +67,12 @@ class CenterDisplayApp(QWidget):
             received_number = int(data_list[1])
             print_str = str(received_number) + " 0"
 
+            # robotControlManager = RobotControlManager()
+            if RF.pressure_flag == 1 or self.flag_start == 1:
+                # if robotControlManager.pressure_flag == 1:
+                print("start")
+                self.flag_start = 1
+            # print(robotControlManager.pressure_flag)
             if self.flag_start == 1:
                 self.finish_time = time.perf_counter()
                 self.flag_start = 2
@@ -79,64 +87,63 @@ class CenterDisplayApp(QWidget):
                 ):
                     print_str = "START"
                 else:
-                    pass
-                    # # クリアしていない場合
-                    # if self.sum_time < 3 and self.flag != 3:
-                    #     # flag = 1 から flag = 0のとき変換
-                    #     if received_number < 2000 and self.flag == 1:
-                    #         self.flag = 0
-                    #         print_str = (
-                    #             str(received_number) + " " + str(int(self.sum_time))
-                    #         )
-                    #         self.sum_time_recode = self.sum_time
-                    #     # flag = 2 から flag = 0のときセンサ0のときflag = 0
-                    #     elif received_number == 0:
-                    #         self.flag = 0
-                    #         print_str = (
-                    #             str(received_number) + " " + str(int(self.sum_time))
-                    #         )
-                    #     # flag = 0 から flag = 1のとき変換、タイマースタート
-                    #     if received_number >= 2000 and self.flag == 0:
-                    #         self.flag = 1
-                    #         self.start_time_float = time.perf_counter()
-                    #     # flag = 1 から flag = 2のとき変換、やり直し出力、カウントリセット
-                    #     if received_number >= 3500 or self.flag == 2:
-                    #         self.flag = 2
-                    #         print_str = "OUT"
-                    #         # self.sum_time = 0
-                    #         print("OUT")
-                    #         sys.exit(app.exec_())
+                    # クリアしていない場合
+                    if self.sum_time < 3 and self.flag != 3:
+                        # flag = 1 から flag = 0のとき変換
+                        if received_number < 2000 and self.flag == 1:
+                            self.flag = 0
+                            print_str = (
+                                str(received_number) + " " + str(int(self.sum_time))
+                            )
+                            self.sum_time_recode = self.sum_time
+                        # flag = 2 から flag = 0のときセンサ0のときflag = 0
+                        elif received_number == 0:
+                            self.flag = 0
+                            print_str = (
+                                str(received_number) + " " + str(int(self.sum_time))
+                            )
+                        # flag = 0 から flag = 1のとき変換、タイマースタート
+                        if received_number >= 2000 and self.flag == 0:
+                            self.flag = 1
+                            self.start_time_float = time.perf_counter()
+                        # flag = 1 から flag = 2のとき変換、やり直し出力、カウントリセット
+                        if received_number >= 3700 or self.flag == 2:
+                            self.flag = 2
+                            print_str = "OUT"
+                            # self.sum_time = 0
+                            print("OUT")
+                            # sys.exit(app.exec_())
 
-                    #     # メインの処理
-                    #     if self.flag == 1:
-                    #         self.sum_time = (
-                    #             self.sum_time_recode
-                    #             + time.perf_counter()
-                    #             - self.start_time_float
-                    #         )
-                    #         print_str = (
-                    #             str(received_number) + " " + str(int(self.sum_time))
-                    #         )
+                        # メインの処理
+                        if self.flag == 1:
+                            self.sum_time = (
+                                self.sum_time_recode
+                                + time.perf_counter()
+                                - self.start_time_float
+                            )
+                            print_str = (
+                                str(received_number) + " " + str(int(self.sum_time))
+                            )
 
-                    # # 3秒以上キープした場合
-                    # elif self.flag == 1:
-                    #     self.sum_time = 0
-                    #     self.sum_time_recode = 0
-                    #     self.flag = 3
-                    #     self.next_time = time.perf_counter()
+                    # 3秒以上キープした場合
+                    elif self.flag == 1:
+                        self.sum_time = 0
+                        self.sum_time_recode = 0
+                        self.flag = 3
+                        self.next_time = time.perf_counter()
 
-                    # elif self.flag == 3:
-                    #     print_str = "CLEAR"  # + str(self.count)
+                    elif self.flag == 3:
+                        print_str = "CLEAR"  # + str(self.count)
 
-                    # if time.perf_counter() - self.next_time > 1 and self.flag == 3:
-                    #     print("CLEAR")
-                    #     sys.exit(app.exec_())
+                    if time.perf_counter() - self.next_time > 1 and self.flag == 3:
+                        print("CLEAR")
+                        sys.exit(app.exec_())
 
-                if time.perf_counter() - self.finish_time > 5:
+                if time.perf_counter() - self.finish_time > 20:
                     print("timeover")
                     sys.exit(app.exec_())
 
-                with open("p400.csv", "a", newline="") as file:
+                with open("p0227.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         # [time.perf_counter() - self.start_time, received_number]

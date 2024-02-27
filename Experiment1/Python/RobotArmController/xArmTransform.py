@@ -165,7 +165,7 @@ class xArmTransform:
         if isLimit:
             # pos X
             if x > self.__maxX:
-                print("limit x")
+                # print("limit x")
                 x = self.__maxX
             elif x < self.__minX:
                 x = self.__minX

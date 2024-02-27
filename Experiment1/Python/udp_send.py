@@ -25,4 +25,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         message = data.encode("utf-8")
         print(message)
         sock.sendto(message, (host, port))
-        # time.sleep(0.01)

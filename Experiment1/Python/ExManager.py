@@ -4,11 +4,42 @@
 # Summary:  Experiment manager
 # -----------------------------------------------------------------------
 
+# import threading
+# import time
 from ctypes import windll
 
+import RobotArmController.Robotconfig_flag as RF
+
+# from pynput import keyboard
 from RobotArmController.RobotControlManager import RobotControlManager
 
+# class Key_Class:
+#     def __init__(self):
+#         thr0 = threading.Thread(target=self.keyloop)
+#         thr0.setDaemon(True)
+#         thr0.start()
+#         RF.pressure_flag = 0
+
+#     def press(self, key):
+#         try:
+#             print(format(key))
+#         except KeyboardInterrupt:
+#             pass
+
+#     def keyloop(self, key):
+#         try:
+#             while True:
+#                 if format(key.char) == "s":
+#                     RF.pressure_flag = 1
+#         except KeyboardInterrupt:
+#             pass
+#             # time.sleep(0.005)
+
+
 if __name__ == "__main__":
+    # key_class = Key_Class()
+    # listener = keyboard.Listener(on_press=key_class.press)
+    # listener.start()
     robotControlManager = RobotControlManager()
     # ----- Debug mode ----- #
     robotControlManager.SendDataToRobot(

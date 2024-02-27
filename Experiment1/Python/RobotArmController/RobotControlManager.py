@@ -10,6 +10,7 @@ from ctypes import windll
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
+import RobotArmController.Robotconfig_flag as RF
 import RobotArmController.Robotconfig_pos as RP
 from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
     CyberneticAvatarMotionBehaviour,
@@ -56,6 +57,7 @@ class RobotControlManager:
         self.xArmIpAddress = "192.168.1.199"
         self.wirelessIpAddress = None
         self.num_int = 127
+        self.pressure_flag = 0
 
     def SendDataToRobot(
         self,
@@ -154,6 +156,7 @@ class RobotControlManager:
             while True:
                 print(time.perf_counter() - taskStartTime)
                 # 60秒で強制終了
+                RF.pressure_flag = 1
                 if time.perf_counter() - taskStartTime > 20:
                     isMoving = False
                 # ??
@@ -327,43 +330,40 @@ class RobotControlManager:
                             time.sleep(sleepTime)
 
                 else:
-                    keycode = input(
-                        'Input > "q": quit, "r": Clean error and init arm, "s": start control \n'
-                    )
+                    keycode = input('Input >  "s": start control \n')
                     # ----- Start streaming ----- #
-                    if keycode == "s":
-                        caBehaviour.SetOriginPosition(
-                            participantMotionManager.LocalPosition()
-                        )
-                        caBehaviour.SetInversedMatrix(
-                            participantMotionManager.LocalRotation()
-                        )
+                    #  if format(key.char) == "s"
+                    # RF.pressure_flag = 1
+                    caBehaviour.SetOriginPosition(
+                        participantMotionManager.LocalPosition()
+                    )
+                    caBehaviour.SetInversedMatrix(
+                        participantMotionManager.LocalRotation()
+                    )
 
-                        position, rotation = (
-                            caBehaviour.GetSharedTransformWithCustomWeight(
-                                participantMotionManager.LocalPosition(),
-                                participantMotionManager.LocalRotation(),
-                                [0.5, 0.5],
-                            )
-                        )
+                    position, rotation = caBehaviour.GetSharedTransformWithCustomWeight(
+                        participantMotionManager.LocalPosition(),
+                        participantMotionManager.LocalRotation(),
+                        [0.5, 0.5],
+                    )
 
-                        # (
-                        #     position,
-                        #     rotation,
-                        # ) = caBehaviour.GetSharedTransform(
-                        #     participantMotionManager.LocalPosition(),
-                        #     participantMotionManager.LocalRotation(),
-                        #     sharedMethod,
-                        #     0.5,
-                        # )
-                        beforeX, beforeY, beforeZ = (
-                            position[2],
-                            position[0],
-                            position[1],
-                        )
+                    # (
+                    #     position,
+                    #     rotation,
+                    # ) = caBehaviour.GetSharedTransform(
+                    #     participantMotionManager.LocalPosition(),
+                    #     participantMotionManager.LocalRotation(),
+                    #     sharedMethod,
+                    #     0.5,
+                    # )
+                    beforeX, beforeY, beforeZ = (
+                        position[2],
+                        position[0],
+                        position[1],
+                    )
 
-                        isMoving = True
-                        taskStartTime = time.perf_counter()
+                    isMoving = True
+                    taskStartTime = time.perf_counter()
 
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt >> Stop: RobotControlManager.SendDataToRobot()")
@@ -387,55 +387,55 @@ class RobotControlManager:
 
             traceback.print_exc()
 
-    def InitRobotArm(self, robotArm, transform, isSetInitPosition=True):  # ??
-        """
-        Initialize the xArm
+    # def InitRobotArm(self, robotArm, transform, isSetInitPosition=True):  # ??
+    #     """
+    #     Initialize the xArm
 
-        Parameters
-        ----------
-        robotArm: XArmAPI
-            XArmAPI object.
-        transform: xArmTransform
-            xArmTransform object.
-        isSetInitPosition: (Optional) bool
-            True -> Set to "INITIAL POSITION" of the xArm studio
-            False -> Set to "ZERO POSITION" of the xArm studio
-        """
+    #     Parameters
+    #     ----------
+    #     robotArm: XArmAPI
+    #         XArmAPI object.
+    #     transform: xArmTransform
+    #         xArmTransform object.
+    #     isSetInitPosition: (Optional) bool
+    #         True -> Set to "INITIAL POSITION" of the xArm studio
+    #         False -> Set to "ZERO POSITION" of the xArm studio
+    #     """
 
-        robotArm.connect()
-        robotArm.motion_enable(enable=True)
-        robotArm.set_mode(0)  # set mode: position control mode
-        robotArm.set_state(state=0)  # set state: sport state
+    #     robotArm.connect()
+    #     robotArm.motion_enable(enable=True)
+    #     robotArm.set_mode(0)  # set mode: position control mode
+    #     robotArm.set_state(state=0)  # set state: sport state
 
-        if isSetInitPosition:
-            robotArm.clean_error()
-            robotArm.clean_warn()
-            (
-                initX,
-                initY,
-                initZ,
-                initRoll,
-                initPitch,
-                initYaw,
-            ) = transform.GetInitialTransform()
-            robotArm.set_position(
-                x=initX,
-                y=initY,
-                z=initZ,
-                roll=initRoll,
-                pitch=initPitch,
-                yaw=initYaw,
-                wait=True,
-            )
-        else:
-            robotArm.reset(wait=True)
+    #     if isSetInitPosition:
+    #         robotArm.clean_error()
+    #         robotArm.clean_warn()
+    #         (
+    #             initX,
+    #             initY,
+    #             initZ,
+    #             initRoll,
+    #             initPitch,
+    #             initYaw,
+    #         ) = transform.GetInitialTransform()
+    #         robotArm.set_position(
+    #             x=initX,
+    #             y=initY,
+    #             z=initZ,
+    #             roll=initRoll,
+    #             pitch=initPitch,
+    #             yaw=initYaw,
+    #             wait=True,
+    #         )
+    #     else:
+    #         robotArm.reset(wait=True)
 
-        robotArm.motion_enable(enable=True)
-        robotArm.set_mode(1)
-        robotArm.set_state(state=0)
+    #     robotArm.motion_enable(enable=True)
+    #     robotArm.set_mode(1)
+    #     robotArm.set_state(state=0)
 
-        time.sleep(0.5)
-        print("Initialized > xArm")
+    #     time.sleep(0.5)
+    #     print("Initialized > xArm")
 
     def ConvertToModbusData(self, value: int):
         """
