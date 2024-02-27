@@ -11,7 +11,7 @@ import serial
 host = "127.0.0.1"
 port = 8888
 
-ser = serial.Serial("COM8", 115200)
+ser = serial.Serial("COM13", 115200)
 not_used = ser.readline()
 # data_parts = line.split(",")
 # bendingValue_int = int(data_parts[0].rstrip())

@@ -25,8 +25,8 @@ class BendingSensorManager:
         self.flag = 0
         self.bendingValue = 400
         self.bendingValue_sub = 0
-        self.ser = serial.Serial("COM6", 115200)
-        self.ser2 = serial.Serial("COM7", 115200)
+        self.ser = serial.Serial("COM10", 115200)  # グリッパー操作
+        self.ser2 = serial.Serial("COM7", 115200)  # 柔らかさFB
         self.not_used = self.ser.readline()
         self.not_used = self.ser2.readline()
         self.arm = XArmAPI("192.168.1.199")
