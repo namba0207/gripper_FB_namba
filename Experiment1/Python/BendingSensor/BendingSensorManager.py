@@ -26,9 +26,9 @@ class BendingSensorManager:
         self.bendingValue = 400
         self.bendingValue_sub = 0
         self.ser = serial.Serial("COM10", 115200)  # グリッパー操作
-        self.ser2 = serial.Serial("COM7", 115200)  # 柔らかさFB
+        # self.ser2 = serial.Serial("COM7", 115200)  # 柔らかさFB
         self.not_used = self.ser.readline()
-        self.not_used = self.ser2.readline()
+        # self.not_used = self.ser2.readline()
         self.arm = XArmAPI("192.168.1.199")
 
     # def sendloop(self):
@@ -88,7 +88,7 @@ class BendingSensorManager:
                         self.slope_h = 200
                     elif self.slope_h < 0:
                         self.slope_h = 0
-            self.ser2.write(bytes([self.slope_h]))
+            # self.ser2.write(bytes([self.slope_h]))
             # print(self.slope_h)
             time.sleep(0.005)
 

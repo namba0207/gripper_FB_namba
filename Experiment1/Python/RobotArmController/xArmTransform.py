@@ -28,13 +28,13 @@ class xArmTransform:
     __initRoll, __initPitch, __initYaw = 90, 90, 0  # 90, 0, 0
 
     # ----- Minimum limitation ----- #
-    __minX, __minY, __minZ = 200, -200, 0
+    __minX, __minY, __minZ = 400, -190, 0
     # __minX, __minY, __minZ = 490, -80, 220
     __minRoll, __minPitch, __minYaw = -90, 0, -90  # -90, 0, -90
 
     # ----- Maximum limitation ----- #
     # __maxX, __maxY, __maxZ = 550, -20, 280
-    __maxX, __maxY, __maxZ = 720, 300, 500
+    __maxX, __maxY, __maxZ = 650, 300, 500
     __maxRoll, __maxPitch, __maxYaw = 95, 180, 90  # 90, 180, 90
 
     def __init__(self):
@@ -151,7 +151,7 @@ class xArmTransform:
 
         euler = self.Quaternion2Euler(np.dot(self.Convert2Matrix(self.q), self.init_q))
 
-        # roll, pitch, yaw = (
+        # roll, pitch, yaw = (#??
         #     self.roll * rotMagnification + self.__initRoll,
         #     self.pitch * rotMagnification + self.__initPitch,
         #     self.yaw * rotMagnification + self.__initYaw,
@@ -165,6 +165,7 @@ class xArmTransform:
         if isLimit:
             # pos X
             if x > self.__maxX:
+                print("limit x")
                 x = self.__maxX
             elif x < self.__minX:
                 x = self.__minX

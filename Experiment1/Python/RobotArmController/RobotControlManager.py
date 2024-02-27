@@ -156,6 +156,7 @@ class RobotControlManager:
                 # 60秒で強制終了
                 if time.perf_counter() - taskStartTime > 20:
                     isMoving = False
+                # ??
                 if time.perf_counter() - taskStartTime > executionTime:
                     # ----- Exit processing after task time elapses ----- #
                     isMoving = False
@@ -189,22 +190,22 @@ class RobotControlManager:
                     )
                     # print(localPosition["participant1"], localPosition["participant2"])
 
-                    # print(localPosition["participant1"], "a")
+                    # with open("xyz0227.csv", "a", newline="") as file:
+                    #     writer = csv.writer(file)
+                    #     writer.writerow(
+                    #         [
+                    #             time.perf_counter() - taskStartTime,
+                    #             localPosition["participant1"],
+                    #             localPosition["participant2"],
+                    #         ]
+                    #     )
 
-                    with open("xyz0227.csv", "a", newline="") as file:
-                        writer = csv.writer(file)
-                        writer.writerow(
-                            [
-                                time.perf_counter() - taskStartTime,
-                                localPosition["participant1"],
-                                localPosition["participant2"],
-                            ]
-                        )
-
-                    weightSlider = [0.5, 0.5]
-
+                    # 差分取って50%50%で計算
+                    # weightSlider = [0.5, 0.5]
                     position, rotation = caBehaviour.GetSharedTransformWithCustomWeight(
-                        localPosition, localRotation, weightSlider
+                        localPosition,
+                        localRotation,
+                        [0.5, 0.5],
                     )
 
                     position = position * 1000
@@ -345,6 +346,7 @@ class RobotControlManager:
                                 [0.5, 0.5],
                             )
                         )
+
                         # (
                         #     position,
                         #     rotation,
@@ -385,7 +387,7 @@ class RobotControlManager:
 
             traceback.print_exc()
 
-    def InitRobotArm(self, robotArm, transform, isSetInitPosition=True):
+    def InitRobotArm(self, robotArm, transform, isSetInitPosition=True):  # ??
         """
         Initialize the xArm
 
@@ -480,6 +482,7 @@ class RobotControlManager:
         print("Error count\t > ", self.errorCount)
         print("------------------------")
 
+    # 初期位置移動
     def InitializeAll(self, robotArm, transform, isSetInitPosition=True):
         """
         Initialize the xArm
