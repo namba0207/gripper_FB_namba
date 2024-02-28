@@ -10,7 +10,6 @@ from ctypes import windll
 
 import numpy as np
 import RobotArmController.Robotconfig as RC
-import RobotArmController.Robotconfig_flag as RF
 import RobotArmController.Robotconfig_pos as RP
 from CyberneticAvatarMotion.CyberneticAvatarMotionBehaviour import (
     CyberneticAvatarMotionBehaviour,
@@ -156,8 +155,7 @@ class RobotControlManager:
             while True:
                 print(time.perf_counter() - taskStartTime)
                 # 60秒で強制終了
-                RF.pressure_flag = 1
-                if time.perf_counter() - taskStartTime > 20:
+                if time.perf_counter() - taskStartTime > 10:
                     isMoving = False
                 # ??
                 if time.perf_counter() - taskStartTime > executionTime:
@@ -193,15 +191,15 @@ class RobotControlManager:
                     )
                     # print(localPosition["participant1"], localPosition["participant2"])
 
-                    # with open("xyz0227.csv", "a", newline="") as file:
-                    #     writer = csv.writer(file)
-                    #     writer.writerow(
-                    #         [
-                    #             time.perf_counter() - taskStartTime,
-                    #             localPosition["participant1"],
-                    #             localPosition["participant2"],
-                    #         ]
-                    #     )
+                    with open("xyz0228yutorope.csv", "a", newline="") as file:
+                        writer = csv.writer(file)
+                        writer.writerow(
+                            [
+                                time.perf_counter() - taskStartTime,
+                                localPosition["participant1"],
+                                localPosition["participant2"],
+                            ]
+                        )
 
                     # 差分取って50%50%で計算
                     # weightSlider = [0.5, 0.5]
@@ -332,8 +330,6 @@ class RobotControlManager:
                 else:
                     keycode = input('Input >  "s": start control \n')
                     # ----- Start streaming ----- #
-                    #  if format(key.char) == "s"
-                    # RF.pressure_flag = 1
                     caBehaviour.SetOriginPosition(
                         participantMotionManager.LocalPosition()
                     )
