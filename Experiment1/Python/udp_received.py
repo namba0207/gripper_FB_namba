@@ -90,11 +90,11 @@ class CenterDisplayApp(QWidget):
                         self.flag = 3
                         print_str = "RETRY"
                         print("RETRY")
-                    elif received_number < 3800 and self.flag == 2:
+                    elif received_number < 3900 and self.flag == 2:
                         self.flag = 1
                         # self.flag_2000 = 1
                         self.start_time_float = time.perf_counter()
-                    elif received_number >= 3800 or self.flag == 2:
+                    elif received_number >= 3900 or self.flag == 2:
                         self.flag = 2
                         print_str = "OVER"
                         print("OVER")
@@ -117,7 +117,7 @@ class CenterDisplayApp(QWidget):
                         )
                         print_str = str(received_number) + " " + str(int(self.sum_time))
 
-                if time.perf_counter() - self.finish_time > 10:
+                if time.perf_counter() - self.finish_time > 7:
                     print("timeover")
                     sys.exit(app.exec_())
 
