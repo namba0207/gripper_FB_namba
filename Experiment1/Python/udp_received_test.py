@@ -67,7 +67,7 @@ class CenterDisplayApp(QWidget):
             received_number = int(
                 (0.343 * e ** (int(data_list[1]) / 500) + 152) * 9.8 / 1000
             )
-            print_str = str(received_number)
+            print_str = "TEST"
 
             if self.p_count > 1 and self.flag_start == 0:
                 print("start")
@@ -98,19 +98,19 @@ class CenterDisplayApp(QWidget):
                             print("RETRY")
                         elif int(data_list[1]) > 0 and self.flag_retry != 1:
                             self.flag_retry = 1
-                        if received_number < 10 and self.flag == 2:
-                            self.flag = 1
-                            self.start_time_float = time.perf_counter()
-                            self.sum_time = 0
+                        # if received_number < 10 and self.flag == 2:
+                        #     self.flag = 1
+                        #     self.start_time_float = time.perf_counter()
+                        #     self.sum_time = 0
                         elif received_number >= 10 or self.flag == 2:
                             self.flag = 2
-                            print_str = str(received_number) + " " + "NG"
+                            print_str = "OVERUP"
                             self.sum_time = 0
-                            print("OVER")
+                            print("OVERUP")
 
-                        if received_number < 6 and self.flag != 2 and self.flag != 3:
-                            self.flag = 0
-                            print_str = str(received_number) + " " + "NG"
+                        if received_number < 6 and self.flag == 1 or self.flag == 4:
+                            self.flag = 4
+                            print_str = "OVERDOWN"
                             self.sum_time = 0
                         # メインの処理
                         if received_number >= 6 and self.flag == 0:
