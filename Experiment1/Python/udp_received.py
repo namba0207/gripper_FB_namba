@@ -136,7 +136,11 @@ class CenterDisplayApp(QWidget):
                     writer.writerow(
                         [
                             time.perf_counter() - self.start_time,
-                            received_number,
+                            float(
+                                (0.343 * e ** (int(data_list[1]) / 500) + 152)
+                                * 9.8
+                                / 1000
+                            ),
                             self.sum_time,
                         ]
                     )
