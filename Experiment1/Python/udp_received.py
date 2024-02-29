@@ -89,7 +89,7 @@ class CenterDisplayApp(QWidget):
                 else:
                     if self.sum_time < 1:
                         if (
-                            received_number == 0
+                            int(data_list[1]) == 0
                             and self.flag_2000 == 1
                             or self.flag == 3
                         ) and self.flag != 2:
