@@ -191,7 +191,7 @@ class RobotControlManager:
                     )
                     # print(localPosition["participant1"], localPosition["participant2"])
 
-                    with open("xyz0229ts42.txt", "a", newline="") as file:
+                    with open("xyz0229ts44.txt", "a", newline="") as file:
                         writer = csv.writer(file)
                         writer.writerow(
                             [
@@ -200,7 +200,6 @@ class RobotControlManager:
                                 localPosition["participant2"],
                             ]
                         )
-
                     # 差分取って50%50%で計算
                     # weightSlider = [0.5, 0.5]
                     position, rotation = caBehaviour.GetSharedTransformWithCustomWeight(
