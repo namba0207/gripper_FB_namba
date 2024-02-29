@@ -121,7 +121,7 @@ class CenterDisplayApp(QWidget):
                     print("timeover")
                     sys.exit(app.exec_())
 
-                with open("p1000h.txt", "a", newline="") as file:
+                with open("p1000h.csv", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
