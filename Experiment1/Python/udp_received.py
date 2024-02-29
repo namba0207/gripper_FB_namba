@@ -87,7 +87,7 @@ class CenterDisplayApp(QWidget):
                 ):
                     print_str = "START"
                 else:
-                    if self.sum_time < 5:
+                    if self.sum_time < 1:
                         if (
                             received_number == 0
                             and self.flag_2000 == 1
@@ -106,12 +106,12 @@ class CenterDisplayApp(QWidget):
                             self.sum_time = 0
                             print("OVER")
 
-                        if received_number < 3 and self.flag != 2 and self.flag != 3:
+                        if received_number < 6 and self.flag != 2 and self.flag != 3:
                             self.flag = 0
                             print_str = str(received_number) + " " + "NG"
                             self.sum_time = 0
                         # メインの処理
-                        if received_number >= 3 and self.flag == 0:
+                        if received_number >= 6 and self.flag == 0:
                             self.flag = 1
                             self.flag_2000 = 1
                             self.start_time_float = time.perf_counter()
