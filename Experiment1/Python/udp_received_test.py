@@ -142,19 +142,19 @@ class CenterDisplayApp(QWidget):
                         else:
                             sys.exit(app.exec_())
 
-                with open("p0229test.txt", "a", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow(
-                        [
-                            time.perf_counter() - self.start_time,
-                            float(
-                                (0.343 * e ** (int(data_list[1]) / 500) + 152)
-                                * 9.8
-                                / 1000
-                            ),
-                            self.sum_time,
-                        ]
-                    )
+                # with open("p0229test.txt", "a", newline="") as file:
+                #     writer = csv.writer(file)
+                #     writer.writerow(
+                #         [
+                #             time.perf_counter() - self.start_time,
+                #             float(
+                #                 (0.343 * e ** (int(data_list[1]) / 500) + 152)
+                #                 * 9.8
+                #                 / 1000
+                #             ),
+                #             self.sum_time,
+                #         ]
+                #     )
             else:
                 pass
 
