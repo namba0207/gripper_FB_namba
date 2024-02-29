@@ -112,6 +112,16 @@ class CenterDisplayApp(QWidget):
                             self.flag = 4
                             print_str = "OVERDOWN"
                             self.sum_time = 0
+
+                        if (
+                            received_number < 6
+                            and self.flag != 2
+                            and self.flag != 3
+                            and self.flag != 4
+                        ):
+                            self.flag = 0
+                            print_str = str(received_number) + " " + "NG"
+                            self.sum_time = 0
                         # メインの処理
                         if received_number >= 6 and self.flag == 0:
                             self.flag = 1
