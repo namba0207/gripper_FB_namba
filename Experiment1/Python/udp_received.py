@@ -131,7 +131,7 @@ class CenterDisplayApp(QWidget):
                         else:
                             sys.exit(app.exec_())
 
-                with open("p0229yr23.txt", "a", newline="") as file:
+                with open("p0229yr26.txt", "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
