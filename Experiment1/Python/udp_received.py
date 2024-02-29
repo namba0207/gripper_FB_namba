@@ -1,4 +1,5 @@
 import csv
+import math
 import sys
 import time
 
@@ -57,13 +58,15 @@ class CenterDisplayApp(QWidget):
             pass
 
     def process_udp_datagrams(self):
-
+        e = math.e
         while self.udp_socket.hasPendingDatagrams():
             datagram, host, port = self.udp_socket.readDatagram(
                 self.udp_socket.pendingDatagramSize()
             )
             data_list = datagram.data().decode().split(",")
-            received_number = int(data_list[1])
+            received_number = int(
+                (0.343 * e ** (int(data_list[1]) / 500) + 152) * 9.8 / 1000
+            )
             print_str = str(received_number) + " 0"
 
             if self.p_count > 1 and self.flag_start == 0:
