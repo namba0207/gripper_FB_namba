@@ -193,7 +193,7 @@ class RobotControlManager:
                     # print(localPosition["participant1"], localPosition["participant2"])
 
                     with open(
-                        "xyzts" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                        "xyzso" + str(int(self.dt_time)) + ".txt", "a", newline=""
                     ) as file:
                         writer = csv.writer(file)
                         writer.writerow(

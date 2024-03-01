@@ -133,7 +133,7 @@ class CenterDisplayApp(QWidget):
                             sys.exit(app.exec_())
 
                 with open(
-                    "pts" + str(int(self.dt_time)) + ".txt",
+                    "pso" + str(int(self.dt_time)) + ".txt",
                     "a",
                     newline="",
                 ) as file:
