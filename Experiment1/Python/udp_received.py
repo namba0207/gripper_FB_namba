@@ -50,7 +50,6 @@ class CenterDisplayApp(QWidget):
         self.next_time = 0
         self.count = 1
         self.p_count = 0
-        # self.dt_now = datetime.datetime.now()
         self.dt_time = time.time()
 
     def press(self, key):

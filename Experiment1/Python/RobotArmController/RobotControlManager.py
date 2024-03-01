@@ -57,6 +57,7 @@ class RobotControlManager:
         self.wirelessIpAddress = None
         self.num_int = 127
         self.pressure_flag = 0
+        self.dt_time = time.time()
 
     def SendDataToRobot(
         self,
@@ -191,7 +192,9 @@ class RobotControlManager:
                     )
                     # print(localPosition["participant1"], localPosition["participant2"])
 
-                    with open("xyz0229ts46.txt", "a", newline="") as file:
+                    with open(
+                        "xyzts" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                    ) as file:
                         writer = csv.writer(file)
                         writer.writerow(
                             [
