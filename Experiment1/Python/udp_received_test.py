@@ -104,14 +104,14 @@ class CenterDisplayApp(QWidget):
                         #     self.sum_time = 0
                         elif received_number >= 10 or self.flag == 2:
                             self.flag = 2
-                            print_str = "OVERUP"
+                            print_str = "OVER"
                             self.sum_time = 0
-                            print("OVERUP")
+                            print("OVER")
 
-                        if received_number < 6 and self.flag == 1 or self.flag == 4:
-                            self.flag = 4
-                            print_str = "OVERDOWN"
-                            self.sum_time = 0
+                        # if received_number < 6 and self.flag == 1 or self.flag == 4:
+                        #     self.flag = 4
+                        #     print_str = "OVERDOWN"
+                        #     self.sum_time = 0
 
                         if (
                             received_number < 6
