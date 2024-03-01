@@ -1,6 +1,4 @@
 import csv
-
-# import datetime
 import math
 import sys
 import time
@@ -77,7 +75,6 @@ class CenterDisplayApp(QWidget):
                 self.flag_start = 1
             if self.flag_start == 1:
                 print("pass")
-                # self.finish_time = time.perf_counter()
                 self.flag_start = 2
             elif self.flag_start == 2:
 
@@ -136,7 +133,9 @@ class CenterDisplayApp(QWidget):
                             sys.exit(app.exec_())
 
                 with open(
-                    "pts" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                    "pts" + str(int(self.dt_time)) + ".txt",
+                    "a",
+                    newline="",
                 ) as file:
                     writer = csv.writer(file)
                     writer.writerow(
