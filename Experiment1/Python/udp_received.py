@@ -1,8 +1,9 @@
 import csv
+
+# import datetime
 import math
 import sys
 import time
-import datetime
 
 from pynput import keyboard, mouse
 from PySide6.QtCore import Qt
@@ -49,6 +50,8 @@ class CenterDisplayApp(QWidget):
         self.next_time = 0
         self.count = 1
         self.p_count = 0
+        # self.dt_now = datetime.datetime.now()
+        self.dt_time = time.time()
 
     def press(self, key):
         try:
@@ -60,7 +63,6 @@ class CenterDisplayApp(QWidget):
 
     def process_udp_datagrams(self):
         e = math.e
-        dt_now = datetime.datetime.now()
         while self.udp_socket.hasPendingDatagrams():
             datagram, host, port = self.udp_socket.readDatagram(
                 self.udp_socket.pendingDatagramSize()
@@ -134,7 +136,9 @@ class CenterDisplayApp(QWidget):
                         else:
                             sys.exit(app.exec_())
 
-                with open("pts" + str(dt_now) + ".txt", "a", newline="") as file:
+                with open(
+                    "pts" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                ) as file:
                     writer = csv.writer(file)
                     writer.writerow(
                         [
