@@ -40,6 +40,7 @@ class CenterDisplayApp(QWidget):
         self.sum_time = 0
         self.sum_time_recode = 0
         self.start_time = 0
+        self.finish_time = 0
         self.start_time_float = 0
         self.flag = 0
         self.flag_start = 0
@@ -74,7 +75,6 @@ class CenterDisplayApp(QWidget):
                 self.flag_start = 1
             if self.flag_start == 1:
                 print("pass")
-                # self.finish_time = time.perf_counter()
                 self.flag_start = 2
             elif self.flag_start == 2:
 
@@ -96,22 +96,34 @@ class CenterDisplayApp(QWidget):
                             self.flag = 3
                             print_str = "RETRY"
                             print("RETRY")
+                            if self.flag_display == 1:
+                                self.flag_display = 2
+                                self.finish_time = time.perf_counter()
+                            elif (
+                                time.perf_counter() - self.finish_time < 1
+                                and self.flag_display == 2
+                            ):
+                                print_str = "RETRY"
+                            else:
+                                sys.exit(app.exec_())
                         elif int(data_list[1]) > 0 and self.flag_retry != 1:
                             self.flag_retry = 1
-                        # if received_number < 10 and self.flag == 2:
-                        #     self.flag = 1
-                        #     self.start_time_float = time.perf_counter()
-                        #     self.sum_time = 0
+
                         elif received_number >= 10 or self.flag == 2:
                             self.flag = 2
                             print_str = "OVER"
                             self.sum_time = 0
                             print("OVER")
-
-                        # if received_number < 6 and self.flag == 1 or self.flag == 4:
-                        #     self.flag = 4
-                        #     print_str = "OVERDOWN"
-                        #     self.sum_time = 0
+                            if self.flag_display == 1:
+                                self.flag_display = 2
+                                self.finish_time = time.perf_counter()
+                            elif (
+                                time.perf_counter() - self.finish_time < 1
+                                and self.flag_display == 2
+                            ):
+                                print_str = "OVER"
+                            else:
+                                sys.exit(app.exec_())
 
                         if (
                             received_number < 6
@@ -133,9 +145,9 @@ class CenterDisplayApp(QWidget):
                         print("CLEAR")
                         if self.flag_display == 1:
                             self.flag_display = 2
-                            self.clear_time = time.perf_counter()
+                            self.finish_time = time.perf_counter()
                         elif (
-                            time.perf_counter() - self.clear_time < 1
+                            time.perf_counter() - self.finish_time < 1
                             and self.flag_display == 2
                         ):
                             print_str = "CLEAR"
