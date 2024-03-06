@@ -192,17 +192,17 @@ class RobotControlManager:
                     )
                     # print(localPosition["participant1"], localPosition["participant2"])
 
-                    with open(
-                        "xyzsh" + str(int(self.dt_time)) + ".txt", "a", newline=""
-                    ) as file:
-                        writer = csv.writer(file)
-                        writer.writerow(
-                            [
-                                time.perf_counter() - taskStartTime,
-                                localPosition["participant1"],
-                                localPosition["participant2"],
-                            ]
-                        )
+                    # with open(
+                    #     "xyztest" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                    # ) as file:
+                    #     writer = csv.writer(file)
+                    #     writer.writerow(
+                    #         [
+                    #             time.perf_counter() - taskStartTime,
+                    #             localPosition["participant1"],
+                    #             localPosition["participant2"],
+                    #         ]
+                    #     )
                     # 差分取って50%50%で計算
                     # weightSlider = [0.5, 0.5]
                     position, rotation = caBehaviour.GetSharedTransformWithCustomWeight(

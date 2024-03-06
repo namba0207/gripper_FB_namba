@@ -49,24 +49,23 @@ class Text_class:
         thr1.setDaemon(True)
         thr1.start()
 
-    def press(self, key):
-        print("アルファベット {0} が押されました".format(key.char))
-        if format(key.char) == "r":
-            self.num1 = randint(1, 2)
-            self.num2 = randint(1, 2)
-            self.num3 = randint(1, 2)
-            self.numlist = random.sample(self.sample_list, 3)
-            # print(self.num1, self.num2, self.num3, self.numlist)
-            with open("data0202ogura4.csv", "a", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerow(
-                    [
-                        self.num1,
-                        self.num2,
-                        self.num3,
-                        self.numlist,
-                    ]
-                )
+    # def press(self, key):
+    #     print("アルファベット {0} が押されました".format(key.char))
+    #     if format(key.char) == "r":
+    #         self.num1 = randint(1, 2)
+    #         self.num2 = randint(1, 2)
+    #         self.num3 = randint(1, 2)
+    #         self.numlist = random.sample(self.sample_list, 3)
+    #         with open("0306test11.txt", "a", newline="") as file:
+    #             writer = csv.writer(file)
+    #             writer.writerow(
+    #                 [
+    #                     self.num1,
+    #                     self.num2,
+    #                     self.num3,
+    #                     self.numlist,
+    #                 ]
+    #             )
 
     def sendloop(self):
         slope = 0
@@ -114,11 +113,6 @@ class Text_class:
             self.pos1_str = str(self.datal.loadcell_int) + "\n"
             self.ser.write(self.pos1_str.encode())
             self.ser2.write(bytes([self.slope_h]))
-            # print(
-            #     self.arm.get_gripper_position()[1],
-            #     self.datal.loadcell_int,
-            #     self.slope_h,
-            # )
             time.sleep(0.0005)
 
     def receiveloop(self):
@@ -144,16 +138,14 @@ class Text_class:
                 code, ret = self.arm.getset_tgpio_modbus_data(
                     self.datal.ConvertToModbusData(self.bendingValue)
                 )
-                # time.sleep((0.00005))
-                # print(self.arm.get_gripper_position()[1], self.datal.loadcell_int)
         except KeyboardInterrupt:
             print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
 
 if __name__ == "__main__":
     text_class = Text_class()
-    listener = keyboard.Listener(on_press=text_class.press)
-    listener.start()
+    # listener = keyboard.Listener(on_press=text_class.press)
+    # listener.start()
     while True:
         try:
             # pass
