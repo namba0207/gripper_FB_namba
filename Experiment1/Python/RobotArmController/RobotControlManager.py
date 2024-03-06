@@ -193,7 +193,7 @@ class RobotControlManager:
                     # print(localPosition["participant1"], localPosition["participant2"])
 
                     with open(
-                        "xyzso" + str(int(self.dt_time)) + ".txt", "a", newline=""
+                        "xyzsh" + str(int(self.dt_time)) + ".txt", "a", newline=""
                     ) as file:
                         writer = csv.writer(file)
                         writer.writerow(
@@ -219,12 +219,6 @@ class RobotControlManager:
                         position[1],
                         -position[0],
                     )
-                    # print(position)
-                    # transform.roll, transform.pitch, transform.yaw = (
-                    #     rotation[0],
-                    #     rotation[1],
-                    #     -rotation[2],
-                    # )
 
                     transform.q = rotation
 
@@ -276,15 +270,6 @@ class RobotControlManager:
                     elif self.num < 0:
                         self.num = 0
                     RC.num_int = int(self.num / (100 - 0) * (255 - 127) + 127)
-                    # RC.num_int = 127
-
-                    # print(
-                    #     (
-                    #         float(self.arm.get_cgpio_analog(1)[1])
-                    #         - float(self.init_loadcell_val)
-                    #     )
-                    #     * 1000
-                    # )
 
                     # ----- If xArm error has occured ----- #
                     if isEnablexArm and self.arm.has_err_warn:
