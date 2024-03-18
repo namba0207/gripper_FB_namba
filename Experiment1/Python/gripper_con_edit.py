@@ -41,31 +41,12 @@ class Text_class:
         self.arm.motion_enable(True)
         self.arm.set_mode(0)
         self.arm.set_state(0)
-
         thr0 = threading.Thread(target=self.sendloop)
         thr0.setDaemon(True)
         thr0.start()
-        thr1 = threading.Thread(target=self.receiveloop)
-        thr1.setDaemon(True)
-        thr1.start()
-
-    # def press(self, key):
-    #     print("アルファベット {0} が押されました".format(key.char))
-    #     if format(key.char) == "r":
-    #         self.num1 = randint(1, 2)
-    #         self.num2 = randint(1, 2)
-    #         self.num3 = randint(1, 2)
-    #         self.numlist = random.sample(self.sample_list, 3)
-    #         with open("0306test11.txt", "a", newline="") as file:
-    #             writer = csv.writer(file)
-    #             writer.writerow(
-    #                 [
-    #                     self.num1,
-    #                     self.num2,
-    #                     self.num3,
-    #                     self.numlist,
-    #                 ]
-    #             )
+        # thr1 = threading.Thread(target=self.receiveloop)
+        # thr1.setDaemon(True)
+        # thr1.start()
 
     def sendloop(self):
         slope = 0
@@ -100,56 +81,55 @@ class Text_class:
                         slope, intercept, r_value, p_value, std_err = st.linregress(
                             self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
                         )
-                    print("傾き:{0}".format(slope))
-                    if slope < 0.5 or slope > 2.5:
-                        slope = 2.5
+                    # print("傾き:{0}".format(slope))
+                    if slope < 0.2 or slope > 3:
+                        slope = 3
                     slope = 1 / slope
-                    self.slope_h = int((slope - 1 / 2.5) * (255 - 0))
-                    if self.slope_h > 150:
-                        self.slope_h = 150
+                    self.slope_h = int((slope - 1 / 3) * (255 - 0))
+                    if self.slope_h > 200:
+                        self.slope_h = 200
                     elif self.slope_h < 0:
                         self.slope_h = 0
-                    # print(self.slope_h)
-            self.pos1_str = str(self.datal.loadcell_int) + "\n"
-            self.ser.write(self.pos1_str.encode())
+            # self.pos1_str = str(self.datal.loadcell_int) + "\n"
+            # self.ser.write(self.pos1_str.encode())
             self.ser2.write(bytes([self.slope_h]))
             time.sleep(0.0005)
 
-    def receiveloop(self):
-        """
-        Receiving data from bending sensor and update self.bendingValue
-        """
-        try:
-            self.pretime = time.perf_counter()
-            while True:
-                self.line = self.ser.readline().decode("utf-8").rstrip()
-                self.data_parts = self.line.split(",")
-                self.bendingValue_int = int(
-                    400
-                    - int(self.data_parts[0].rstrip())
-                    / 2200
-                    * 400  # 発振するときデバイスの可動域の大きさ注意！!
-                )
-                if self.bendingValue_int > 400:
-                    self.bendingValue_int = 400
-                elif self.bendingValue_int < 200:
-                    self.bendingValue_int = 200
-                self.bendingValue = self.bendingValue_int
-                code, ret = self.arm.getset_tgpio_modbus_data(
-                    self.datal.ConvertToModbusData(self.bendingValue)
-                )
-        except KeyboardInterrupt:
-            print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
+    # def receiveloop(self):
+    #     """
+    #     Receiving data from bending sensor and update self.bendingValue
+    #     """
+    #     try:
+    #         self.pretime = time.perf_counter()
+    #         while True:
+    #             self.line = self.ser.readline().decode("utf-8").rstrip()
+    #             self.data_parts = self.line.split(",")
+    #             self.bendingValue_int = int(
+    #                 400
+    #                 - int(self.data_parts[0].rstrip())
+    #                 / 2200
+    #                 * 400  # 発振するときデバイスの可動域の大きさ注意！!
+    #             )
+    #             if self.bendingValue_int > 400:
+    #                 self.bendingValue_int = 400
+    #             elif self.bendingValue_int < 200:
+    #                 self.bendingValue_int = 200
+    #             self.bendingValue = self.bendingValue_int
+    #             code, ret = self.arm.getset_tgpio_modbus_data(
+    #                 self.datal.ConvertToModbusData(self.bendingValue)
+    #             )
+    #     except KeyboardInterrupt:
+    #         print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
 
 
-if __name__ == "__main__":
-    text_class = Text_class()
-    # listener = keyboard.Listener(on_press=text_class.press)
-    # listener.start()
-    while True:
-        try:
-            # pass
-            time.sleep(0.01)
-        except KeyboardInterrupt:
-            print("KeyboardInterrupt Stop:text")
-            break
+# if __name__ == "__main__":
+#     text_class = Text_class()
+#     # listener = keyboard.Listener(on_press=text_class.press)
+#     # listener.start()
+#     while True:
+#         try:
+#             # pass
+#             time.sleep(0.01)
+#         except KeyboardInterrupt:
+#             print("KeyboardInterrupt Stop:text")
+#             break
