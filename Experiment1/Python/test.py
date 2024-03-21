@@ -1,151 +1,113 @@
-import csv
-import sys
+# -----------------------------------------------------------------------
+# Author:   Takumi Katagiri (Nagoya Institute of Technology), Takayoshi Hagiwara (KMD)
+# Created:  2021
+# Summary:  曲げセンサからのデータ取得用マネージャー
+# -----------------------------------------------------------------------
+
+import threading
 import time
 
-from pynput import keyboard, mouse
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
-from PySide6.QtNetwork import QUdpSocket
-from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+import numpy as np
+import RobotArmController.Robotconfig as RC
+import RobotArmController.Robotconfig_pos as RP
+import RobotArmController.Robotconfig_vib as RV
+import serial
+from scipy import stats as st
+from xarm.wrapper import XArmAPI
 
 
-class CenterDisplayApp(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        # ウィンドウの初期設定
-        self.setWindowTitle("UDP Communication App")
-        self.setGeometry(100, 100, 600, 400)
-
-        # レイアウトの設定
-        main_layout = QVBoxLayout(self)
-
-        # 中央のウィジェット
-        self.center_label = QLabel("-", alignment=Qt.AlignCenter)
-        main_layout.addWidget(self.center_label)
-
-        # UDP通信用の設定
-        self.udp_socket = QUdpSocket(self)
-        self.udp_socket.bind(8888)  # ポート番号を8888に変更
-
-        # UDPデータ受信時の処理を設定
-        self.udp_socket.readyRead.connect(self.process_udp_datagrams)
-
-        # フォントサイズを大きくする
-        font = QFont()
-        font.setPointSize(400)  # フォントサイズを300に設定
-        self.center_label.setFont(font)
-
-        self.sum_time = 0
-        self.start_time = 0
-        self.start_time_float = 0
+class BendingSensorManager:
+    def __init__(self) -> None:
+        self.slope_h = 0
+        self.pos2 = 0
+        self.x_data = np.array([0])
+        self.x_data = np.array([0])
         self.flag = 0
-        self.flag_start = 0
-        self.flag_display = 0
-        self.flag_2000 = 0
-        self.next_time = 0
-        self.count = 1
-        self.p_count = 0
+        self.bendingValue = 400
+        self.bendingValue_sub = 0
+        self.ser = serial.Serial("COM10", 115200)  # グリッパー操作
+        self.ser2 = serial.Serial("COM7", 115200)  # 柔らかさFB
+        self.not_used = self.ser.readline()
+        self.not_used = self.ser2.readline()
+        self.arm = XArmAPI("192.168.1.199")
 
-    def press(self, key):
-        try:
-            if format(key) == "Key.enter":
-                print("enter")
-                self.p_count += 1
-        except AttributeError:
-            pass
+    # def sendloop(self):
+    #     while True:
+    #         # self.num_str = str(RC.num_int) + "," + str(self.pos2) + "\n"
+    #         self.num_str = str(RC.num_int) + "\n"
+    #         self.ser.write(self.num_str.encode())
+    #         time.sleep(0.005)
 
-    def process_udp_datagrams(self):
+    def sendloop2(self):
+        slope = 0
+        while True:
+            # 掴み始め・離し始め
+            if (
+                self.flag == 0
+                and RC.num_int >= 128
+                # and self.arm.get_gripper_position()[1] < 270
+            ):
+                self.grippos = self.arm.get_gripper_position()[1]
+                self.flag = 1
+            elif RC.num_int < 128 or self.arm.get_gripper_position()[1] > self.grippos:
+                self.grippos = 0
+                self.flag = 0
 
-        while self.udp_socket.hasPendingDatagrams():
-            datagram, host, port = self.udp_socket.readDatagram(
-                self.udp_socket.pendingDatagramSize()
-            )
-            data_list = datagram.data().decode().split(",")
-            received_number = int(data_list[1])
-            print_str = str(received_number) + " 0"
-
-            if self.p_count > 1 and self.flag_start == 0:
-                print("start")
-                self.flag_start = 1
-            if self.flag_start == 1:
-                print("pass")
-                # self.finish_time = time.perf_counter()
-                self.flag_start = 2
-            elif self.flag_start == 2:
-
-                # display用のプログラム
-                if self.flag_display == 0:
-                    self.flag_display = 1
-                    self.start_time = time.perf_counter()
-                elif (
-                    time.perf_counter() - self.start_time < 1 and self.flag_display == 1
-                ):
-                    print_str = "START"
-                else:
-                    if self.sum_time < 1:
-                        if (
-                            received_number == 0 and self.flag_2000 == 1 or self.flag == 3
-                        ) and self.flag != 2:
-                            self.flag = 3
-                            print_str = "RETRY"
-                            print("RETRY")
-                        elif received_number < 3900 and self.flag == 2:
-                            self.flag = 1
-                            # self.start_time_float = time.perf_counter()
-                        elif received_number >= 3900 or self.flag == 2:
-                            self.flag = 2
-                            print_str = str(received_number) + " " + "NG"
-                            self.sum_time = 0
-                            print("OVER")
-
-                        if received_number < 3000 and self.flag != 2 and self.flag != 3:
-                            self.flag = 0
-                            print_str = str(received_number) + " " + "NG"
-                            self.sum_time = 0
-                        # メインの処理
-                        if received_number >= 3000 and self.flag == 0:
-                            self.flag = 1
-                            self.flag_2000 = 1
-                            self.start_time_float = time.perf_counter()
-                        if self.flag == 1:
-                            self.sum_time = (
-                                time.perf_counter()
-                                - self.start_time_float
-                            )
-                            print_str = str(received_number) + " " + "OK"
-                    else:
-                        print("CLEAR")
-                        if self.flag_display == 1:
-                            self.flag_display = 2
-                            self.clear_time = time.perf_counter()
-                        elif (
-                            time.perf_counter() - self.clear_time < 1 and self.flag_display == 2
-                        ):
-                            print_str = "CLEAR"
-                        else:
-                            sys.exit(app.exec_())
-
-                with open("p0228yr.txt", "a", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow(
-                        [
-                            time.perf_counter() - self.start_time,
-                            received_number,
-                            self.sum_time,
-                        ]
-                    )
+            if self.flag == 0:
+                self.x_list = np.array([0])
+                self.y_list = np.array([0])
+                self.slope_h = 0
             else:
-                pass
+                self.x_list = np.append(
+                    # self.x_list,
+                    # [270 - self.arm.get_gripper_position()[1]],
+                    self.x_list,
+                    [self.grippos - self.arm.get_gripper_position()[1]],
+                )
+                self.y_list = np.append(self.y_list, [RC.num_int - 128])
+                # データ数が10を超えたら古いデータを削除!!!最初の数字を(0,0)にしないと最小二乗法ですべての点が同じ時に傾きがぶれやすくなる！！
+                if len(self.x_list) > 10:
+                    self.x_list = self.x_list[2:]
+                    self.y_list = self.y_list[2:]
+                    self.x_list = np.insert(self.x_list, 0, 0)
+                    self.y_list = np.insert(self.y_list, 0, 0)
+                if len(self.x_list) >= 10:
+                    self.x_data = np.array([self.x_list])
+                    self.y_data = np.array([self.y_list])
+                    if np.std(self.x_data) == 0:
+                        pass
+                    else:
+                        slope, intercept, r_value, p_value, std_err = (
+                            st.linregress(  # 最小二乗法
+                                self.x_data[-1:-11:-1], self.y_data[-1:-11:-1]
+                            )
+                        )
+                    if slope < 0.2 or slope > 3:
+                        slope = 3
+                    slope = 1 / slope
+                    self.slope_h = int((slope - 1 / 3) * (255 - 0))
+                    if self.slope_h > 200:
+                        self.slope_h = 200
+                    elif self.slope_h < 0:
+                        self.slope_h = 0
+            self.ser2.write(bytes([self.slope_h]))
+            time.sleep(0.005)
 
-            print(self.flag, self.next_time)
-            self.center_label.setText(print_str)
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = CenterDisplayApp()
-    listener = keyboard.Listener(on_press=window.press)
-    listener.start()
-    window.show()
-    sys.exit(app.exec_())
+    def StartReceiving(self):
+        """
+        Receiving data from bending sensor and update self.bendingValue
+        """
+        try:
+            thr = threading.Thread(target=self.sendloop2)
+            thr.setDaemon(True)
+            thr.start()
+            while True:
+                self.line = self.ser.readline().decode("utf-8").rstrip()
+                self.bendingValue_int = int(400 * float(self.line))
+                if self.bendingValue_int > 400:
+                    self.bendingValue_int = 400
+                elif self.bendingValue_int < 200:
+                    self.bendingValue_int = 200
+                self.bendingValue = self.bendingValue_int
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt >> Stop: BendingSensorManager.py")

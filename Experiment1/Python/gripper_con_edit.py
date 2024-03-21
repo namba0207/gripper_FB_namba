@@ -3,11 +3,11 @@ import threading
 import time
 
 import numpy as np
-
 import serial
 from ArmWrapper1000 import ArmWrapper
 from scipy import stats as st
 from xarm.wrapper import XArmAPI
+
 
 class Text_class:
     def __init__(self):
@@ -20,9 +20,9 @@ class Text_class:
         self.flag = 0
         self.sample_list = [1, 2, 4]
         ip = "192.168.1.199"
-        self.ser = serial.Serial("COM8", 115200)
-        not_used = self.ser.readline()
-        self.ser2 = serial.Serial("COM7", 115200)
+        # self.ser = serial.Serial("COM8", 115200)
+        # not_used = self.ser.readline()
+        self.ser2 = serial.Serial("COM12", 115200)
         self.not_used = self.ser2.readline()
         self.arm = XArmAPI(ip)
         self.datal = ArmWrapper(True, ip)
@@ -82,3 +82,42 @@ class Text_class:
                         self.slope_h = 0
             self.ser2.write(bytes([self.slope_h]))
             time.sleep(0.0005)
+
+    def receiveloop(self):
+        """
+        Receiving data from bending sensor and update self.bendingValue
+        """
+        try:
+            self.pretime = time.perf_counter()
+            while True:
+                self.line = self.ser.readline().decode("utf-8").rstrip()
+                self.data_parts = self.line.split(",")
+                self.bendingValue_int = int(
+                    400
+                    - int(self.data_parts[0].rstrip())
+                    / 2200
+                    * 400  # 発振するときデバイスの可動域の大きさ注意！!
+                )
+                if self.bendingValue_int > 400:
+                    self.bendingValue_int = 400
+                elif self.bendingValue_int < 200:
+                    self.bendingValue_int = 200
+                self.bendingValue = self.bendingValue_int
+                code, ret = self.arm.getset_tgpio_modbus_data(
+                    self.datal.ConvertToModbusData(self.bendingValue)
+                )
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt >> Stop: BendingSensorManager.py")
+
+
+if __name__ == "__main__":
+    text_class = Text_class()
+    # listener = keyboard.Listener(on_press=text_class.press)
+    # listener.start()
+    while True:
+        try:
+            # pass
+            time.sleep(0.01)
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt Stop:text")
+            break
